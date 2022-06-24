@@ -1,0 +1,16 @@
+msdosfs_syms.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/msdos_fs.h \
+   /linux/linux-2.0.x/include/linux/symtab_begin.h \
+   /linux/linux-2.0.x/include/linux/symtab_end.h
+namei.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/msdos_fs.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   ../fat/msbuffer.h

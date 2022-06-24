@@ -1,0 +1,41 @@
+autofs_i.h: \
+   /linux/linux-2.0.x/include/linux/auto_fs.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/wait.h \
+   /linux/linux-2.0.x/include/asm/segment.h
+	@touch autofs_i.h
+dir.o: \
+   autofs_i.h
+dirhash.o: \
+   autofs_i.h
+init.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   autofs_i.h
+inode.o: \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/file.h \
+   /linux/linux-2.0.x/include/linux/locks.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   autofs_i.h \
+   /linux/linux-2.0.x/include/linux/module.h
+root.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/param.h \
+   autofs_i.h
+symlink.o: \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   autofs_i.h
+waitq.o: \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/file.h \
+   autofs_i.h
+.PRECIOUS:	autofs_i.h \
+

@@ -1,0 +1,2 @@
+mount -t proc proc /proc
+rm -rf /var/tmp/*

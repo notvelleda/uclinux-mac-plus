@@ -1,0 +1,229 @@
+af_rose.o:  \
+   $(wildcard /linux/linux-2.0.x/include/config/rose.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/rose/module.h) \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/socket.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/sockios.h \
+   /linux/linux-2.0.x/include/linux/net.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/net/ax25.h \
+   /linux/linux-2.0.x/include/linux/inet.h \
+   /linux/linux-2.0.x/include/linux/netdevice.h \
+   /linux/linux-2.0.x/include/linux/if_arp.h \
+   /linux/linux-2.0.x/include/linux/skbuff.h \
+   /linux/linux-2.0.x/include/net/sock.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/termios.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/notifier.h \
+   /linux/linux-2.0.x/include/net/rose.h \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   /linux/linux-2.0.x/include/net/ip.h \
+   /linux/linux-2.0.x/include/net/arp.h \
+   /linux/linux-2.0.x/include/linux/if_arp.h \
+   $(wildcard /linux/linux-2.0.x/include/config/proc/fs.h)
+rose_dev.o:  \
+   $(wildcard /linux/linux-2.0.x/include/config/rose.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/rose/module.h) \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/socket.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/linux/if_ether.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/linux/inet.h \
+   /linux/linux-2.0.x/include/linux/netdevice.h \
+   /linux/linux-2.0.x/include/linux/etherdevice.h \
+   /linux/linux-2.0.x/include/linux/if_arp.h \
+   /linux/linux-2.0.x/include/linux/skbuff.h \
+   /linux/linux-2.0.x/include/net/ip.h \
+   /linux/linux-2.0.x/include/net/arp.h \
+   /linux/linux-2.0.x/include/net/ax25.h \
+   /linux/linux-2.0.x/include/net/rose.h \
+   $(wildcard /linux/linux-2.0.x/include/config/inet.h)
+rose_in.o:  \
+   $(wildcard /linux/linux-2.0.x/include/config/rose.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/rose/module.h) \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/socket.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/sockios.h \
+   /linux/linux-2.0.x/include/linux/net.h \
+   /linux/linux-2.0.x/include/net/ax25.h \
+   /linux/linux-2.0.x/include/linux/inet.h \
+   /linux/linux-2.0.x/include/linux/netdevice.h \
+   /linux/linux-2.0.x/include/linux/skbuff.h \
+   /linux/linux-2.0.x/include/net/sock.h \
+   /linux/linux-2.0.x/include/net/ip.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/net/rose.h
+rose_link.o:  \
+   $(wildcard /linux/linux-2.0.x/include/config/rose.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/rose/module.h) \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/socket.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/sockios.h \
+   /linux/linux-2.0.x/include/linux/net.h \
+   /linux/linux-2.0.x/include/net/ax25.h \
+   /linux/linux-2.0.x/include/linux/inet.h \
+   /linux/linux-2.0.x/include/linux/netdevice.h \
+   /linux/linux-2.0.x/include/linux/skbuff.h \
+   /linux/linux-2.0.x/include/net/sock.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/firewall.h \
+   /linux/linux-2.0.x/include/net/rose.h \
+   $(wildcard /linux/linux-2.0.x/include/config/firewall.h)
+rose_loopback.o:  \
+   $(wildcard /linux/linux-2.0.x/include/config/rose.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/rose/module.h) \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/socket.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/net/ax25.h \
+   /linux/linux-2.0.x/include/linux/skbuff.h \
+   /linux/linux-2.0.x/include/net/rose.h
+rose_out.o:  \
+   $(wildcard /linux/linux-2.0.x/include/config/rose.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/rose/module.h) \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/socket.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/sockios.h \
+   /linux/linux-2.0.x/include/linux/net.h \
+   /linux/linux-2.0.x/include/net/ax25.h \
+   /linux/linux-2.0.x/include/linux/inet.h \
+   /linux/linux-2.0.x/include/linux/netdevice.h \
+   /linux/linux-2.0.x/include/linux/skbuff.h \
+   /linux/linux-2.0.x/include/net/sock.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/net/rose.h
+rose_route.o:  \
+   $(wildcard /linux/linux-2.0.x/include/config/rose.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/rose/module.h) \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/socket.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/sockios.h \
+   /linux/linux-2.0.x/include/linux/net.h \
+   /linux/linux-2.0.x/include/net/ax25.h \
+   /linux/linux-2.0.x/include/linux/inet.h \
+   /linux/linux-2.0.x/include/linux/netdevice.h \
+   /linux/linux-2.0.x/include/net/arp.h \
+   /linux/linux-2.0.x/include/linux/if_arp.h \
+   /linux/linux-2.0.x/include/linux/skbuff.h \
+   /linux/linux-2.0.x/include/net/sock.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/termios.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/notifier.h \
+   /linux/linux-2.0.x/include/linux/firewall.h \
+   /linux/linux-2.0.x/include/net/rose.h \
+   $(wildcard /linux/linux-2.0.x/include/config/firewall.h)
+rose_subr.o:  \
+   $(wildcard /linux/linux-2.0.x/include/config/rose.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/rose/module.h) \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/socket.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/sockios.h \
+   /linux/linux-2.0.x/include/linux/net.h \
+   /linux/linux-2.0.x/include/net/ax25.h \
+   /linux/linux-2.0.x/include/linux/inet.h \
+   /linux/linux-2.0.x/include/linux/netdevice.h \
+   /linux/linux-2.0.x/include/linux/skbuff.h \
+   /linux/linux-2.0.x/include/net/sock.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/net/rose.h
+rose_timer.o:  \
+   $(wildcard /linux/linux-2.0.x/include/config/rose.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/rose/module.h) \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/socket.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/sockios.h \
+   /linux/linux-2.0.x/include/linux/net.h \
+   /linux/linux-2.0.x/include/net/ax25.h \
+   /linux/linux-2.0.x/include/linux/inet.h \
+   /linux/linux-2.0.x/include/linux/netdevice.h \
+   /linux/linux-2.0.x/include/linux/skbuff.h \
+   /linux/linux-2.0.x/include/net/sock.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/net/rose.h
+sysctl_net_rose.o: \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/sysctl.h \
+   /linux/linux-2.0.x/include/net/ax25.h \
+   /linux/linux-2.0.x/include/net/rose.h

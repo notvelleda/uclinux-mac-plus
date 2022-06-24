@@ -1,0 +1,76 @@
+fddi.o: \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/socket.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/linux/inet.h \
+   /linux/linux-2.0.x/include/linux/netdevice.h \
+   /linux/linux-2.0.x/include/linux/fddidevice.h \
+   /linux/linux-2.0.x/include/linux/skbuff.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/net/arp.h \
+   /linux/linux-2.0.x/include/net/sock.h
+p8022.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/netdevice.h \
+   /linux/linux-2.0.x/include/linux/skbuff.h \
+   /linux/linux-2.0.x/include/net/datalink.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/net/p8022.h \
+   /linux/linux-2.0.x/include/linux/symtab_begin.h \
+   /linux/linux-2.0.x/include/linux/symtab_end.h
+p8022tr.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/netdevice.h \
+   /linux/linux-2.0.x/include/linux/skbuff.h \
+   /linux/linux-2.0.x/include/net/datalink.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/net/p8022tr.h \
+   /linux/linux-2.0.x/include/linux/symtab_begin.h \
+   /linux/linux-2.0.x/include/linux/symtab_end.h
+p8023.o: \
+   /linux/linux-2.0.x/include/linux/netdevice.h \
+   /linux/linux-2.0.x/include/linux/skbuff.h \
+   /linux/linux-2.0.x/include/net/datalink.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/in.h
+psnap.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/netdevice.h \
+   /linux/linux-2.0.x/include/linux/skbuff.h \
+   /linux/linux-2.0.x/include/net/datalink.h \
+   /linux/linux-2.0.x/include/net/p8022.h \
+   /linux/linux-2.0.x/include/net/psnap.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/linux/symtab_begin.h \
+   /linux/linux-2.0.x/include/linux/symtab_end.h
+sysctl_net_802.o: \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/sysctl.h
+tr.o: \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/socket.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/linux/inet.h \
+   /linux/linux-2.0.x/include/linux/netdevice.h \
+   /linux/linux-2.0.x/include/linux/trdevice.h \
+   /linux/linux-2.0.x/include/linux/skbuff.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/net.h \
+   /linux/linux-2.0.x/include/net/arp.h

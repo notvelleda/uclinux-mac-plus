@@ -1,0 +1,1 @@
+run build.sh in this directory to compile the stage 2 loader (stage2.bin) with the Docker build environment

@@ -1,0 +1,130 @@
+dir.o: \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/ncp_fs.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/locks.h \
+   ncplib_kernel.h \
+   $(wildcard /linux/linux-2.0.x/include/config/ncpfs/os2/ns.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ncpfs/nfs/ns.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ncpfs/strong.h)
+file.o: \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/ncp_fs.h \
+   /linux/linux-2.0.x/include/linux/locks.h \
+   ncplib_kernel.h \
+   /linux/linux-2.0.x/include/linux/malloc.h
+inode.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/ncp_fs.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/locks.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   $(wildcard /linux/linux-2.0.x/include/config/kerneld.h) \
+   /linux/linux-2.0.x/include/linux/kerneld.h \
+   ncplib_kernel.h \
+   $(wildcard /linux/linux-2.0.x/include/config/ncpfs/packet/signing.h)
+ioctl.o: \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/ncp_fs.h \
+   /linux/linux-2.0.x/include/linux/ioctl.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/ncp.h \
+   ncplib_kernel.h \
+   $(wildcard /linux/linux-2.0.x/include/config/ncpfs/mount/subdir.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ncpfs/packet/signing.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ncpfs/ioctl/locking.h)
+mmap.o: \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/shm.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/mman.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/ncp_fs.h \
+   ncplib_kernel.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h
+ncplib_kernel.o: \
+   ncplib_kernel.h \
+   $(wildcard /linux/linux-2.0.x/include/config/ncpfs/os2/ns.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ncpfs/nfs/ns.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ncpfs/ioctl/locking.h)
+ncplib_kernel.h: \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/ncp.h \
+   /linux/linux-2.0.x/include/linux/ncp_fs.h \
+   /linux/linux-2.0.x/include/linux/ncp_fs_sb.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/string.h \
+   /linux/linux-2.0.x/include/linux/ncp.h \
+   $(wildcard /linux/linux-2.0.x/include/config/ncpfs/ioctl/locking.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ncpfs/mount/subdir.h)
+	@touch ncplib_kernel.h
+ncpsign_kernel.o:  \
+   $(wildcard /linux/linux-2.0.x/include/config/ncpfs/packet/signing.h) \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/version.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/ncp.h \
+   /linux/linux-2.0.x/include/linux/ncp_fs.h \
+   /linux/linux-2.0.x/include/linux/ncp_fs_sb.h \
+   ncpsign_kernel.h
+ncpsign_kernel.h: \
+   /linux/linux-2.0.x/include/linux/ncp_fs.h \
+   /linux/linux-2.0.x/include/linux/ncp_fs_sb.h
+	@touch ncpsign_kernel.h
+sock.o: \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/ncp_fs.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/socket.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/linux/net.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/netdevice.h \
+   /linux/linux-2.0.x/include/linux/ipx.h \
+   /linux/linux-2.0.x/include/linux/ncp.h \
+   /linux/linux-2.0.x/include/linux/ncp_fs.h \
+   /linux/linux-2.0.x/include/linux/ncp_fs_sb.h \
+   /linux/linux-2.0.x/include/net/sock.h \
+   ncpsign_kernel.h \
+   $(wildcard /linux/linux-2.0.x/include/config/ncpfs/packet/signing.h)
+.PRECIOUS:	ncplib_kernel.h \
+	ncpsign_kernel.h \
+

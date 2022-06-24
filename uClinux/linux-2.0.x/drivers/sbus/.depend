@@ -1,0 +1,11 @@
+dvma.o: \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/asm/delay.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/dma.h
+sbus.o: \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/dma.h

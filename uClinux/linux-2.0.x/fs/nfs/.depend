@@ -1,0 +1,140 @@
+bio.o: \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/nfs_fs.h \
+   /linux/linux-2.0.x/include/linux/nfsiod.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/pagemap.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h
+dir.o: \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/nfs_fs.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/asm/segment.h
+file.o: \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/nfs_fs.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/pagemap.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h
+inode.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/nfs_fs.h \
+   /linux/linux-2.0.x/include/linux/nfsiod.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/locks.h \
+   /linux/linux-2.0.x/include/linux/smp.h \
+   /linux/linux-2.0.x/include/linux/smp_lock.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/linux/unistd.h \
+   $(wildcard /linux/linux-2.0.x/include/config/smp.h)
+nfsiod.o: \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/nfs_fs.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/rpcsock.h \
+   /linux/linux-2.0.x/include/linux/nfsiod.h
+nfsroot.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/random.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/asm/param.h \
+   /linux/linux-2.0.x/include/linux/utsname.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/linux/if.h \
+   /linux/linux-2.0.x/include/linux/inet.h \
+   /linux/linux-2.0.x/include/linux/net.h \
+   /linux/linux-2.0.x/include/linux/netdevice.h \
+   /linux/linux-2.0.x/include/linux/if_arp.h \
+   $(wildcard /linux/linux-2.0.x/include/config/ax25.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ax25/module.h) \
+   /linux/linux-2.0.x/include/net/ax25.h \
+   /linux/linux-2.0.x/include/linux/skbuff.h \
+   /linux/linux-2.0.x/include/linux/socket.h \
+   /linux/linux-2.0.x/include/linux/route.h \
+   /linux/linux-2.0.x/include/linux/nfs.h \
+   /linux/linux-2.0.x/include/linux/nfs_fs.h \
+   /linux/linux-2.0.x/include/linux/nfs_mount.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/net/route.h \
+   /linux/linux-2.0.x/include/net/sock.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   $(wildcard /linux/linux-2.0.x/include/config/rnfs/bootp.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/rnfs/rarp.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ip/multicast.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/rnfs/dynamic.h)
+proc.o: \
+   /linux/linux-2.0.x/include/linux/param.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/nfs_fs.h \
+   /linux/linux-2.0.x/include/linux/utsname.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/linux/pagemap.h \
+   /linux/linux-2.0.x/include/asm/segment.h
+rpcsock.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/nfs_fs.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/socket.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/linux/net.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/rpcsock.h \
+   /linux/linux-2.0.x/include/linux/udp.h \
+   /linux/linux-2.0.x/include/net/sock.h \
+   /linux/linux-2.0.x/include/asm/segment.h
+sock.o: \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/nfs_fs.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/socket.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/linux/net.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/rpcsock.h \
+   /linux/linux-2.0.x/include/asm/segment.h
+symlink.o: \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/nfs_fs.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/asm/segment.h

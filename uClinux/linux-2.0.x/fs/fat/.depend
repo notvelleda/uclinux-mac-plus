@@ -1,0 +1,94 @@
+buffer.o: \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/msdos_fs.h
+cache.o: \
+   /linux/linux-2.0.x/include/linux/msdos_fs.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   msbuffer.h
+dir.o: \
+   /linux/linux-2.0.x/include/linux/version.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/msdos_fs.h \
+   /linux/linux-2.0.x/include/linux/nls.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/ioctl.h \
+   /linux/linux-2.0.x/include/linux/dirent.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   msbuffer.h
+fatfs_syms.o: \
+   /linux/linux-2.0.x/include/linux/version.h \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/msdos_fs.h \
+   msbuffer.h \
+   /linux/linux-2.0.x/include/linux/symtab_begin.h \
+   /linux/linux-2.0.x/include/linux/symtab_end.h
+file.o: \
+   /linux/linux-2.0.x/include/linux/version.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/locks.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/msdos_fs.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/pagemap.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   msbuffer.h
+inode.o: \
+   /linux/linux-2.0.x/include/linux/version.h \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/msdos_fs.h \
+   /linux/linux-2.0.x/include/linux/nls.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/blkdev.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/locks.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   msbuffer.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/unaligned.h
+misc.o: \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/msdos_fs.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   msbuffer.h
+mmap.o: \
+   /linux/linux-2.0.x/include/linux/version.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/shm.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/mman.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/msdos_fs.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h
+tables.o: \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/msdos_fs.h

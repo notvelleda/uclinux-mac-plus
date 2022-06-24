@@ -1,0 +1,279 @@
+*** alloc.c.orig	Mon Apr 30 12:25:48 2001
+--- alloc.c	Mon Apr 30 12:32:27 2001
+***************
+*** 59,83 ****
+  
+  #ifdef L_malloc
+  
+! void *
+! malloc(size_t len)
+  {
+!   void * result = mmap((void *)0, len, PROT_READ | PROT_WRITE,
+!                  MAP_SHARED | MAP_ANONYMOUS, 0, 0);
+!   if (result == (void*)-1)
+      return 0;
+!     
+    return result;
+  }
+  
+  #endif
+  
+  #ifdef L_free
+  
+! void
+! free(void * ptr)
+  {
+!   munmap(ptr, 0);
+  }
+  
+  #endif
+--- 60,308 ----
+  
+  #ifdef L_malloc
+  
+! static struct poolblk *poollist;
+! 
+! static void *
+!   real_malloc (size_t len)
+  {
+!   void *result = mmap ((void *) 0, len, PROT_READ | PROT_WRITE,
+! 		       MAP_SHARED | MAP_ANONYMOUS, 0, 0);
+!   if (result == (void *) -1)
+      return 0;
+! 
+    return result;
++ 
++ 
++ }
++ 
++ /* unlink from the freelist */
++ static 
++   mb_unlink (struct memblk *mb)
++ {
++   if (mb->mb_prev)
++     mb->mb_prev->mb_next = mb->mb_next;
++   else
++     mb->mb_pool->pb_freelist = mb->mb_next;
++   if (mb->mb_next)
++     mb->mb_next->mb_prev = mb->mb_prev;
++   mb->mb_magic = MEM_MAGIC_USED;
++ }
++ 
++ 
++ 
++ static char *
++   alloc_memblk (struct memblk *mb, size_t len)
++ {
++   size_t newlen;
++   struct memblk *newmb;
++ 
++   newlen = mb->mb_len - len;
++   if (newlen > 1023)
++     {
++       newmb = (struct memblk *) ((char *) mb + len);
++ 
++       /* re-link the freelist */
++       *newmb = *mb;
++       if (mb->mb_prev)
++ 	mb->mb_prev->mb_next = newmb;
++       else
++ 	mb->mb_pool->pb_freelist = newmb;
++       if (mb->mb_next)
++ 	mb->mb_next->mb_prev = newmb;
++       newmb->mb_len = newlen;
++       mb->mb_len = len;
++     }
++   else
++     {
++       mb_unlink (mb);
++     }
++   mb->mb_prev = mb->mb_next = 0;
++   return ((char *) ++mb);
++ }
++ 
++ #ifdef MEMORY_DEBUG
++ show_pools ()
++ {
++   struct poolblk *pb;
++   struct memblk *mb;
++ 
++   printf ("====\n");
++   for (pb = poollist; pb; pb = pb->pb_next)
++     {
++       printf ("Pool %x\n", pb);
++       for (mb = pb->pb_freelist; mb; mb = mb->mb_next)
++ 	{
++ 	  printf ("  Block: at %x %d bytes\n", mb, mb->mb_len);
++ 	}
++     }
++   printf ("~~~~\n");
++ }
++ #endif
++ 
++ static struct memblk *
++   m_search_pool (size_t len)
++ {
++   struct poolblk *pb;
++   struct memblk *mb;
++ 
++   for (pb = poollist; pb; pb = pb->pb_next)
++     {
++       for (mb = pb->pb_freelist; mb; mb = mb->mb_next)
++ 	if (mb->mb_len >= len)
++ 	  {
++ #ifdef MEMORY_DEBUG
++ 	    printf ("found free segment at %x\n", mb);
++ #endif
++ 	    return (mb);
++ 	  }
++     }
++   return ((struct memblk *) 0);
++ }
++ 
++ static 
++   defrag_heap ()
++ {
++   struct poolblk *pb;
++   struct memblk *mb, *mb2, *mbend;
++ 
++ #ifdef MEMORY_DEBUG
++   printf ("Before defrag: ");
++   show_pools ();
++ #endif
++ 
++   for (pb = poollist; pb; pb = pb->pb_next)
++     {
++     mb_again:
++       for (mb = pb->pb_freelist; mb; mb = mb->mb_next)
++ 	{
++ 	  mbend = (struct memblk *) ((char *) mb + mb->mb_len);
++ 	  for (mb2 = pb->pb_freelist; mb2; mb2 = mb2->mb_next)
++ 	    {
++ 	      if (mb2 == mbend)
++ 		{
++ 		  /* unlink mb2 */
++ 		  mb_unlink (mb2);
++ 		  mb->mb_len += mb2->mb_len;
++ 		  goto mb_again;
++ 		}
++ 	    }
++ 	}
++     }
++ 
++ #ifdef MEMORY_DEBUG
++   printf ("After defrag: ");
++   show_pools ();
++ #endif
++ }
++ 
++ 
++ void *
++   malloc (size_t len)
++ {
++   struct poolblk *pb, *newpb;
++   struct memblk *mb;
++   size_t lenadj, poolsz;
++   char *end;
++ 
++   lenadj = (len + sizeof (struct memblk) + 1023) & ~1023;
++ #ifdef MEMORY_DEBUG
++   printf ("searching for segment of %d bytes\n", lenadj);
++ #endif
++ 
++   if (poollist)
++     {
++       mb = m_search_pool (lenadj);
++       if (mb)
++ 	return (alloc_memblk (mb, lenadj));
++ #ifdef MEMORY_DEBUG
++       printf ("cleaning the heap\n");
++ #endif
++       defrag_heap ();
++       mb = m_search_pool (lenadj);
++       if (mb)
++ 	return (alloc_memblk (mb, lenadj));
++     }
++ #ifdef MEMORY_DEBUG
++   printf ("allocating new pool\n");
++ #endif
++   if (lenadj + sizeof (struct poolblk) > POOLSIZE)
++     poolsz = (lenadj + sizeof (struct poolblk) + 1023) & ~1023;
++   else
++     poolsz = POOLSIZE;
++   newpb = (struct poolblk *) real_malloc (poolsz);
++   if (!newpb)
++     return ((char *) 0);
++   if (poollist)
++     {
++       for (pb = poollist; pb->pb_next; pb = pb->pb_next)
++ 	;
++       pb->pb_next = newpb;
++     }
++   else
++     {
++       poollist = newpb;
++     }
++   newpb->pb_next = 0;
++   end = (char *) newpb + poolsz;
++   mb = newpb->pb_freelist = (struct memblk *) (newpb + 1);
++   mb->mb_next = 0;
++   mb->mb_prev = 0;
++   mb->mb_pool = newpb;
++   mb->mb_len = end - (char *) mb;
++   mb->mb_magic = MEM_MAGIC_FREE;
++ #ifdef MEMORY_DEBUG
++   printf ("newpb=%x\n", newpb);
++   printf ("newpb->pb_freelist=%x\n", newpb->pb_freelist);
++   printf ("newpb->pb_freelist->mb_len=%x\n", newpb->pb_freelist->mb_len);
++   show_pools ();
++ #endif
++   mb = m_search_pool (lenadj);
++   if (mb)
++     return (alloc_memblk (mb, lenadj));
++ #ifdef MEMORY_DEBUG
++   printf ("huh? m_search_pool failed?");
++ #endif
++   return ((char *) 0);
+  }
+  
+  #endif
+  
+  #ifdef L_free
+  
+! /* relink onto the end of the freelist */
+! static mb_link (struct memblk *mb)
+  {
+!   struct memblk *lastmb;
+! 
+!   lastmb = mb->mb_pool->pb_freelist;
+!   if (lastmb)
+!     {
+!       while (lastmb->mb_next)
+! 	lastmb = lastmb->mb_next;
+!       lastmb->mb_next = mb;
+!     }
+!   else
+!     {
+!       mb->mb_pool->pb_freelist = mb;
+!     }
+!   mb->mb_prev = lastmb;
+!   mb->mb_next = 0;
+!   mb->mb_magic = MEM_MAGIC_FREE;
+! }
+! 
+! void 
+!   free (void *p)
+! {
+!   struct memblk *mb;
+! 
+!   mb = (struct memblk *) p;
+!   --mb;
+!   if (mb->mb_magic != MEM_MAGIC_USED) {
+!     //write(2, "attempted to free block with corrupt MAGIC\n", 43);
+!     return;    
+!   }
+!   mb_link (mb);
+  }
+  
+  #endif
++ 

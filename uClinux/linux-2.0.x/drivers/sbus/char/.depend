@@ -1,0 +1,77 @@
+suncons.o: \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/kd.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/page.h \
+   /linux/linux-2.0.x/include/asm/pgtable.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   ../../char/kbd_kern.h \
+   ../../char/vt_kern.h \
+   ../../char/consolemap.h \
+   ../../char/selection.h \
+   ../../char/console_struct.h
+sunkbd.o: \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/ptrace.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/asm/delay.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   ../../char/kbd_kern.h \
+   ../../char/diacr.h \
+   ../../char/vt_kern.h
+sunkeymap.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/keyboard.h \
+   /linux/linux-2.0.x/include/linux/kd.h
+sunmouse.o: \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/miscdevice.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/linux/random.h
+sunserial.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/delay.h \
+   sunserial.h \
+   $(wildcard /linux/linux-2.0.x/include/config/ap1000.h)

@@ -1,0 +1,205 @@
+calibr.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/ftape.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   tracing.h \
+   calibr.h \
+   fdc-io.h
+calibr.h: \
+   /linux/linux-2.0.x/include/linux/timex.h
+	@touch calibr.h
+ecc.o: \
+   /linux/linux-2.0.x/include/linux/ftape.h \
+   /linux/linux-2.0.x/include/asm/errno.h \
+   tracing.h \
+   ecc.h
+fc-10.o: \
+   /linux/linux-2.0.x/include/linux/ftape.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   tracing.h \
+   fdc-io.h \
+   fc-10.h
+fdc-io.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/ftape.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/dma.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   tracing.h \
+   fdc-io.h \
+   fdc-isr.h \
+   ftape-io.h \
+   ftape-rw.h \
+   calibr.h \
+   fc-10.h \
+   qic117.h
+fdc-io.h: \
+   /linux/linux-2.0.x/include/linux/fdreg.h
+	@touch fdc-io.h
+fdc-isr.o: \
+   /linux/linux-2.0.x/include/linux/ftape.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/dma.h \
+   tracing.h \
+   fdc-isr.h \
+   qic117.h \
+   fdc-io.h \
+   ftape-ctl.h \
+   ftape-rw.h \
+   ftape-io.h \
+   calibr.h \
+   ftape-bsm.h
+ftape-bsm.o: \
+   /linux/linux-2.0.x/include/linux/ftape.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   tracing.h \
+   ftape-bsm.h \
+   ftape-ctl.h \
+   ftape-rw.h
+ftape-ctl.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/ftape.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   tracing.h \
+   ftape-eof.h \
+   ftape-io.h \
+   ftape-ctl.h \
+   ftape-write.h \
+   ftape-read.h \
+   ftape-rw.h \
+   qic117.h \
+   ftape-bsm.h
+ftape-ctl.h: \
+   /linux/linux-2.0.x/include/linux/ioctl.h \
+   /linux/linux-2.0.x/include/linux/mtio.h \
+   vendors.h
+	@touch ftape-ctl.h
+ftape-eof.o: \
+   /linux/linux-2.0.x/include/linux/ftape.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   tracing.h \
+   ftape-eof.h \
+   ftape-write.h \
+   ftape-read.h \
+   ftape-rw.h \
+   ftape-ctl.h \
+   ftape-bsm.h
+ftape-io.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/ftape.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/linux/ioctl.h \
+   /linux/linux-2.0.x/include/linux/mtio.h \
+   tracing.h \
+   fdc-io.h \
+   qic117.h \
+   ftape-io.h \
+   ftape-ctl.h \
+   ftape-rw.h \
+   ftape-write.h \
+   ftape-read.h \
+   ftape-eof.h \
+   kernel-interface.h \
+   calibr.h
+ftape-io.h: \
+   vendors.h
+	@touch ftape-io.h
+ftape-read.o: \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/ftape.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   tracing.h \
+   ftape-read.h \
+   qic117.h \
+   ftape-io.h \
+   ftape-ctl.h \
+   ftape-rw.h \
+   ftape-write.h \
+   ftape-eof.h \
+   ecc.h \
+   ftape-bsm.h
+ftape-rw.o: \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/ftape.h \
+   tracing.h \
+   ftape-rw.h \
+   fdc-io.h \
+   kernel-interface.h \
+   qic117.h \
+   ftape-io.h \
+   ftape-ctl.h \
+   ftape-read.h \
+   ftape-eof.h \
+   ecc.h \
+   ftape-bsm.h
+ftape-rw.h: \
+   fdc-io.h \
+   kernel-interface.h
+	@touch ftape-rw.h
+ftape-write.o: \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/ftape.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   tracing.h \
+   ftape-write.h \
+   ftape-read.h \
+   qic117.h \
+   ftape-io.h \
+   ftape-ctl.h \
+   ftape-rw.h \
+   ftape-eof.h \
+   ecc.h \
+   ftape-bsm.h
+kernel-interface.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/version.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/ftape.h \
+   /linux/linux-2.0.x/include/asm/dma.h \
+   tracing.h \
+   kernel-interface.h \
+   ftape-read.h \
+   ftape-write.h \
+   ftape-io.h \
+   ftape-ctl.h \
+   ftape-rw.h \
+   fdc-io.h
+kernel-interface.h: \
+   /linux/linux-2.0.x/include/linux/linkage.h \
+   /linux/linux-2.0.x/include/linux/signal.h
+	@touch kernel-interface.h
+tracing.o: \
+   /linux/linux-2.0.x/include/linux/ftape.h \
+   tracing.h
+tracing.h: \
+   /linux/linux-2.0.x/include/linux/kernel.h
+	@touch tracing.h
+.PRECIOUS:	calibr.h \
+	fdc-io.h \
+	ftape-ctl.h \
+	ftape-io.h \
+	ftape-rw.h \
+	kernel-interface.h \
+	tracing.h \
+

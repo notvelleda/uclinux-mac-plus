@@ -1,0 +1,71 @@
+isdn_audio.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/isdn.h \
+   isdn_audio.h \
+   isdn_common.h
+isdn_cards.o:  \
+   $(wildcard /linux/linux-2.0.x/include/config/isdn/drv/icn.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/isdn/drv/hisax.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/isdn/drv/pcbit.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/isdn/drv/avmb1.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/pci.h)
+isdn_common.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/version.h \
+   /linux/linux-2.0.x/include/linux/isdn.h \
+   isdn_common.h \
+   isdn_tty.h \
+   isdn_net.h \
+   isdn_ppp.h \
+   $(wildcard /linux/linux-2.0.x/include/config/isdn/audio.h) \
+   isdn_audio.h \
+   isdn_cards.h \
+   $(wildcard /linux/linux-2.0.x/include/config/isdn/ppp.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/isdn/timeout/rules.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/isdn/mpp.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/netdevices.h)
+isdn_common.h:  \
+   $(wildcard /linux/linux-2.0.x/include/config/isdn/timeout/rules.h)
+	@touch isdn_common.h
+isdn_net.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/isdn.h \
+   /linux/linux-2.0.x/include/linux/if_arp.h \
+   /linux/linux-2.0.x/include/net/arp.h \
+   /linux/linux-2.0.x/include/net/icmp.h \
+   isdn_common.h \
+   isdn_net.h \
+   $(wildcard /linux/linux-2.0.x/include/config/isdn/ppp.h) \
+   isdn_ppp.h \
+   $(wildcard /linux/linux-2.0.x/include/config/inet.h)
+isdn_ppp.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/version.h \
+   /linux/linux-2.0.x/include/linux/isdn.h \
+   isdn_common.h \
+   isdn_ppp.h \
+   isdn_net.h \
+   $(wildcard /linux/linux-2.0.x/include/config/isdn/mpp.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/isdn/ppp/vj.h) \
+   /linux/linux-2.0.x/include/linux/symtab_begin.h \
+   /linux/linux-2.0.x/include/linux/symtab_end.h
+isdn_ppp.h: \
+   /linux/linux-2.0.x/include/linux/ppp_defs.h
+	@touch isdn_ppp.h
+isdn_syms.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/version.h \
+   /linux/linux-2.0.x/include/linux/isdn.h \
+   isdn_common.h \
+   /linux/linux-2.0.x/include/linux/symtab_begin.h \
+   /linux/linux-2.0.x/include/linux/symtab_end.h
+isdn_tty.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/isdn.h \
+   isdn_common.h \
+   isdn_tty.h \
+   $(wildcard /linux/linux-2.0.x/include/config/isdn/audio.h) \
+   isdn_audio.h
+.PRECIOUS:	isdn_common.h \
+	isdn_ppp.h \
+

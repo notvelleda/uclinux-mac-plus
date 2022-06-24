@@ -1,0 +1,127 @@
+array.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/kernel_stat.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/user.h \
+   /linux/linux-2.0.x/include/linux/a.out.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/mman.h \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/pagemap.h \
+   /linux/linux-2.0.x/include/linux/swap.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/pgtable.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   $(wildcard /linux/linux-2.0.x/include/config/debug/malloc.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/modules.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/pci.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/blk/dev/md.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/rtc.h)
+base.o: \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   /linux/linux-2.0.x/include/linux/stat.h
+fd.o: \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   /linux/linux-2.0.x/include/linux/stat.h
+inode.o: \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/locks.h \
+   /linux/linux-2.0.x/include/linux/limits.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h
+kmsg.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/io.h
+link.o: \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   /linux/linux-2.0.x/include/linux/stat.h
+mem.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/asm/page.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/pgtable.h
+net.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/asm/segment.h
+procfs_syms.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   /linux/linux-2.0.x/include/linux/symtab_begin.h \
+   /linux/linux-2.0.x/include/linux/symtab_end.h
+root.o: \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   $(wildcard /linux/linux-2.0.x/include/config/pci.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/debug/malloc.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/modules.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/rtc.h)
+scsi.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/asm/segment.h
+serial.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/kernel_stat.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/user.h \
+   /linux/linux-2.0.x/include/linux/a.out.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/mman.h \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/pagemap.h \
+   /linux/linux-2.0.x/include/linux/swap.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/pgtable.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   $(wildcard /linux/linux-2.0.x/include/config/coldfire/serial.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/m68360.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/m68360/smc/uart.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/m68360/scc/uart.h)

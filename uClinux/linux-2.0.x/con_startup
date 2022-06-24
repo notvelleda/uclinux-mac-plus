@@ -1,0 +1,19 @@
+arch/m68knommu/kernel/console.c:	kmem_start = conswitchp->con_startup (kmem_start, &display_desc);
+arch/m68knommu/kernel/console.c:	/*conswitchp->con_set_font (&display_desc, 0, 0, "MINI4x6");*/
+arch/m68knommu/kernel/console.c:		i = conswitchp->con_set_font(vc_cons[fg_console].d, 8,
+arch/m68knommu/kernel/console.c:		i = conswitchp->con_get_font(vc_cons[fg_console].d,
+arch/i960/kernel/console.c:		i = conswitchp->con_set_font(vc_cons[fg_console].d, 8,
+arch/i960/kernel/console.c:		i = conswitchp->con_get_font(vc_cons[fg_console].d,
+arch/m68k/kernel/console.c:	kmem_start = conswitchp->con_startup (kmem_start, &display_desc);
+arch/or32/kernel/console.c:	kmem_start = conswitchp->con_startup (kmem_start, &display_desc);
+arch/or32/kernel/console.c:	/*conswitchp->con_set_font (&display_desc, 0, 0, "MINI4x6");*/
+arch/or32/kernel/console.c:		i = conswitchp->con_set_font(vc_cons[fg_console].d, 8,
+arch/or32/kernel/console.c:		i = conswitchp->con_get_font(vc_cons[fg_console].d,
+arch/niosnommu/kernel/console.c:	kmem_start = conswitchp->con_startup (kmem_start, &display_desc);
+arch/niosnommu/kernel/console.c:	/*conswitchp->con_set_font (&display_desc, 0, 0, "MINI4x6");*/
+arch/niosnommu/kernel/console.c:		i = conswitchp->con_set_font(vc_cons[fg_console].d, 8,
+arch/niosnommu/kernel/console.c:		i = conswitchp->con_get_font(vc_cons[fg_console].d,
+arch/h8300/kernel/console.c:	kmem_start = conswitchp->con_startup (kmem_start, &display_desc);
+arch/h8300/kernel/console.c:	/*conswitchp->con_set_font (&display_desc, 0, 0, "MINI4x6");*/
+arch/h8300/kernel/console.c:		i = conswitchp->con_set_font(vc_cons[fg_console].d, 8,
+arch/h8300/kernel/console.c:		i = conswitchp->con_get_font(vc_cons[fg_console].d,

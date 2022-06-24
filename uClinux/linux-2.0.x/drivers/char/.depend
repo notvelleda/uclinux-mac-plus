@@ -1,0 +1,1685 @@
+68302serial.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/delay.h \
+   68302serial.h \
+   $(wildcard /linux/linux-2.0.x/include/config/clock/20mhz.h)
+68328serial.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/delay.h \
+   68328serial.h \
+   $(wildcard /linux/linux-2.0.x/include/config/xcopilot/bugs.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/68328/serial/rts/cts.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/pilot.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ucsimm.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/cwez328.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/m68ez328ads.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/alma/ans.h)
+68328serial.h:  \
+   $(wildcard /linux/linux-2.0.x/include/config/m68ez328.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/m68328.h)
+	@touch 68328serial.h
+68332dio.o: \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/asm/MC68332.h \
+   /linux/linux-2.0.x/include/asm/68332dio.h \
+   $(wildcard /linux/linux-2.0.x/include/config/68332/portf.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/68332/tpu.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/68332/porte.h)
+68332keyboard.o: \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/random.h \
+   /linux/linux-2.0.x/include/linux/keyboard.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/machdep.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/MC68332.h
+68332serial.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/delay.h \
+   68332serial.h \
+   $(wildcard /linux/linux-2.0.x/include/config/mwi.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/fr1000.h)
+68332serial.h:  \
+   $(wildcard /linux/linux-2.0.x/include/config/m68332.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/cpu32.h)
+	@touch 68332serial.h
+68kserial.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/delay.h \
+   68kserial.h
+68kserial.h:  \
+   $(wildcard /linux/linux-2.0.x/include/config/mc68328.h)
+	@touch 68kserial.h
+LEONserial.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/delay.h \
+   LEONserial.h
+NIOSserial.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/delay.h \
+   NIOSserial.h
+SH7615serial.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/delay.h
+amigamouse.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/miscdevice.h \
+   /linux/linux-2.0.x/include/linux/random.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/bootinfo.h \
+   /linux/linux-2.0.x/include/asm/bootinfo.h
+apm_bios.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/stddef.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/linkage.h \
+   $(wildcard /linux/linux-2.0.x/include/config/proc/fs.h) \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   /linux/linux-2.0.x/include/linux/miscdevice.h \
+   /linux/linux-2.0.x/include/linux/apm_bios.h \
+   /linux/linux-2.0.x/include/linux/symtab_begin.h \
+   /linux/linux-2.0.x/include/linux/symtab_end.h \
+   $(wildcard /linux/linux-2.0.x/include/config/apm/cpu/idle.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/apm/display/blank.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/apm/do/enable.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/apm/ignore/user/suspend.h)
+atarimouse.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/miscdevice.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/random.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bootinfo.h \
+   /linux/linux-2.0.x/include/asm/bootinfo.h
+atixlmouse.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/miscdevice.h \
+   /linux/linux-2.0.x/include/linux/random.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/irq.h
+baycom.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/version.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tqueue.h \
+   /linux/linux-2.0.x/include/linux/baycom.h
+blip-led.o: \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   blip-led.h
+busmouse.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/busmouse.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/miscdevice.h \
+   /linux/linux-2.0.x/include/linux/random.h \
+   /linux/linux-2.0.x/include/linux/delay.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/irq.h
+console.o: \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/kd.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   $(wildcard /linux/linux-2.0.x/include/config/apm.h) \
+   /linux/linux-2.0.x/include/linux/apm_bios.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   kbd_kern.h \
+   vt_kern.h \
+   consolemap.h \
+   selection.h \
+   console_struct.h \
+   $(wildcard /linux/linux-2.0.x/include/config/serial/echo.h) \
+   /linux/linux-2.0.x/include/linux/serial_reg.h
+consolemap.o: \
+   /linux/linux-2.0.x/include/linux/kd.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   consolemap.h \
+   uni_hash.tbl
+cyclades.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/serial.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/ptrace.h \
+   /linux/linux-2.0.x/include/linux/cyclades.h \
+   /linux/linux-2.0.x/include/linux/delay.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/bios32.h \
+   /linux/linux-2.0.x/include/linux/pci.h \
+   /linux/linux-2.0.x/include/linux/version.h \
+   $(wildcard /linux/linux-2.0.x/include/config/proc/fs.h) \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   $(wildcard /linux/linux-2.0.x/include/config/cobalt/27.h) \
+   /linux/linux-2.0.x/include/asm/page.h \
+   /linux/linux-2.0.x/include/asm/pgtable.h \
+   $(wildcard /linux/linux-2.0.x/include/config/cyz/intr.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/pci.h)
+dac0800.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/wait.h \
+   /linux/linux-2.0.x/include/asm/param.h \
+   /linux/linux-2.0.x/include/asm/dma.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h \
+   /linux/linux-2.0.x/include/asm/mcfdma.h \
+   /linux/linux-2.0.x/include/asm/mcftimer.h
+daci2s.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/wait.h \
+   /linux/linux-2.0.x/include/asm/param.h \
+   /linux/linux-2.0.x/include/asm/dma.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h \
+   /linux/linux-2.0.x/include/asm/mcfdma.h \
+   /linux/linux-2.0.x/include/asm/mcftimer.h
+defkeymap.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/keyboard.h \
+   /linux/linux-2.0.x/include/linux/kd.h
+diacr.h: \
+   /linux/linux-2.0.x/include/linux/kd.h
+	@touch diacr.h
+ds1302.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/wait.h \
+   /linux/linux-2.0.x/include/asm/param.h \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h
+ds1743.o: \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/miscdevice.h \
+   /linux/linux-2.0.x/include/linux/mc146818rtc.h \
+   /linux/linux-2.0.x/include/linux/nvram.h \
+   /linux/linux-2.0.x/include/linux/ds1743.h \
+   /linux/linux-2.0.x/include/linux/time.h
+exp.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/delay.h \
+   /linux/linux-2.0.x/include/linux/wait.h \
+   /linux/linux-2.0.x/include/asm/param.h \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h
+fbmem.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/mman.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bootinfo.h \
+   /linux/linux-2.0.x/include/asm/page.h \
+   /linux/linux-2.0.x/include/asm/pgtable.h \
+   /linux/linux-2.0.x/include/linux/fb.h
+ft245.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/delay.h \
+   /linux/linux-2.0.x/include/asm/traps.h \
+   ft245.h \
+   $(wildcard /linux/linux-2.0.x/include/config/68katy.h) \
+   ../../arch/m68knommu/platform/68000/68Katy/68Katy_ser_conf.h
+gbatxt.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/delay.h \
+   gbatxt.h \
+   $(wildcard /linux/linux-2.0.x/include/config/magic/sysrq.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ledman.h)
+gbatxt.h: \
+   /linux/linux-2.0.x/include/linux/serial.h
+	@touch gbatxt.h
+h8.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/stddef.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/linkage.h \
+   $(wildcard /linux/linux-2.0.x/include/config/proc/fs.h) \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   /linux/linux-2.0.x/include/linux/miscdevice.h \
+   /linux/linux-2.0.x/include/linux/lists.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/asm/unistd.h \
+   h8.h \
+   $(wildcard /linux/linux-2.0.x/include/config/h8/display/blank.h)
+hitachi-sci.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/serial.h \
+   /linux/linux-2.0.x/include/linux/serial_reg.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/ptrace.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/delay.h \
+   hitachi-sci.h \
+   $(wildcard /linux/linux-2.0.x/include/config/clk/freq.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/console/2400bps.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/console/4800bps.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/console/9600bps.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/console/19200bps.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/console/38400bps.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/console/channel.h)
+hitachi-sci.h:  \
+   $(wildcard /linux/linux-2.0.x/include/config/h83002.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/h83048.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/h83007.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/h83068.h)
+	@touch hitachi-sci.h
+idetest.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h
+isicom.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/version.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/termios.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/serial.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/miscdevice.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/linux/isicom.h
+istallion.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/wait.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/termios.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/tty_driver.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/serial.h \
+   /linux/linux-2.0.x/include/linux/cdk.h \
+   /linux/linux-2.0.x/include/linux/comstats.h \
+   /linux/linux-2.0.x/include/linux/istallion.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/delay.h \
+   /linux/linux-2.0.x/include/asm/io.h
+kbd_kern.h: \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/keyboard.h
+	@touch kbd_kern.h
+keyb_m68k.o: \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/random.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/machdep.h \
+   kbd_kern.h \
+   diacr.h \
+   vt_kern.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/system.h
+keyb_mac.o: \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/random.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/keyboard.h \
+   /linux/linux-2.0.x/include/linux/kd.h \
+   /linux/linux-2.0.x/include/linux/tqueue.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   ../../arch/m68knommu/platform/68000/MacPlus/mac_hw.h
+keyboard.o: \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/ptrace.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/random.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   kbd_kern.h \
+   diacr.h \
+   vt_kern.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/system.h
+keypad.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/delay.h \
+   /linux/linux-2.0.x/include/linux/wait.h \
+   /linux/linux-2.0.x/include/asm/param.h \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h
+lc7981.o: \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/fs.h
+lcddma.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/asm/dma.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h \
+   /linux/linux-2.0.x/include/asm/mcfdma.h \
+   /linux/linux-2.0.x/include/asm/mcftimer.h \
+   /linux/linux-2.0.x/include/asm/param.h \
+   /linux/linux-2.0.x/include/linux/version.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/io.h
+lcdtxt.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/delay.h \
+   /linux/linux-2.0.x/include/asm/param.h \
+   $(wildcard /linux/linux-2.0.x/include/config/secureedgemp3.h) \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h \
+   $(wildcard /linux/linux-2.0.x/include/config/elia.h) \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h
+ledman.o: \
+   /linux/linux-2.0.x/include/linux/version.h \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/utsname.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/ledman.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/symtab_begin.h \
+   /linux/linux-2.0.x/include/linux/symtab_end.h \
+   $(wildcard /linux/linux-2.0.x/include/config/sh/keywest.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/sh/bigsur.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/m586.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/x86.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/snapgear.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/nettel.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/m5307.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/m5272.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/se1100.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/gilbarconap.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/sh/secureedge5410.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/m5206e.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/elia.h) \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h \
+   /linux/linux-2.0.x/include/asm/nettel.h \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h \
+   /linux/linux-2.0.x/include/asm/nettel.h \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h \
+   /linux/linux-2.0.x/include/asm/nap.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h \
+   /linux/linux-2.0.x/include/asm/nettel.h \
+   $(wildcard /linux/linux-2.0.x/include/config/coldfire.h) \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h \
+   /linux/linux-2.0.x/include/asm/elia.h \
+   /linux/linux-2.0.x/include/linux/smp_lock.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/delay.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   $(wildcard /linux/linux-2.0.x/include/config/chinook.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/sitectrler.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/adtran/advanta.h) \
+   /linux/linux-2.0.x/include/linux/kernel_stat.h
+lirc_intr.o: \
+   /linux/linux-2.0.x/include/linux/version.h \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   $(wildcard /linux/linux-2.0.x/include/config/coldfire.h) \
+   /linux/linux-2.0.x/include/linux/serial_reg.h \
+   /linux/linux-2.0.x/include/linux/time.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/wait.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/delay.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/fcntl.h \
+   /linux/linux-2.0.x/include/linux/lirc.h \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h \
+   /linux/linux-2.0.x/include/asm/mcftimer.h \
+   /linux/linux-2.0.x/include/asm/nettel.h \
+   $(wildcard /linux/linux-2.0.x/include/config/m5272.h)
+lirc_serial.o: \
+   /linux/linux-2.0.x/include/linux/version.h \
+   $(wildcard /linux/linux-2.0.x/include/config/serial/module.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/coldfire.h) \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/serial_reg.h \
+   /linux/linux-2.0.x/include/linux/time.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/wait.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/delay.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/fcntl.h \
+   /linux/linux-2.0.x/include/linux/lirc.h \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h \
+   /linux/linux-2.0.x/include/asm/mcfuart.h \
+   /linux/linux-2.0.x/include/asm/mcftimer.h \
+   /linux/linux-2.0.x/include/asm/nettel.h \
+   $(wildcard /linux/linux-2.0.x/include/config/m5272.h)
+lp.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/lp.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/delay.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h
+lp_intern.o: \
+   /linux/linux-2.0.x/include/linux/lp_intern.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   $(wildcard /linux/linux-2.0.x/include/config/amiga.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/atari.h) \
+   /linux/linux-2.0.x/include/linux/delay.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h
+lp_m68k.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   $(wildcard /linux/linux-2.0.x/include/config/amiga.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/multiface/iii/lp.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/atari.h) \
+   /linux/linux-2.0.x/include/linux/lp_m68k.h \
+   /linux/linux-2.0.x/include/linux/lp_intern.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h
+m5249audio.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/wait.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/delay.h \
+   /linux/linux-2.0.x/include/linux/soundcard.h \
+   /linux/linux-2.0.x/include/asm/param.h \
+   /linux/linux-2.0.x/include/asm/dma.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h \
+   /linux/linux-2.0.x/include/asm/mcfdma.h \
+   /linux/linux-2.0.x/include/asm/m5249audio.h \
+   $(wildcard /linux/linux-2.0.x/include/config/audioirq.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/audioirqasm.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/audiodma.h)
+max311Xserial.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/delay.h \
+   max311Xserial.h
+mbus.o: \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/types.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h \
+   /linux/linux-2.0.x/include/asm/mcfmbus.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   mbus.h
+mbus.h: \
+   /linux/linux-2.0.x/include/linux/ioctl.h
+	@touch mbus.h
+mc68328digi.o: \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/miscdevice.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/param.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   $(wildcard /linux/linux-2.0.x/include/config/m68328.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/m68ez328.h) \
+   /linux/linux-2.0.x/include/asm/MC68EZ328.h \
+   $(wildcard /linux/linux-2.0.x/include/config/m68vz328.h) \
+   /linux/linux-2.0.x/include/linux/mc68328digi.h \
+   /linux/linux-2.0.x/include/linux/version.h \
+   $(wildcard /linux/linux-2.0.x/include/config/m68vz328/chipslice.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/m68ez328/chipslice.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/pilot.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/xcopilot/bugs.h)
+mcf_qspi.o: \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/module.h \
+   $(wildcard /linux/linux-2.0.x/include/config/modversions.h) \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/wrapper.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/asm/ptrace.h \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/m5272sim.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   mcf_qspi.h
+mcf_qspi.h: \
+   /linux/linux-2.0.x/include/asm/mcfqspi.h
+	@touch mcf_qspi.h
+mcfserial.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   $(wildcard /linux/linux-2.0.x/include/config/ledman.h) \
+   /linux/linux-2.0.x/include/linux/ledman.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/delay.h \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h \
+   /linux/linux-2.0.x/include/asm/mcfuart.h \
+   /linux/linux-2.0.x/include/asm/nettel.h \
+   /linux/linux-2.0.x/include/asm/semp3.h \
+   /linux/linux-2.0.x/include/asm/nap.h \
+   mcfserial.h \
+   $(wildcard /linux/linux-2.0.x/include/config/lirc/serial.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/magic/sysrq.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/m5272.h)
+mcfserial.h: \
+   /linux/linux-2.0.x/include/linux/serial.h
+	@touch mcfserial.h
+mcfwatchdog.o: \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/param.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/traps.h \
+   /linux/linux-2.0.x/include/asm/machdep.h \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcftimer.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/delay.h \
+   $(wildcard /linux/linux-2.0.x/include/config/m5272.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/oldmask.h)
+mem.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/miscdevice.h \
+   /linux/linux-2.0.x/include/linux/tpqic02.h \
+   /linux/linux-2.0.x/include/linux/ftape.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/mman.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/random.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/pgtable.h \
+   $(wildcard /linux/linux-2.0.x/include/config/ledman.h) \
+   /linux/linux-2.0.x/include/linux/ledman.h \
+   $(wildcard /linux/linux-2.0.x/include/config/lirc/serial.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/lirc/intr.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/sound.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/isdn.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/pcwatchdog.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/printer.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/busmouse.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/umisc.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/psmouse.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ms/busmouse.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/atixl/busmouse.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/soft/watchdog.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/h8.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/wdt.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/apm.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/rtc.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/sun/mouse.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/68328/digi.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/m68360/sim/wdt.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ds1743.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/qic02/tape.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ftape.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/mcf/mbus.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/watchdog.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/lcdtxt.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/keypad.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/key.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/led/atmel.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/idetest.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/mcf/qspi.h)
+misc.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/miscdevice.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   $(wildcard /linux/linux-2.0.x/include/config/apm.h) \
+   /linux/linux-2.0.x/include/linux/apm_bios.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   selection.h \
+   $(wildcard /linux/linux-2.0.x/include/config/kerneld.h) \
+   /linux/linux-2.0.x/include/linux/kerneld.h \
+   $(wildcard /linux/linux-2.0.x/include/config/m68360/sim/wdt.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/proc/fs.h) \
+   /linux/linux-2.0.x/include/linux/symtab_begin.h \
+   $(wildcard /linux/linux-2.0.x/include/config/console.h) \
+   /linux/linux-2.0.x/include/linux/symtab_end.h \
+   $(wildcard /linux/linux-2.0.x/include/config/busmouse.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/psmouse.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ms/busmouse.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/atixl/busmouse.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/amigamouse.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/atarimouse.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/sun/mouse.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/soft/watchdog.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/wdt.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/pcwatchdog.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/h8.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/rtc.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/68328/digi.h)
+msbusmouse.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/busmouse.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/miscdevice.h \
+   /linux/linux-2.0.x/include/linux/random.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/irq.h
+n_tty.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/ctype.h \
+   /linux/linux-2.0.x/include/linux/kd.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/bitops.h
+pcwd.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/wait.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/delay.h \
+   /linux/linux-2.0.x/include/linux/miscdevice.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/pcwd.h \
+   /linux/linux-2.0.x/include/asm/io.h
+pcxx.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/ptrace.h \
+   /linux/linux-2.0.x/include/linux/delay.h \
+   /linux/linux-2.0.x/include/linux/serial.h \
+   /linux/linux-2.0.x/include/linux/tty_driver.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/ctype.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   digi.h \
+   fep.h \
+   pcxx.h \
+   digi_fep.h \
+   digi_bios.h
+pd72001_serial.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/delay.h \
+   /linux/linux-2.0.x/include/asm/traps.h \
+   pd72001.h \
+   $(wildcard /linux/linux-2.0.x/include/config/sm2010.h) \
+   ../../arch/m68knommu/platform/68000/SM2010/sm2010_ser_conf.h
+psaux.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/miscdevice.h \
+   /linux/linux-2.0.x/include/linux/random.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   $(wildcard /linux/linux-2.0.x/include/config/pci.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/82c710/mouse.h)
+pty.o: \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/bitops.h
+pwm328.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/wait.h \
+   /linux/linux-2.0.x/include/asm/param.h \
+   /linux/linux-2.0.x/include/asm/dma.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/system.h
+random.o: \
+   /linux/linux-2.0.x/include/linux/utsname.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/random.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   $(wildcard /linux/linux-2.0.x/include/config/rst/cookies.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/syn/cookies.h)
+riscom8.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/serial.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   riscom8.h \
+   riscom8_reg.h
+riscom8.h: \
+   /linux/linux-2.0.x/include/linux/serial.h
+	@touch riscom8.h
+rtc.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/miscdevice.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mc146818rtc.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h
+scc.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/tqueue.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_driver.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/termios.h \
+   /linux/linux-2.0.x/include/linux/serial.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/ptrace.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/delay.h \
+   /linux/linux-2.0.x/include/linux/skbuff.h \
+   /linux/linux-2.0.x/include/linux/netdevice.h \
+   /linux/linux-2.0.x/include/linux/if_ether.h \
+   /linux/linux-2.0.x/include/linux/if_arp.h \
+   /linux/linux-2.0.x/include/linux/socket.h \
+   $(wildcard /linux/linux-2.0.x/include/config/scc/standalone.h) \
+   /linux/linux-2.0.x/include/linux/scc.h \
+   /linux/linux-2.0.x/include/net/ax25.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   $(wildcard /linux/linux-2.0.x/include/config/scc/dev.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/scc/tty.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/inet.h)
+selection.o: \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   vt_kern.h \
+   consolemap.h \
+   selection.h
+selection.h: \
+   /linux/linux-2.0.x/include/asm/io.h \
+   $(wildcard /linux/linux-2.0.x/include/config/tga/console.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/vga/console.h)
+	@touch selection.h
+serial-atmel.o: \
+   /linux/linux-2.0.x/include/linux/serial.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/delay.h \
+   serial-atmel.h \
+   $(wildcard /linux/linux-2.0.x/include/config/arch/atmel/eb55.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/swap/atmel/ports.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/console/on/sc28l91.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/console/on/atmel.h)
+serial-atmel.h: \
+   /linux/linux-2.0.x/include/asm/page.h
+	@touch serial-atmel.h
+serial-sc28l91.o: \
+   /linux/linux-2.0.x/include/linux/serial.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/delay.h \
+   serial-sc28l91.h \
+   $(wildcard /linux/linux-2.0.x/include/config/sc28l91/uart/base.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/console/on/sc28l91.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/arch/atmel.h)
+serial-sc28l91.h: \
+   /linux/linux-2.0.x/include/asm/page.h
+	@touch serial-sc28l91.h
+serial.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/serial.h \
+   /linux/linux-2.0.x/include/linux/serial_reg.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/ptrace.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   $(wildcard /linux/linux-2.0.x/include/config/coldfire.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/pci.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/serial/pci.h) \
+   /linux/linux-2.0.x/include/linux/pci.h \
+   /linux/linux-2.0.x/include/linux/bios32.h \
+   $(wildcard /linux/linux-2.0.x/include/config/ledman.h) \
+   /linux/linux-2.0.x/include/linux/ledman.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/mcfpci.h \
+   $(wildcard /linux/linux-2.0.x/include/config/or32.h) \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   $(wildcard /linux/linux-2.0.x/include/config/nettel.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/uclinux.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/hub6.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/serial/nopause/io.h) \
+   /linux/linux-2.0.x/include/linux/symtab_begin.h \
+   /linux/linux-2.0.x/include/linux/symtab_end.h \
+   $(wildcard /linux/linux-2.0.x/include/config/auto/irq.h)
+softdog.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/miscdevice.h \
+   $(wildcard /linux/linux-2.0.x/include/config/watchdog/nowayout.h)
+specialix.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/serial.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/delay.h \
+   /linux/linux-2.0.x/include/linux/tqueue.h \
+   /linux/linux-2.0.x/include/linux/version.h \
+   /linux/linux-2.0.x/include/linux/pci.h \
+   /linux/linux-2.0.x/include/linux/bios32.h \
+   specialix_io8.h \
+   cd1865.h \
+   $(wildcard /linux/linux-2.0.x/include/config/specialix/rtscts.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/pci.h)
+specialix_io8.h: \
+   /linux/linux-2.0.x/include/linux/serial.h
+	@touch specialix_io8.h
+spi.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/version.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/unistd.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h
+stallion.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/wait.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/termios.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/tty_driver.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/serial.h \
+   /linux/linux-2.0.x/include/linux/cd1400.h \
+   /linux/linux-2.0.x/include/linux/sc26198.h \
+   /linux/linux-2.0.x/include/linux/comstats.h \
+   /linux/linux-2.0.x/include/linux/stallion.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   $(wildcard /linux/linux-2.0.x/include/config/pci.h) \
+   /linux/linux-2.0.x/include/linux/pci.h \
+   /linux/linux-2.0.x/include/linux/bios32.h
+t6963fb.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/wait.h \
+   /linux/linux-2.0.x/include/asm/param.h \
+   /linux/linux-2.0.x/include/asm/dma.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/coldfire.h \
+   /linux/linux-2.0.x/include/asm/mcfsim.h \
+   /linux/linux-2.0.x/include/asm/mcfdma.h \
+   /linux/linux-2.0.x/include/asm/mcftimer.h \
+   /linux/linux-2.0.x/include/linux/fb.h \
+   $(wildcard /linux/linux-2.0.x/include/config/t6963/dma.h)
+tga.o: \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/kd.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/bios32.h \
+   /linux/linux-2.0.x/include/linux/pci.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   kbd_kern.h \
+   vt_kern.h \
+   consolemap.h \
+   selection.h \
+   console_struct.h
+tpqic02.o: \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/mtio.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/delay.h \
+   /linux/linux-2.0.x/include/linux/tpqic02.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/asm/dma.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   $(wildcard /linux/linux-2.0.x/include/config/qic02/dynconf.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/max/16m.h)
+tty_io.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/ctype.h \
+   /linux/linux-2.0.x/include/linux/kd.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/linux/scc.h \
+   /linux/linux-2.0.x/include/linux/fb.h \
+   kbd_kern.h \
+   vt_kern.h \
+   selection.h \
+   $(wildcard /linux/linux-2.0.x/include/config/kerneld.h) \
+   /linux/linux-2.0.x/include/linux/kerneld.h \
+   $(wildcard /linux/linux-2.0.x/include/config/m68360.h) \
+   /linux/linux-2.0.x/include/asm/quicc_cpm.h \
+   $(wildcard /linux/linux-2.0.x/include/config/console.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/framebuffer.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/keyboard.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/68332/keyboard.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/mac/plus.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/coldfire/serial.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/serial.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/leon/serial.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/nios/serial.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/gbatxt.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/68328/serial.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/68332/serial.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/lc7981.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/68332/tpu.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/68332/portf.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/68332/porte.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/max311x/serial.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/72001/serial.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ft245/serial.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/sc28l91.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/serial/atmel.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/serial/atmel/bt.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/scc.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/hitachi/sci.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/cyclades.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/stallion.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/istallion.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/digi.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/riscom8.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/specialix.h)
+tty_ioctl.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/termios.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h
+vc_screen.o: \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   vt_kern.h \
+   selection.h
+vesa_blank.o: \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/linux/mm.h
+vga.o: \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/tty_flip.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/kd.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   kbd_kern.h \
+   vt_kern.h \
+   consolemap.h \
+   selection.h \
+   console_struct.h \
+   $(wildcard /linux/linux-2.0.x/include/config/hga.h)
+vt.o: \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/tty.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/kd.h \
+   /linux/linux-2.0.x/include/linux/vt.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   kbd_kern.h \
+   vt_kern.h \
+   diacr.h \
+   selection.h
+vt_kern.h: \
+   /linux/linux-2.0.x/include/linux/vt.h
+	@touch vt_kern.h
+wd501p.h:  \
+   $(wildcard /linux/linux-2.0.x/include/config/wdt/501.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/wdt501/fan.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/wdt/500.h)
+	@touch wd501p.h
+wdt.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/version.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/miscdevice.h \
+   wd501p.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   $(wildcard /linux/linux-2.0.x/include/config/watchdog/nowayout.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/wdt/501.h)
+.PRECIOUS:	68328serial.h \
+	68332serial.h \
+	68kserial.h \
+	diacr.h \
+	gbatxt.h \
+	hitachi-sci.h \
+	kbd_kern.h \
+	mbus.h \
+	mcf_qspi.h \
+	mcfserial.h \
+	riscom8.h \
+	selection.h \
+	serial-atmel.h \
+	serial-sc28l91.h \
+	specialix_io8.h \
+	vt_kern.h \
+	wd501p.h \
+

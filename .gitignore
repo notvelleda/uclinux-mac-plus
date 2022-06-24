@@ -1,0 +1,3 @@
+*.o
+*.gdb
+uClinux/images

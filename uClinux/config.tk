@@ -1,0 +1,2646 @@
+#!/usr/bin/wish -f
+# FILE: header.tk
+# This file is boilerplate TCL/TK function definitions for 'make xconfig'.
+#
+# CHANGES
+# =======
+#
+# 8 January 1999, Michael Elizabeth Chastain, <mec@shout.net>
+# - Remove unused do_cmd function (part of the 2.0 sound support).
+# - Arrange buttons in three columns for better screen fitting.
+# - Add CONSTANT_Y, CONSTANT_M, CONSTANT_N for commands like:
+#     dep_tristate 'foo' CONFIG_FOO m
+#
+# 23 January 1999, Michael Elizabeth Chastain, <mec@shout.net>
+# - Shut vfix the hell up.
+#
+# 24 January 1999, Michael Elizabeth Chastain, <mec@shout.net>
+# - Improve the exit message (Jeff Ronne).
+
+#
+# This is a handy replacement for ".widget cget" that requires neither tk4
+# nor additional source code uglification.
+#
+proc cget { w option } {
+	return "[lindex [$w configure $option] 4]"
+}
+
+#
+# Function to compensate for broken config.in scripts like the sound driver,
+# which make dependencies on variables that are never even conditionally
+# defined.
+#
+proc vfix { var } {
+	global $var
+	if [ catch {eval concat $$var} ] {
+		set $var 4
+	}
+}
+
+#
+# Constant values used by certain dep_tristate commands.
+#
+set CONSTANT_Y 1
+set CONSTANT_M 2
+set CONSTANT_N 0
+set CONSTANT_E 4
+
+#
+# Create a "reference" object to steal colors from.
+#
+button .ref
+
+#
+# On monochrome displays, -disabledforeground is blank by default; that's
+# bad.  Fill it with -foreground instead.
+#
+if { [cget .ref -disabledforeground] == "" } {
+	.ref configure -disabledforeground [cget .ref -foreground]
+}
+
+
+#
+# Define some macros we will need to parse the config.in file.
+#
+
+proc mainmenu_name { text } {
+	wm title . "$text"
+}
+
+proc menu_option { w menu_num text } {
+	global menus_per_column
+	global processed_top_level
+	set processed_top_level [expr $processed_top_level + 1]
+	if { $processed_top_level <= $menus_per_column } then {
+	    set myframe left
+	} elseif { $processed_top_level <= [expr 2 * $menus_per_column] } then {
+	    set myframe middle
+	} else {
+	    set myframe right
+	} 
+	button .f0.x$menu_num -anchor w -text "$text" \
+	    -command "$w .$w \"$text\""
+	pack .f0.x$menu_num -pady 0 -side top -fill x -in .f0.$myframe
+}
+
+proc load_configfile { w title func } {
+	catch {destroy $w}
+	toplevel $w -class Dialog
+	global loadfile
+	frame $w.x
+	label $w.bm -bitmap questhead
+	pack  $w.bm -pady 10 -side top -padx 10
+	label $w.x.l -text "Enter filename:" -relief raised
+	entry $w.x.x -width 35 -relief sunken -borderwidth 2 \
+		-textvariable loadfile
+	pack $w.x.l $w.x.x -anchor w -side left
+	pack $w.x -side top -pady 10
+	wm title $w "$title" 
+
+	set oldFocus [focus]
+	frame $w.f
+	button $w.f.back -text "OK" -width 20 \
+		-command "destroy $w; focus $oldFocus;$func .fileio"
+	button $w.f.canc -text "Cancel" \
+		-width 20 -command "destroy $w; focus $oldFocus"
+	pack $w.f.back $w.f.canc -side left -pady 10 -padx 45
+	pack $w.f -pady 10 -side bottom -padx 10 -anchor w
+	focus $w
+	global winx; global winy
+	set winx [expr [winfo x .]+30]; set winy [expr [winfo y .]+30]
+	wm geometry $w +$winx+$winy
+}
+
+bind all <Alt-q> {maybe_exit .maybe}
+
+proc maybe_exit { w } {
+	catch {destroy $w}
+	toplevel $w -class Dialog
+	label $w.bm -bitmap questhead
+	pack  $w.bm -pady 10 -side top -padx 10
+	message $w.m -width 400 -aspect 300 \
+		-text "Changes will be lost.  Are you sure?" -relief flat
+	pack  $w.m -pady 10 -side top -padx 10
+	wm title $w "Are you sure?" 
+
+	set oldFocus [focus]
+	frame $w.f
+	button $w.f.back -text "OK" -width 20 \
+		-command "exit"
+	button $w.f.canc -text "Cancel" \
+		-width 20 -command "destroy $w; focus $oldFocus"
+	pack $w.f.back $w.f.canc -side left -pady 10 -padx 45
+	pack $w.f -pady 10 -side bottom -padx 10 -anchor w
+  	bind $w <Return> "exit"
+    	bind $w <Escape> "destroy $w; focus $oldFocus"
+	focus $w
+	global winx; global winy
+	set winx [expr [winfo x .]+30]; set winy [expr [winfo y .]+30]
+	wm geometry $w +$winx+$winy
+}
+
+proc read_config_file { w } {
+	global loadfile
+	if { [string length $loadfile] != 0 && [file readable $loadfile] == 1 } then {
+		read_config $loadfile
+	} else {
+		catch {destroy $w}
+		toplevel $w -class Dialog
+		message $w.m -width 400 -aspect 300 -text \
+			"Unable to read file $loadfile" \
+			 -relief raised 
+		label $w.bm -bitmap error
+		pack $w.bm $w.m -pady 10 -side top -padx 10
+		wm title $w "Xconfig Internal Error" 
+
+		set oldFocus [focus]
+		frame $w.f
+		button $w.f.back -text "Bummer" \
+			-width 10 -command "destroy $w; focus $oldFocus"
+		pack $w.f.back -side bottom -pady 10 -anchor s
+		pack $w.f -pady 10 -side top -padx 10 -anchor s
+		focus $w
+		global winx; global winy
+		set winx [expr [winfo x .]+30]; set winy [expr [winfo y .]+30]
+		wm geometry $w +$winx+$winy
+	}
+}
+
+proc write_config_file  { w } {
+	global loadfile
+	if { [string length $loadfile] != 0 
+    		&& ([file writable $loadfile] == 1 || ([file exists $loadfile] == 0 && [file writable [file dirname $loadfile]] == 1)) } then {
+		writeconfig $loadfile /dev/null
+	} else {
+		catch {destroy $w}
+		toplevel $w -class Dialog
+		message $w.m -width 400 -aspect 300 -text \
+			"Unable to write file $loadfile" \
+			 -relief raised 
+		label $w.bm -bitmap error
+		pack $w.bm $w.m -pady 10 -side top -padx 10
+		wm title $w "Xconfig Internal Error" 
+
+		set oldFocus [focus]
+		frame $w.f
+		button $w.f.back -text "OK" \
+			-width 10 -command "destroy $w; focus $oldFocus"
+		pack $w.f.back -side bottom -pady 10 -anchor s
+		pack $w.f -pady 10 -side top -padx 10 -anchor s
+		focus $w
+		global winx; global winy
+		set winx [expr [winfo x .]+30]; set winy [expr [winfo y .]+30]
+		wm geometry $w +$winx+$winy
+	}
+}
+
+proc read_config { filename } {
+	set file1 [open $filename r]
+	clear_choices
+	while { [gets $file1 line] >= 0} {
+		if [regexp {([0-9A-Za-z_]+)=([ynm])} $line foo var value] {
+			if { $value == "y" } then { set cmd "global $var; set $var 1" }
+			if { $value == "n" } then { set cmd "global $var; set $var 0" }
+			if { $value == "m" } then { set cmd "global $var; set $var 2" }
+			eval $cmd
+		}
+		if [regexp {# ([0-9A-Za-z_]+) is not set} $line foo var] {
+			set cmd "global $var; set $var 0"
+			eval $cmd
+		}
+		if [regexp {([0-9A-Za-z_]+)=([0-9A-Fa-f]+)} $line foo var value] {
+			set cmd "global $var; set $var $value"
+			eval $cmd
+		}
+		if [regexp {([0-9A-Za-z_]+)="([^"]*)"} $line foo var value] {
+			set cmd "global $var; set $var \"$value\""
+			eval $cmd
+		}
+	}
+	close $file1
+	update_choices
+	update_mainmenu
+}
+proc write_comment { file1 file2 text } {
+    	puts $file1 ""
+	puts $file1 "#"
+	puts $file1 "# $text"
+	puts $file1 "#"
+	puts $file2 "/*"
+	puts $file2 " * $text"
+	puts $file2 " */"
+}
+
+proc effective_dep { deplist } {
+	global CONFIG_MODULES
+	set depend 1
+	foreach i $deplist {
+		if {$i == 0} then {set depend 0}
+		if {$i == 2 && $depend == 1} then {set depend 2}
+	}
+	if {$depend == 2 && $CONFIG_MODULES == 0} then {set depend 0}
+	return $depend
+}
+
+proc sync_tristate { var dep } {
+	global CONFIG_MODULES
+	if {$dep == 0 && ($var == 1 || $var == 2)} then {
+		set var 0
+	} elseif {$dep == 2 && $var == 1} then {
+		set var 2
+	} elseif {$var == 2 && $CONFIG_MODULES == 0} then {
+		if {$dep == 1} then {set var 1} else {set var 0}
+	}
+	return $var
+}
+
+proc sync_bool { var dep modset } {
+	set var [sync_tristate $var $dep]
+	if {$dep == 2 && $var == 2} then {
+		set var $modset
+	}
+	return $var
+}
+
+proc write_tristate { file1 file2 varname variable deplist modset } {
+	set variable [sync_tristate $variable [effective_dep $deplist]]
+	if { $variable == 2 } \
+		then { set variable $modset }
+	if { $variable == 1 } \
+		then { puts $file1 "$varname=y"; \
+		       puts $file2 "#define $varname 1" } \
+	elseif { $variable == 2 } \
+		then { puts $file1 "$varname=m"; \
+		       puts $file2 "#undef  $varname"; \
+		       puts $file2 "#define ${varname}_MODULE 1" } \
+	elseif { $variable == 0 } \
+		then { puts $file1 "# $varname is not set"; \
+		       puts $file2 "#undef  $varname"} \
+	else { \
+	    puts stdout "ERROR - Attempting to write value for unconfigured variable ($varname)." \
+	}
+}
+
+proc write_int { file1 file2 varname variable dep } {
+	if { $dep == 0 } \
+		then { puts $file1 "# $varname is not set"; \
+		       puts $file2 "#undef  $varname"} \
+	else {
+		puts $file1 "$varname=$variable"; \
+		puts $file2 "#define $varname ($variable)"; \
+	}
+}
+
+proc write_hex { file1 file2 varname variable dep } {
+	if { $dep == 0 } \
+		then { puts $file1 "# $varname is not set"; \
+		       puts $file2 "#undef  $varname"} \
+	else {
+		puts $file1 "$varname=$variable"; \
+		puts -nonewline $file2 "#define $varname 0x"; \
+		puts $file2 [exec echo $variable | sed s/^0\[xX\]//]; \
+	}
+}
+
+proc write_string { file1 file2 varname variable dep } {
+	if { $dep == 0 } \
+		then { puts $file1 "# $varname is not set"; \
+		       puts $file2 "#undef  $varname"} \
+	else {
+		puts $file1 "$varname=\"$variable\""; \
+		puts $file2 "#define $varname \"$variable\""; \
+	}
+}
+
+proc option_name {w mnum line text helpidx} {
+	button $w.x$line.l -text "$text" -relief groove -anchor w
+	$w.x$line.l configure -activefore [cget $w.x$line.l -fg] \
+				-activeback [cget $w.x$line.l -bg]
+	button $w.x$line.help -text "Help" -relief raised \
+		-command "dohelp .dohelp $helpidx .menu$mnum"
+	pack $w.x$line.help -side right -fill y
+	pack $w.x$line.l -side right -fill both -expand on
+}
+
+proc toggle_switch2 {w mnum line text variable} {
+	frame $w.x$line -relief sunken
+	radiobutton $w.x$line.y -text "y" -variable $variable -value 1 \
+		-relief groove -width 2 -command "update_active"
+	radiobutton $w.x$line.m -text "-"  -variable $variable -value 2 \
+		-relief groove -width 2 -command "update_active"
+	radiobutton $w.x$line.n -text "n"  -variable $variable -value 0 \
+		-relief groove -width 2 -command "update_active"
+
+	option_name $w $mnum $line $text $variable
+
+	pack $w.x$line.n $w.x$line.m $w.x$line.y -side right -fill y
+}
+
+proc toggle_switch3 {w mnum line text variable} {
+	frame $w.x$line -relief sunken
+	radiobutton $w.x$line.y -text "y" -variable $variable -value 1 \
+		-relief groove -width 2 -command "update_active"
+	radiobutton $w.x$line.m -text "m"  -variable $variable -value 2 \
+		-relief groove -width 2 -command "update_active"
+	radiobutton $w.x$line.n -text "n"  -variable $variable -value 0 \
+		-relief groove -width 2 -command "update_active"
+
+	option_name $w $mnum $line $text $variable
+
+	global CONFIG_MODULES
+	if {($CONFIG_MODULES == 0)} then {
+		$w.x$line.m configure -state disabled
+	}
+	pack $w.x$line.n $w.x$line.m $w.x$line.y -side right -fill y
+}
+
+proc bool {w mnum line text variable} {
+	toggle_switch2 $w $mnum $line $text $variable
+	$w.x$line.m configure -state disabled
+	pack $w.x$line -anchor w -fill both -expand on
+}
+
+proc tristate {w mnum line text variable } {
+	toggle_switch3 $w $mnum $line $text $variable
+	pack $w.x$line -anchor w -fill both -expand on
+}
+
+proc dep_tristate {w mnum line text variable } {
+	tristate $w $mnum $line $text $variable
+}
+
+proc dep_bool {w mnum line text variable } {
+	bool $w $mnum $line $text $variable
+}
+
+proc int { w mnum line text variable } {
+	frame $w.x$line
+	entry $w.x$line.x -width 18 -relief sunken -borderwidth 2 \
+		-textvariable $variable
+	option_name $w $mnum $line $text $variable
+	pack $w.x$line.x -anchor w -side right -fill y
+	pack $w.x$line -anchor w -fill both -expand on
+}
+
+proc hex { w mnum line text variable } {
+	int $w $mnum $line $text $variable
+}
+
+proc istring { w mnum line text variable } {
+	frame $w.x$line
+	entry $w.x$line.x -width 18 -relief sunken -borderwidth 2 \
+		-textvariable $variable
+	option_name $w $mnum $line $text $variable
+	pack $w.x$line.x -anchor w -side right -fill y
+	pack $w.x$line -anchor w -fill both -expand on
+}
+
+proc minimenu { w mnum line text variable helpidx } {
+	frame $w.x$line
+	menubutton $w.x$line.x -textvariable $variable -menu \
+		$w.x$line.x.menu -relief raised \
+		-anchor w
+	option_name $w $mnum $line $text $helpidx
+	pack $w.x$line.x -anchor w -side right -fill y
+	pack $w.x$line -anchor w -fill both -expand on
+}
+
+proc menusplit {w m n} {
+	if { $n > 2 } then {
+		update idletasks
+		set menuoptsize [expr [$m yposition 2] - [$m yposition 1]]   
+		set maxsize [winfo screenheight $w]
+		set splitpoint [expr $maxsize * 4 / 5 / $menuoptsize - 1]
+		for {set i [expr $splitpoint + 1]} {$i <= $n} {incr i $splitpoint} {
+			$m entryconfigure $i -columnbreak 1
+		}
+	}
+}
+
+proc menutitle {text menu w} {
+	wm title $w "$text"
+}
+
+proc submenu { w mnum line text subnum } {
+	frame $w.x$line
+	button $w.x$line.l -text "" -width 15 -relief groove
+	$w.x$line.l configure -activefore [cget $w.x$line.l -fg] \
+		-activeback [cget $w.x$line.l -bg] -state disabled
+	button $w.x$line.m -text "$text" -relief raised -anchor w \
+		-command "catch {destroy .menu$subnum}; menu$subnum .menu$subnum \"$text\""
+	pack $w.x$line.l -side left -fill both
+	pack $w.x$line.m -anchor w -side right -fill both -expand on
+	pack $w.x$line -anchor w -fill both -expand on
+}
+
+proc comment {w mnum line text } {
+	frame $w.x$line
+	button $w.x$line.l -text "" -width 15 -relief groove
+	$w.x$line.l configure -activefore [cget $w.x$line.l -fg] \
+		-activeback [cget $w.x$line.l -bg] -state disabled
+	button $w.x$line.m -text "$text" -relief groove -anchor w
+	$w.x$line.m configure -activefore [cget $w.x$line.m -fg] \
+		-activeback [cget $w.x$line.m -bg]
+	pack $w.x$line.l -side left -fill both
+	pack $w.x$line.m -anchor w -side right -fill both -expand on
+	pack $w.x$line -anchor w -fill both -expand on
+}
+
+proc dohelp {w var parent}  {
+	catch {destroy $w}
+	toplevel $w -class Dialog
+
+	set filefound 0
+	set found 0
+	set lineno 0
+
+	global help_file
+
+	if { [file readable $help_file ] == 1} then {
+		set filefound 1
+		# First escape sed regexp special characters in var:
+		set var [exec echo "$var" | sed s/\[\]\[\/.^$*\]/\\\\&/g]
+		# Now pick out right help text:
+		set message [exec sed -n "
+			/^$var\[ 	\]*\$/,\${
+				/^$var\[ 	\]*\$/c\\
+${var}:\\
+
+				/^#/b
+				/^\[^ 	\]/q
+				s/^  //
+				p
+			}
+			" $help_file ]
+		set found [expr [string length "$message"] > 0]
+	}
+
+	frame $w.f1
+	pack $w.f1 -fill both -expand on
+
+	# Do the OK button
+	#
+	set oldFocus [focus]
+	frame $w.f2
+	button $w.f2.ok -text "OK" \
+		-width 10 -command "destroy $w; catch {focus $oldFocus}"
+	pack $w.f2.ok -side bottom -pady 6 -anchor n
+	pack $w.f2 -side bottom -padx 10 -anchor s
+
+	scrollbar $w.f1.vscroll -command "$w.f1.canvas yview"
+	pack $w.f1.vscroll -side right -fill y
+
+	canvas $w.f1.canvas -relief flat -borderwidth 0 \
+		-yscrollcommand "$w.f1.vscroll set"
+	frame $w.f1.f
+	pack $w.f1.canvas -side right -fill y -expand on
+
+	if { $found == 0 } then {
+		if { $filefound == 0 } then {
+		message $w.f1.f.m -width 750 -aspect 300 -relief flat -text \
+			"No help available - unable to open file $help_file.  This file should have come with your distribution."
+		} else {
+		message $w.f1.f.m -width 400 -aspect 300 -relief flat -text \
+			"No help available for $var"
+		}
+		label $w.f1.bm -bitmap error
+		wm title $w "RTFM"
+	} else {
+		text $w.f1.f.m -width 73 -relief flat -wrap word
+		$w.f1.f.m insert 0.0 $message
+		$w.f1.f.m conf -state disabled -height [$w.f1.f.m index end]
+
+		label $w.f1.bm -bitmap info
+		wm title $w "Configuration help" 
+	}
+	pack $w.f1.f.m -side left
+	pack $w.f1.bm $w.f1.f -side left -padx 10
+
+	focus $w
+	set winx [expr [winfo x $parent]+20]
+	set winy [expr [winfo y $parent]+20]
+	wm geometry $w +$winx+$winy
+	set sizok [expr [winfo reqheight $w.f2.ok] + 12]
+	set maxy [expr [winfo screenheight .] * 3 / 4]
+	set canvtotal [winfo reqheight $w.f1.f.m]
+	if [expr $sizok + $canvtotal < $maxy] {
+		set sizy $canvtotal
+	} else {
+		set sizy [expr $maxy - $sizok]
+	}
+	$w.f1.canvas configure -height $sizy -width [winfo reqwidth $w.f1.f.m] \
+		-scrollregion "0 0 [winfo reqwidth $w.f1.f.m] \
+			[winfo reqheight $w.f1.f.m]"
+	$w.f1.canvas create window 0 0 -anchor nw -window $w.f1.f
+	update idletasks
+
+	set maxy [winfo screenheight .]
+	if [expr $sizok + $canvtotal < $maxy] {
+		set sizy [expr $sizok + $canvtotal]
+	} else {
+		set sizy $maxy
+	}
+	wm maxsize $w [winfo width $w] $sizy
+}
+
+bind all <Alt-s> { catch {exec cp -f .config .config.old}; \
+		writeconfig .config include/linux/autoconf.h; wrapup .wrap }
+
+proc wrapup {w }  {
+	catch {destroy $w}
+	toplevel $w -class Dialog
+
+	global CONFIG_MODVERSIONS; vfix CONFIG_MODVERSIONS
+	if { ([file exists .hdepend] != 1) || ($CONFIG_MODVERSIONS == 1) } then {
+	    message $w.m -width 400 -aspect 300 -relief raised -text \
+		"End of Linux kernel configuration.  Check the top-level Makefile for additional configuration.  Next, you must run 'make dep'."
+	} else {
+	    message $w.m -width 400 -aspect 300 -relief raised -text \
+		"End of Linux kernel configuration.  Check the top-level Makefile for additional configuration.  Next, you may 'make bzImage', 'make bzdisk', or 'make bzlilo.'"
+	}
+	label $w.bm -bitmap info
+	pack $w.bm $w.m -pady 10 -side top -padx 10
+	wm title $w "Kernel build instructions" 
+
+	set oldFocus [focus]
+	frame $w.f
+	button $w.f.back -text "OK" \
+		-width 10 -command "exit"
+	pack $w.f.back -side bottom -pady 10 -anchor s
+	pack $w.f -pady 10 -side top -padx 10 -anchor s
+	focus $w
+        bind $w <Return> "exit"
+	global winx; global winy
+	set winx [expr [winfo x .]+30]; set winy [expr [winfo y .]+30]
+	wm geometry $w +$winx+$winy
+
+}
+
+proc unregister_active {num} {
+	global active_menus
+	set index [lsearch -exact $active_menus $num]
+	if {$index != -1} then {set active_menus [lreplace $active_menus $index $index]}
+}
+
+proc update_active {} {
+	global active_menus total_menus
+	set max 0
+	if {[llength $active_menus] > 0} then {
+		set max [lindex $active_menus end]
+		update_define [toplevel_menu [lindex $active_menus 0]] $max 0
+	}
+	foreach i $active_menus {
+		if {[winfo exists .menu$i] == 0} then {
+			unregister_active $i
+		} else {
+			update_menu$i
+		}
+	}
+	update_define [expr $max + 1] $total_menus 1
+	update_mainmenu
+}
+
+proc configure_entry {w option items} {
+	foreach i $items {
+		$w.$i configure -state $option
+	}
+}
+
+proc validate_int {name val default} {
+	if {([exec echo $val | sed s/^-//g | tr -d \[:digit:\] ] != "")} then {
+		global $name; set $name $default
+	}
+}
+
+proc validate_hex {name val default} {
+	if {([exec echo $val | tr -d \[:xdigit:\] ] != "")} then {
+		global $name; set $name $default
+	}
+}
+
+proc update_define {first last allow_update} {
+	for {set i $first} {$i <= $last} {incr i} {
+		update_define_menu$i
+		if {$allow_update == 1} then update
+	}
+}
+
+#
+# Next set up the particulars for the top level menu, and define a few
+# buttons which we will stick down at the bottom.
+#
+
+frame .f0 
+frame .f0.left
+frame .f0.middle
+frame .f0.right
+
+set active_menus [list]
+set processed_top_level 0
+set autoconf_file ""
+set help_file ""
+set menus_per_column 3
+set total_menus 2
+
+proc toplevel_menu {num} {
+	return $num
+}
+
+mainmenu_name "SnapGear Embedded Linux Configuration"
+menu_option menu1 1 "Vendor/Product Selection"
+proc menu1 {w title} {
+	set oldFocus [focus]
+	catch {destroy $w; unregister_active 1}
+	toplevel $w -class Dialog
+	wm withdraw $w
+	global active_menus
+	set active_menus [lsort -integer [linsert $active_menus end 1]]
+	message $w.m -width 400 -aspect 300 -text \
+		"Vendor/Product Selection"  -relief raised
+	pack $w.m -pady 10 -side top -padx 10
+	wm title $w "Vendor/Product Selection" 
+
+	bind $w <Escape> "catch {focus $oldFocus}; destroy $w; unregister_active 1; break"
+	set nextscript "catch {focus $oldFocus}; destroy $w; unregister_active 1; menu2 .menu2 \"$title\""
+	frame $w.f
+	button $w.f.back -text "Main Menu" \
+		-width 15 -command "catch {focus $oldFocus}; destroy $w; unregister_active 1"
+	button $w.f.next -text "Next" -underline 0\
+		-width 15 -command $nextscript
+	bind all <Alt-n> $nextscript
+	button $w.f.prev -text "Prev" -underline 0\
+		-width 15 -command "catch {focus $oldFocus}; destroy $w; unregister_active 1; menu0 .menu0 \"$title\""
+	$w.f.prev configure -state disabled
+	pack $w.f.back $w.f.next $w.f.prev -side left -expand on
+	pack $w.f -pady 10 -side bottom -anchor w -fill x
+	frame $w.topline -relief ridge -borderwidth 2 -height 2
+	pack $w.topline -side top -fill x
+
+	frame $w.botline -relief ridge -borderwidth 2 -height 2
+	pack $w.botline -side bottom -fill x
+
+	frame $w.config
+	pack $w.config -fill y -expand on
+
+	scrollbar $w.config.vscroll -command "$w.config.canvas yview"
+	pack $w.config.vscroll -side right -fill y
+
+	canvas $w.config.canvas -height 1\
+		-relief flat -borderwidth 0 -yscrollcommand "$w.config.vscroll set" \
+		-width [expr [winfo screenwidth .] * 1 / 2] 
+	frame $w.config.f
+	bind $w <Key-Down> "$w.config.canvas yview scroll  1 unit;break;"
+	bind $w <Key-Up> "$w.config.canvas yview scroll  -1 unit;break;"
+	bind $w <Key-Next> "$w.config.canvas yview scroll  1 page;break;"
+	bind $w <Key-Prior> "$w.config.canvas yview scroll  -1 page;break;"
+	bind $w <Key-Home> "$w.config.canvas yview moveto 0;break;"
+	bind $w <Key-End> "$w.config.canvas yview moveto 1 ;break;"
+	pack $w.config.canvas -side right -fill y
+
+
+	comment $w.config.f 1 0 "Select the Vendor you wish to target"
+	global tmpvar_0
+	minimenu $w.config.f 1 1 "Vendor" tmpvar_0 CONFIG_DEFAULTS_3COM
+	menu $w.config.f.x1.x.menu -tearoffcommand "menutitle \"Vendor\""
+	$w.config.f.x1.x.menu add radiobutton -label "3com" -variable tmpvar_0 -value "3com" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "ADI" -variable tmpvar_0 -value "ADI" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Apple" -variable tmpvar_0 -value "Apple" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Arcturus" -variable tmpvar_0 -value "Arcturus" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Arnewsh" -variable tmpvar_0 -value "Arnewsh" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Atmel" -variable tmpvar_0 -value "Atmel" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "BMOW" -variable tmpvar_0 -value "BMOW" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Conexant" -variable tmpvar_0 -value "Conexant" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Cwlinux" -variable tmpvar_0 -value "Cwlinux" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Cytek" -variable tmpvar_0 -value "Cytek" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Exys" -variable tmpvar_0 -value "Exys" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Feith" -variable tmpvar_0 -value "Feith" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Future" -variable tmpvar_0 -value "Future" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "GDB" -variable tmpvar_0 -value "GDB" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Hitachi" -variable tmpvar_0 -value "Hitachi" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Imt" -variable tmpvar_0 -value "Imt" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Insight" -variable tmpvar_0 -value "Insight" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Intel" -variable tmpvar_0 -value "Intel" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "KendinMicrel" -variable tmpvar_0 -value "KendinMicrel" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "LEOX" -variable tmpvar_0 -value "LEOX" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Mecel" -variable tmpvar_0 -value "Mecel" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Midas" -variable tmpvar_0 -value "Midas" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Motorola" -variable tmpvar_0 -value "Motorola" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "NEC" -variable tmpvar_0 -value "NEC" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Netburner" -variable tmpvar_0 -value "Netburner" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "NetSilicon" -variable tmpvar_0 -value "NetSilicon" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Nintendo" -variable tmpvar_0 -value "Nintendo" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "OPENcores" -variable tmpvar_0 -value "OPENcores" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Promise" -variable tmpvar_0 -value "Promise" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Samsung" -variable tmpvar_0 -value "Samsung" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "SecureEdge" -variable tmpvar_0 -value "SecureEdge" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "senTec" -variable tmpvar_0 -value "senTec" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "SnapGear" -variable tmpvar_0 -value "SnapGear" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Soekris" -variable tmpvar_0 -value "Soekris" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "SSV" -variable tmpvar_0 -value "SSV" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "SWARM" -variable tmpvar_0 -value "SWARM" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "TeleIP" -variable tmpvar_0 -value "TeleIP" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Triscend" -variable tmpvar_0 -value "Triscend" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Via" -variable tmpvar_0 -value "Via" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Weiss" -variable tmpvar_0 -value "Weiss" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "Xilinx" -variable tmpvar_0 -value "Xilinx" -command "update_active"
+	menusplit $w $w.config.f.x1.x.menu 41
+	comment $w.config.f 1 2 "Select the Product you wish to target"
+	global tmpvar_1
+	minimenu $w.config.f 1 3 "3com Products" tmpvar_1 CONFIG_DEFAULTS_3COM_PALMIIIX
+	menu $w.config.f.x3.x.menu -tearoffcommand "menutitle \"3com Products\""
+	$w.config.f.x3.x.menu add radiobutton -label "PalmIIIx" -variable tmpvar_1 -value "PalmIIIx" -command "update_active"
+	$w.config.f.x3.x.menu add radiobutton -label "Xcopilot" -variable tmpvar_1 -value "Xcopilot" -command "update_active"
+	menusplit $w $w.config.f.x3.x.menu 2
+	global tmpvar_2
+	minimenu $w.config.f 1 4 "ADI Products" tmpvar_2 CONFIG_DEFAULTS_ADI_COYOTE
+	menu $w.config.f.x4.x.menu -tearoffcommand "menutitle \"ADI Products\""
+	$w.config.f.x4.x.menu add radiobutton -label "Coyote" -variable tmpvar_2 -value "Coyote" -command "update_active"
+	menusplit $w $w.config.f.x4.x.menu 1
+	global tmpvar_3
+	minimenu $w.config.f 1 5 "Apple Products" tmpvar_3 CONFIG_DEFAULTS_APPLE_MACPLUS
+	menu $w.config.f.x5.x.menu -tearoffcommand "menutitle \"Apple Products\""
+	$w.config.f.x5.x.menu add radiobutton -label "MacPlus" -variable tmpvar_3 -value "MacPlus" -command "update_active"
+	menusplit $w $w.config.f.x5.x.menu 1
+	global tmpvar_4
+	minimenu $w.config.f 1 6 "Arcturus Products" tmpvar_4 CONFIG_DEFAULTS_ARCTURUS_UC5272
+	menu $w.config.f.x6.x.menu -tearoffcommand "menutitle \"Arcturus Products\""
+	$w.config.f.x6.x.menu add radiobutton -label "uC5272" -variable tmpvar_4 -value "uC5272" -command "update_active"
+	$w.config.f.x6.x.menu add radiobutton -label "uCdimm" -variable tmpvar_4 -value "uCdimm" -command "update_active"
+	$w.config.f.x6.x.menu add radiobutton -label "uCdimm+mtd" -variable tmpvar_4 -value "uCdimm+mtd" -command "update_active"
+	$w.config.f.x6.x.menu add radiobutton -label "uCquicc" -variable tmpvar_4 -value "uCquicc" -command "update_active"
+	$w.config.f.x6.x.menu add radiobutton -label "uCsimm" -variable tmpvar_4 -value "uCsimm" -command "update_active"
+	menusplit $w $w.config.f.x6.x.menu 5
+	global tmpvar_5
+	minimenu $w.config.f 1 7 "Arnewsh Products" tmpvar_5 CONFIG_DEFAULTS_ARNEWSH_M5206
+	menu $w.config.f.x7.x.menu -tearoffcommand "menutitle \"Arnewsh Products\""
+	$w.config.f.x7.x.menu add radiobutton -label "M5206" -variable tmpvar_5 -value "M5206" -command "update_active"
+	$w.config.f.x7.x.menu add radiobutton -label "M5307" -variable tmpvar_5 -value "M5307" -command "update_active"
+	menusplit $w $w.config.f.x7.x.menu 2
+	global tmpvar_6
+	minimenu $w.config.f 1 8 "Atmel Products" tmpvar_6 CONFIG_DEFAULTS_ATMEL_AT91
+	menu $w.config.f.x8.x.menu -tearoffcommand "menutitle \"Atmel Products\""
+	$w.config.f.x8.x.menu add radiobutton -label "AT91" -variable tmpvar_6 -value "AT91" -command "update_active"
+	menusplit $w $w.config.f.x8.x.menu 1
+	global tmpvar_7
+	minimenu $w.config.f 1 9 "BMOW Products" tmpvar_7 CONFIG_DEFAULTS_BMOW_68KATY
+	menu $w.config.f.x9.x.menu -tearoffcommand "menutitle \"BMOW Products\""
+	$w.config.f.x9.x.menu add radiobutton -label "68Katy" -variable tmpvar_7 -value "68Katy" -command "update_active"
+	menusplit $w $w.config.f.x9.x.menu 1
+	global tmpvar_8
+	minimenu $w.config.f 1 10 "Conexant Products" tmpvar_8 CONFIG_DEFAULTS_CONEXANT_HUMBER
+	menu $w.config.f.x10.x.menu -tearoffcommand "menutitle \"Conexant Products\""
+	$w.config.f.x10.x.menu add radiobutton -label "Humber" -variable tmpvar_8 -value "Humber" -command "update_active"
+	$w.config.f.x10.x.menu add radiobutton -label "P52" -variable tmpvar_8 -value "P52" -command "update_active"
+	menusplit $w $w.config.f.x10.x.menu 2
+	global tmpvar_9
+	minimenu $w.config.f 1 11 "Cwlinux Products" tmpvar_9 CONFIG_DEFAULTS_CWLINUX_CWEZ328
+	menu $w.config.f.x11.x.menu -tearoffcommand "menutitle \"Cwlinux Products\""
+	$w.config.f.x11.x.menu add radiobutton -label "cwez328" -variable tmpvar_9 -value "cwez328" -command "update_active"
+	$w.config.f.x11.x.menu add radiobutton -label "cwvz328" -variable tmpvar_9 -value "cwvz328" -command "update_active"
+	menusplit $w $w.config.f.x11.x.menu 2
+	global tmpvar_10
+	minimenu $w.config.f 1 12 "Cytek Products" tmpvar_10 CONFIG_DEFAULTS_CYTEK_NETMP3
+	menu $w.config.f.x12.x.menu -tearoffcommand "menutitle \"Cytek Products\""
+	$w.config.f.x12.x.menu add radiobutton -label "NETmp3" -variable tmpvar_10 -value "NETmp3" -command "update_active"
+	menusplit $w $w.config.f.x12.x.menu 1
+	global tmpvar_11
+	minimenu $w.config.f 1 13 "Exys Products" tmpvar_11 CONFIG_DEFAULTS_EXYS_DE2
+	menu $w.config.f.x13.x.menu -tearoffcommand "menutitle \"Exys Products\""
+	$w.config.f.x13.x.menu add radiobutton -label "de2" -variable tmpvar_11 -value "de2" -command "update_active"
+	menusplit $w $w.config.f.x13.x.menu 1
+	global tmpvar_12
+	minimenu $w.config.f 1 14 "Feith Products" tmpvar_12 CONFIG_DEFAULTS_FEITH_CLEOPATRA2
+	menu $w.config.f.x14.x.menu -tearoffcommand "menutitle \"Feith Products\""
+	$w.config.f.x14.x.menu add radiobutton -label "Cleopatra2" -variable tmpvar_12 -value "Cleopatra2" -command "update_active"
+	$w.config.f.x14.x.menu add radiobutton -label "Cleopatra" -variable tmpvar_12 -value "Cleopatra" -command "update_active"
+	menusplit $w $w.config.f.x14.x.menu 2
+	global tmpvar_13
+	minimenu $w.config.f 1 15 "Future Products" tmpvar_13 CONFIG_DEFAULTS_FUTURE_FUTURENETBURNER5282BADGE
+	menu $w.config.f.x15.x.menu -tearoffcommand "menutitle \"Future Products\""
+	$w.config.f.x15.x.menu add radiobutton -label "FutureNetburner5282Badge" -variable tmpvar_13 -value "FutureNetburner5282Badge" -command "update_active"
+	menusplit $w $w.config.f.x15.x.menu 1
+	global tmpvar_14
+	minimenu $w.config.f 1 16 "GDB Products" tmpvar_14 CONFIG_DEFAULTS_GDB_ARMULATOR
+	menu $w.config.f.x16.x.menu -tearoffcommand "menutitle \"GDB Products\""
+	$w.config.f.x16.x.menu add radiobutton -label "ARMulator" -variable tmpvar_14 -value "ARMulator" -command "update_active"
+	$w.config.f.x16.x.menu add radiobutton -label "ARMulator-EB" -variable tmpvar_14 -value "ARMulator-EB" -command "update_active"
+	menusplit $w $w.config.f.x16.x.menu 2
+	global tmpvar_15
+	minimenu $w.config.f 1 17 "Hitachi Products" tmpvar_15 CONFIG_DEFAULTS_HITACHI_BIGSURIV
+	menu $w.config.f.x17.x.menu -tearoffcommand "menutitle \"Hitachi Products\""
+	$w.config.f.x17.x.menu add radiobutton -label "BigSurIV" -variable tmpvar_15 -value "BigSurIV" -command "update_active"
+	$w.config.f.x17.x.menu add radiobutton -label "EDOSK2674" -variable tmpvar_15 -value "EDOSK2674" -command "update_active"
+	$w.config.f.x17.x.menu add radiobutton -label "KeyWest" -variable tmpvar_15 -value "KeyWest" -command "update_active"
+	menusplit $w $w.config.f.x17.x.menu 3
+	global tmpvar_16
+	minimenu $w.config.f 1 18 "Imt Products" tmpvar_16 CONFIG_DEFAULTS_IMT_MWI
+	menu $w.config.f.x18.x.menu -tearoffcommand "menutitle \"Imt Products\""
+	$w.config.f.x18.x.menu add radiobutton -label "mwi" -variable tmpvar_16 -value "mwi" -command "update_active"
+	menusplit $w $w.config.f.x18.x.menu 1
+	global tmpvar_17
+	minimenu $w.config.f 1 19 "Insight Products" tmpvar_17 CONFIG_DEFAULTS_INSIGHT_MBVANILLA_NET
+	menu $w.config.f.x19.x.menu -tearoffcommand "menutitle \"Insight Products\""
+	$w.config.f.x19.x.menu add radiobutton -label "mbvanilla_net" -variable tmpvar_17 -value "mbvanilla_net" -command "update_active"
+	$w.config.f.x19.x.menu add radiobutton -label "XC2V1K_Microblaze" -variable tmpvar_17 -value "XC2V1K_Microblaze" -command "update_active"
+	$w.config.f.x19.x.menu add radiobutton -label "XC2VP7_Microblaze" -variable tmpvar_17 -value "XC2VP7_Microblaze" -command "update_active"
+	menusplit $w $w.config.f.x19.x.menu 3
+	global tmpvar_18
+	minimenu $w.config.f 1 20 "Intel Products" tmpvar_18 CONFIG_DEFAULTS_INTEL_IXDP425
+	menu $w.config.f.x20.x.menu -tearoffcommand "menutitle \"Intel Products\""
+	$w.config.f.x20.x.menu add radiobutton -label "IXDP425" -variable tmpvar_18 -value "IXDP425" -command "update_active"
+	menusplit $w $w.config.f.x20.x.menu 1
+	global tmpvar_19
+	minimenu $w.config.f 1 21 "KendinMicrel Products" tmpvar_19 CONFIG_DEFAULTS_KENDINMICREL_KS8695
+	menu $w.config.f.x21.x.menu -tearoffcommand "menutitle \"KendinMicrel Products\""
+	$w.config.f.x21.x.menu add radiobutton -label "KS8695" -variable tmpvar_19 -value "KS8695" -command "update_active"
+	menusplit $w $w.config.f.x21.x.menu 1
+	global tmpvar_20
+	minimenu $w.config.f 1 22 "LEOX Products" tmpvar_20 CONFIG_DEFAULTS_LEOX_TSIM
+	menu $w.config.f.x22.x.menu -tearoffcommand "menutitle \"LEOX Products\""
+	$w.config.f.x22.x.menu add radiobutton -label "TSIM" -variable tmpvar_20 -value "TSIM" -command "update_active"
+	menusplit $w $w.config.f.x22.x.menu 1
+	global tmpvar_21
+	minimenu $w.config.f 1 23 "Mecel Products" tmpvar_21 CONFIG_DEFAULTS_MECEL_FR1000
+	menu $w.config.f.x23.x.menu -tearoffcommand "menutitle \"Mecel Products\""
+	$w.config.f.x23.x.menu add radiobutton -label "FR1000" -variable tmpvar_21 -value "FR1000" -command "update_active"
+	menusplit $w $w.config.f.x23.x.menu 1
+	global tmpvar_22
+	minimenu $w.config.f 1 24 "Midas Products" tmpvar_22 CONFIG_DEFAULTS_MIDAS_RTE_NB85E_CB
+	menu $w.config.f.x24.x.menu -tearoffcommand "menutitle \"Midas Products\""
+	$w.config.f.x24.x.menu add radiobutton -label "RTE-NB85E-CB" -variable tmpvar_22 -value "RTE-NB85E-CB" -command "update_active"
+	$w.config.f.x24.x.menu add radiobutton -label "RTE-V850E-MA1-CB" -variable tmpvar_22 -value "RTE-V850E-MA1-CB" -command "update_active"
+	$w.config.f.x24.x.menu add radiobutton -label "RTE-V850E-ME2-CB" -variable tmpvar_22 -value "RTE-V850E-ME2-CB" -command "update_active"
+	menusplit $w $w.config.f.x24.x.menu 3
+	global tmpvar_23
+	minimenu $w.config.f 1 25 "Motorola Products" tmpvar_23 CONFIG_DEFAULTS_MOTOROLA_M5206EC3
+	menu $w.config.f.x25.x.menu -tearoffcommand "menutitle \"Motorola Products\""
+	$w.config.f.x25.x.menu add radiobutton -label "M5206eC3" -variable tmpvar_23 -value "M5206eC3" -command "update_active"
+	$w.config.f.x25.x.menu add radiobutton -label "M5206eLITE" -variable tmpvar_23 -value "M5206eLITE" -command "update_active"
+	$w.config.f.x25.x.menu add radiobutton -label "M5249C3" -variable tmpvar_23 -value "M5249C3" -command "update_active"
+	$w.config.f.x25.x.menu add radiobutton -label "M5272C3" -variable tmpvar_23 -value "M5272C3" -command "update_active"
+	$w.config.f.x25.x.menu add radiobutton -label "M5282C3" -variable tmpvar_23 -value "M5282C3" -command "update_active"
+	$w.config.f.x25.x.menu add radiobutton -label "M5307C3" -variable tmpvar_23 -value "M5307C3" -command "update_active"
+	$w.config.f.x25.x.menu add radiobutton -label "M5407C3" -variable tmpvar_23 -value "M5407C3" -command "update_active"
+	menusplit $w $w.config.f.x25.x.menu 7
+	global tmpvar_24
+	minimenu $w.config.f 1 26 "NEC Products" tmpvar_24 CONFIG_DEFAULTS_NEC_ANNA
+	menu $w.config.f.x26.x.menu -tearoffcommand "menutitle \"NEC Products\""
+	$w.config.f.x26.x.menu add radiobutton -label "Anna" -variable tmpvar_24 -value "Anna" -command "update_active"
+	$w.config.f.x26.x.menu add radiobutton -label "common" -variable tmpvar_24 -value "common" -command "update_active"
+	$w.config.f.x26.x.menu add radiobutton -label "v850e-sim-gdb" -variable tmpvar_24 -value "v850e-sim-gdb" -command "update_active"
+	menusplit $w $w.config.f.x26.x.menu 3
+	global tmpvar_25
+	minimenu $w.config.f 1 27 "Netburner Products" tmpvar_25 CONFIG_DEFAULTS_NETBURNER_CFV240
+	menu $w.config.f.x27.x.menu -tearoffcommand "menutitle \"Netburner Products\""
+	$w.config.f.x27.x.menu add radiobutton -label "CFV240" -variable tmpvar_25 -value "CFV240" -command "update_active"
+	$w.config.f.x27.x.menu add radiobutton -label "MOD5282" -variable tmpvar_25 -value "MOD5282" -command "update_active"
+	menusplit $w $w.config.f.x27.x.menu 2
+	global tmpvar_26
+	minimenu $w.config.f 1 28 "NetSilicon Products" tmpvar_26 CONFIG_DEFAULTS_NETSILICON_NET_ARM
+	menu $w.config.f.x28.x.menu -tearoffcommand "menutitle \"NetSilicon Products\""
+	$w.config.f.x28.x.menu add radiobutton -label "NET+ARM" -variable tmpvar_26 -value "NET+ARM" -command "update_active"
+	menusplit $w $w.config.f.x28.x.menu 1
+	global tmpvar_27
+	minimenu $w.config.f 1 29 "Nintendo Products" tmpvar_27 CONFIG_DEFAULTS_NINTENDO_GBA
+	menu $w.config.f.x29.x.menu -tearoffcommand "menutitle \"Nintendo Products\""
+	$w.config.f.x29.x.menu add radiobutton -label "GBA" -variable tmpvar_27 -value "GBA" -command "update_active"
+	menusplit $w $w.config.f.x29.x.menu 1
+	global tmpvar_28
+	minimenu $w.config.f 1 30 "OPENcores Products" tmpvar_28 CONFIG_DEFAULTS_OPENCORES_OR32
+	menu $w.config.f.x30.x.menu -tearoffcommand "menutitle \"OPENcores Products\""
+	$w.config.f.x30.x.menu add radiobutton -label "or32" -variable tmpvar_28 -value "or32" -command "update_active"
+	menusplit $w $w.config.f.x30.x.menu 1
+	global tmpvar_29
+	minimenu $w.config.f 1 31 "Promise Products" tmpvar_29 CONFIG_DEFAULTS_PROMISE_SX6
+	menu $w.config.f.x31.x.menu -tearoffcommand "menutitle \"Promise Products\""
+	$w.config.f.x31.x.menu add radiobutton -label "SX6" -variable tmpvar_29 -value "SX6" -command "update_active"
+	menusplit $w $w.config.f.x31.x.menu 1
+	global tmpvar_30
+	minimenu $w.config.f 1 32 "Samsung Products" tmpvar_30 CONFIG_DEFAULTS_SAMSUNG_4510B
+	menu $w.config.f.x32.x.menu -tearoffcommand "menutitle \"Samsung Products\""
+	$w.config.f.x32.x.menu add radiobutton -label "4510B" -variable tmpvar_30 -value "4510B" -command "update_active"
+	menusplit $w $w.config.f.x32.x.menu 1
+	global tmpvar_31
+	minimenu $w.config.f 1 33 "SecureEdge Products" tmpvar_31 CONFIG_DEFAULTS_SECUREEDGE_DISKTEL
+	menu $w.config.f.x33.x.menu -tearoffcommand "menutitle \"SecureEdge Products\""
+	$w.config.f.x33.x.menu add radiobutton -label "DISKtel" -variable tmpvar_31 -value "DISKtel" -command "update_active"
+	$w.config.f.x33.x.menu add radiobutton -label "eLIA" -variable tmpvar_31 -value "eLIA" -command "update_active"
+	$w.config.f.x33.x.menu add radiobutton -label "MP3" -variable tmpvar_31 -value "MP3" -command "update_active"
+	$w.config.f.x33.x.menu add radiobutton -label "NETtel1500" -variable tmpvar_31 -value "NETtel1500" -command "update_active"
+	$w.config.f.x33.x.menu add radiobutton -label "NETtel3540" -variable tmpvar_31 -value "NETtel3540" -command "update_active"
+	$w.config.f.x33.x.menu add radiobutton -label "SecureEdge1100" -variable tmpvar_31 -value "SecureEdge1100" -command "update_active"
+	$w.config.f.x33.x.menu add radiobutton -label "SecureEdge2540" -variable tmpvar_31 -value "SecureEdge2540" -command "update_active"
+	$w.config.f.x33.x.menu add radiobutton -label "SecureEdge2570" -variable tmpvar_31 -value "SecureEdge2570" -command "update_active"
+	$w.config.f.x33.x.menu add radiobutton -label "SecureEdge2580" -variable tmpvar_31 -value "SecureEdge2580" -command "update_active"
+	$w.config.f.x33.x.menu add radiobutton -label "SecureEdge2580-JFFS" -variable tmpvar_31 -value "SecureEdge2580-JFFS" -command "update_active"
+	$w.config.f.x33.x.menu add radiobutton -label "SecureEdgeEdna" -variable tmpvar_31 -value "SecureEdgeEdna" -command "update_active"
+	$w.config.f.x33.x.menu add radiobutton -label "SecureEdgeNAS" -variable tmpvar_31 -value "SecureEdgeNAS" -command "update_active"
+	$w.config.f.x33.x.menu add radiobutton -label "SecureEdgePCMCIA" -variable tmpvar_31 -value "SecureEdgePCMCIA" -command "update_active"
+	$w.config.f.x33.x.menu add radiobutton -label "SecureEdgeVPN" -variable tmpvar_31 -value "SecureEdgeVPN" -command "update_active"
+	menusplit $w $w.config.f.x33.x.menu 14
+	global tmpvar_32
+	minimenu $w.config.f 1 34 "senTec Products" tmpvar_32 CONFIG_DEFAULTS_SENTEC_COBRA5272
+	menu $w.config.f.x34.x.menu -tearoffcommand "menutitle \"senTec Products\""
+	$w.config.f.x34.x.menu add radiobutton -label "COBRA5272" -variable tmpvar_32 -value "COBRA5272" -command "update_active"
+	menusplit $w $w.config.f.x34.x.menu 1
+	global tmpvar_33
+	minimenu $w.config.f 1 35 "SnapGear Products" tmpvar_33 CONFIG_DEFAULTS_SNAPGEAR_LITE300
+	menu $w.config.f.x35.x.menu -tearoffcommand "menutitle \"SnapGear Products\""
+	$w.config.f.x35.x.menu add radiobutton -label "LITE300" -variable tmpvar_33 -value "LITE300" -command "update_active"
+	$w.config.f.x35.x.menu add radiobutton -label "LITE" -variable tmpvar_33 -value "LITE" -command "update_active"
+	$w.config.f.x35.x.menu add radiobutton -label "PRO" -variable tmpvar_33 -value "PRO" -command "update_active"
+	$w.config.f.x35.x.menu add radiobutton -label "SE2910-Intel" -variable tmpvar_33 -value "SE2910-Intel" -command "update_active"
+	$w.config.f.x35.x.menu add radiobutton -label "SE3400" -variable tmpvar_33 -value "SE3400" -command "update_active"
+	$w.config.f.x35.x.menu add radiobutton -label "SE4000" -variable tmpvar_33 -value "SE4000" -command "update_active"
+	$w.config.f.x35.x.menu add radiobutton -label "SME530" -variable tmpvar_33 -value "SME530" -command "update_active"
+	$w.config.f.x35.x.menu add radiobutton -label "SME550" -variable tmpvar_33 -value "SME550" -command "update_active"
+	$w.config.f.x35.x.menu add radiobutton -label "SME570" -variable tmpvar_33 -value "SME570" -command "update_active"
+	$w.config.f.x35.x.menu add radiobutton -label "SOHO+" -variable tmpvar_33 -value "SOHO+" -command "update_active"
+	menusplit $w $w.config.f.x35.x.menu 10
+	global tmpvar_34
+	minimenu $w.config.f 1 36 "Soekris Products" tmpvar_34 CONFIG_DEFAULTS_SOEKRIS_NET4801
+	menu $w.config.f.x36.x.menu -tearoffcommand "menutitle \"Soekris Products\""
+	$w.config.f.x36.x.menu add radiobutton -label "net4801" -variable tmpvar_34 -value "net4801" -command "update_active"
+	menusplit $w $w.config.f.x36.x.menu 1
+	global tmpvar_35
+	minimenu $w.config.f 1 37 "SSV Products" tmpvar_35 CONFIG_DEFAULTS_SSV_DNP5280
+	menu $w.config.f.x37.x.menu -tearoffcommand "menutitle \"SSV Products\""
+	$w.config.f.x37.x.menu add radiobutton -label "DNP5280" -variable tmpvar_35 -value "DNP5280" -command "update_active"
+	menusplit $w $w.config.f.x37.x.menu 1
+	global tmpvar_36
+	minimenu $w.config.f 1 38 "SWARM Products" tmpvar_36 CONFIG_DEFAULTS_SWARM_SWARM
+	menu $w.config.f.x38.x.menu -tearoffcommand "menutitle \"SWARM Products\""
+	$w.config.f.x38.x.menu add radiobutton -label "SWARM" -variable tmpvar_36 -value "SWARM" -command "update_active"
+	menusplit $w $w.config.f.x38.x.menu 1
+	global tmpvar_37
+	minimenu $w.config.f 1 39 "TeleIP Products" tmpvar_37 CONFIG_DEFAULTS_TELEIP_RSC
+	menu $w.config.f.x39.x.menu -tearoffcommand "menutitle \"TeleIP Products\""
+	$w.config.f.x39.x.menu add radiobutton -label "rsc" -variable tmpvar_37 -value "rsc" -command "update_active"
+	menusplit $w $w.config.f.x39.x.menu 1
+	global tmpvar_38
+	minimenu $w.config.f 1 40 "Triscend Products" tmpvar_38 CONFIG_DEFAULTS_TRISCEND_A7DB
+	menu $w.config.f.x40.x.menu -tearoffcommand "menutitle \"Triscend Products\""
+	$w.config.f.x40.x.menu add radiobutton -label "A7DB" -variable tmpvar_38 -value "A7DB" -command "update_active"
+	$w.config.f.x40.x.menu add radiobutton -label "DevA7" -variable tmpvar_38 -value "DevA7" -command "update_active"
+	menusplit $w $w.config.f.x40.x.menu 2
+	global tmpvar_39
+	minimenu $w.config.f 1 41 "Via Products" tmpvar_39 CONFIG_DEFAULTS_VIA_EPIA
+	menu $w.config.f.x41.x.menu -tearoffcommand "menutitle \"Via Products\""
+	$w.config.f.x41.x.menu add radiobutton -label "EPIA" -variable tmpvar_39 -value "EPIA" -command "update_active"
+	menusplit $w $w.config.f.x41.x.menu 1
+	global tmpvar_40
+	minimenu $w.config.f 1 42 "Weiss Products" tmpvar_40 CONFIG_DEFAULTS_WEISS_SM2010
+	menu $w.config.f.x42.x.menu -tearoffcommand "menutitle \"Weiss Products\""
+	$w.config.f.x42.x.menu add radiobutton -label "SM2010" -variable tmpvar_40 -value "SM2010" -command "update_active"
+	menusplit $w $w.config.f.x42.x.menu 1
+	global tmpvar_41
+	minimenu $w.config.f 1 43 "Xilinx Products" tmpvar_41 CONFIG_DEFAULTS_XILINX_COMMON
+	menu $w.config.f.x43.x.menu -tearoffcommand "menutitle \"Xilinx Products\""
+	$w.config.f.x43.x.menu add radiobutton -label "common" -variable tmpvar_41 -value "common" -command "update_active"
+	menusplit $w $w.config.f.x43.x.menu 1
+
+
+
+	focus $w
+	update_active
+	global winx; global winy
+	set winx [expr [winfo x .]+30]; set winy [expr [winfo y .]+30]
+	if {[winfo exists $w]} then {wm geometry $w +$winx+$winy}
+	update idletasks
+	if {[winfo exists $w]} then  {$w.config.canvas create window 0 0 -anchor nw -window $w.config.f
+
+	$w.config.canvas configure \
+		-width [expr [winfo reqwidth $w.config.f] + 1]\
+		-scrollregion "-1 -1 [expr [winfo reqwidth $w.config.f] + 1] \
+			 [expr [winfo reqheight $w.config.f] + 1]"
+
+	set winy [expr [winfo reqh $w] - [winfo reqh $w.config.canvas]]
+	set scry [expr [winfo screenh $w] / 2]
+	set maxy [expr [winfo screenh $w] * 3 / 4]
+	set canvtotal [expr [winfo reqh $w.config.f] + 2]
+	if [expr $winy + $canvtotal < $maxy] {
+		$w.config.canvas configure -height $canvtotal
+	} else {
+		$w.config.canvas configure -height [expr $scry - $winy]
+		}
+	}
+	update idletasks
+	if {[winfo exists $w]} then {
+	wm maxsize $w [winfo width $w] [winfo screenheight $w]
+	wm minsize $w [winfo width $w] 100
+
+	wm deiconify $w
+}
+}
+
+proc update_menu1 {} {
+	global CONFIG_DEFAULTS_3COM
+	if {($CONFIG_DEFAULTS_3COM == 1)} then {configure_entry .menu1.config.f.x3 normal {x l}} else {configure_entry .menu1.config.f.x3 disabled {x l}}
+	global CONFIG_DEFAULTS_ADI
+	if {($CONFIG_DEFAULTS_ADI == 1)} then {configure_entry .menu1.config.f.x4 normal {x l}} else {configure_entry .menu1.config.f.x4 disabled {x l}}
+	global CONFIG_DEFAULTS_APPLE
+	if {($CONFIG_DEFAULTS_APPLE == 1)} then {configure_entry .menu1.config.f.x5 normal {x l}} else {configure_entry .menu1.config.f.x5 disabled {x l}}
+	global CONFIG_DEFAULTS_ARCTURUS
+	if {($CONFIG_DEFAULTS_ARCTURUS == 1)} then {configure_entry .menu1.config.f.x6 normal {x l}} else {configure_entry .menu1.config.f.x6 disabled {x l}}
+	global CONFIG_DEFAULTS_ARNEWSH
+	if {($CONFIG_DEFAULTS_ARNEWSH == 1)} then {configure_entry .menu1.config.f.x7 normal {x l}} else {configure_entry .menu1.config.f.x7 disabled {x l}}
+	global CONFIG_DEFAULTS_ATMEL
+	if {($CONFIG_DEFAULTS_ATMEL == 1)} then {configure_entry .menu1.config.f.x8 normal {x l}} else {configure_entry .menu1.config.f.x8 disabled {x l}}
+	global CONFIG_DEFAULTS_BMOW
+	if {($CONFIG_DEFAULTS_BMOW == 1)} then {configure_entry .menu1.config.f.x9 normal {x l}} else {configure_entry .menu1.config.f.x9 disabled {x l}}
+	global CONFIG_DEFAULTS_CONEXANT
+	if {($CONFIG_DEFAULTS_CONEXANT == 1)} then {configure_entry .menu1.config.f.x10 normal {x l}} else {configure_entry .menu1.config.f.x10 disabled {x l}}
+	global CONFIG_DEFAULTS_CWLINUX
+	if {($CONFIG_DEFAULTS_CWLINUX == 1)} then {configure_entry .menu1.config.f.x11 normal {x l}} else {configure_entry .menu1.config.f.x11 disabled {x l}}
+	global CONFIG_DEFAULTS_CYTEK
+	if {($CONFIG_DEFAULTS_CYTEK == 1)} then {configure_entry .menu1.config.f.x12 normal {x l}} else {configure_entry .menu1.config.f.x12 disabled {x l}}
+	global CONFIG_DEFAULTS_EXYS
+	if {($CONFIG_DEFAULTS_EXYS == 1)} then {configure_entry .menu1.config.f.x13 normal {x l}} else {configure_entry .menu1.config.f.x13 disabled {x l}}
+	global CONFIG_DEFAULTS_FEITH
+	if {($CONFIG_DEFAULTS_FEITH == 1)} then {configure_entry .menu1.config.f.x14 normal {x l}} else {configure_entry .menu1.config.f.x14 disabled {x l}}
+	global CONFIG_DEFAULTS_FUTURE
+	if {($CONFIG_DEFAULTS_FUTURE == 1)} then {configure_entry .menu1.config.f.x15 normal {x l}} else {configure_entry .menu1.config.f.x15 disabled {x l}}
+	global CONFIG_DEFAULTS_GDB
+	if {($CONFIG_DEFAULTS_GDB == 1)} then {configure_entry .menu1.config.f.x16 normal {x l}} else {configure_entry .menu1.config.f.x16 disabled {x l}}
+	global CONFIG_DEFAULTS_HITACHI
+	if {($CONFIG_DEFAULTS_HITACHI == 1)} then {configure_entry .menu1.config.f.x17 normal {x l}} else {configure_entry .menu1.config.f.x17 disabled {x l}}
+	global CONFIG_DEFAULTS_IMT
+	if {($CONFIG_DEFAULTS_IMT == 1)} then {configure_entry .menu1.config.f.x18 normal {x l}} else {configure_entry .menu1.config.f.x18 disabled {x l}}
+	global CONFIG_DEFAULTS_INSIGHT
+	if {($CONFIG_DEFAULTS_INSIGHT == 1)} then {configure_entry .menu1.config.f.x19 normal {x l}} else {configure_entry .menu1.config.f.x19 disabled {x l}}
+	global CONFIG_DEFAULTS_INTEL
+	if {($CONFIG_DEFAULTS_INTEL == 1)} then {configure_entry .menu1.config.f.x20 normal {x l}} else {configure_entry .menu1.config.f.x20 disabled {x l}}
+	global CONFIG_DEFAULTS_KENDINMICREL
+	if {($CONFIG_DEFAULTS_KENDINMICREL == 1)} then {configure_entry .menu1.config.f.x21 normal {x l}} else {configure_entry .menu1.config.f.x21 disabled {x l}}
+	global CONFIG_DEFAULTS_LEOX
+	if {($CONFIG_DEFAULTS_LEOX == 1)} then {configure_entry .menu1.config.f.x22 normal {x l}} else {configure_entry .menu1.config.f.x22 disabled {x l}}
+	global CONFIG_DEFAULTS_MECEL
+	if {($CONFIG_DEFAULTS_MECEL == 1)} then {configure_entry .menu1.config.f.x23 normal {x l}} else {configure_entry .menu1.config.f.x23 disabled {x l}}
+	global CONFIG_DEFAULTS_MIDAS
+	if {($CONFIG_DEFAULTS_MIDAS == 1)} then {configure_entry .menu1.config.f.x24 normal {x l}} else {configure_entry .menu1.config.f.x24 disabled {x l}}
+	global CONFIG_DEFAULTS_MOTOROLA
+	if {($CONFIG_DEFAULTS_MOTOROLA == 1)} then {configure_entry .menu1.config.f.x25 normal {x l}} else {configure_entry .menu1.config.f.x25 disabled {x l}}
+	global CONFIG_DEFAULTS_NEC
+	if {($CONFIG_DEFAULTS_NEC == 1)} then {configure_entry .menu1.config.f.x26 normal {x l}} else {configure_entry .menu1.config.f.x26 disabled {x l}}
+	global CONFIG_DEFAULTS_NETBURNER
+	if {($CONFIG_DEFAULTS_NETBURNER == 1)} then {configure_entry .menu1.config.f.x27 normal {x l}} else {configure_entry .menu1.config.f.x27 disabled {x l}}
+	global CONFIG_DEFAULTS_NETSILICON
+	if {($CONFIG_DEFAULTS_NETSILICON == 1)} then {configure_entry .menu1.config.f.x28 normal {x l}} else {configure_entry .menu1.config.f.x28 disabled {x l}}
+	global CONFIG_DEFAULTS_NINTENDO
+	if {($CONFIG_DEFAULTS_NINTENDO == 1)} then {configure_entry .menu1.config.f.x29 normal {x l}} else {configure_entry .menu1.config.f.x29 disabled {x l}}
+	global CONFIG_DEFAULTS_OPENCORES
+	if {($CONFIG_DEFAULTS_OPENCORES == 1)} then {configure_entry .menu1.config.f.x30 normal {x l}} else {configure_entry .menu1.config.f.x30 disabled {x l}}
+	global CONFIG_DEFAULTS_PROMISE
+	if {($CONFIG_DEFAULTS_PROMISE == 1)} then {configure_entry .menu1.config.f.x31 normal {x l}} else {configure_entry .menu1.config.f.x31 disabled {x l}}
+	global CONFIG_DEFAULTS_SAMSUNG
+	if {($CONFIG_DEFAULTS_SAMSUNG == 1)} then {configure_entry .menu1.config.f.x32 normal {x l}} else {configure_entry .menu1.config.f.x32 disabled {x l}}
+	global CONFIG_DEFAULTS_SECUREEDGE
+	if {($CONFIG_DEFAULTS_SECUREEDGE == 1)} then {configure_entry .menu1.config.f.x33 normal {x l}} else {configure_entry .menu1.config.f.x33 disabled {x l}}
+	global CONFIG_DEFAULTS_SENTEC
+	if {($CONFIG_DEFAULTS_SENTEC == 1)} then {configure_entry .menu1.config.f.x34 normal {x l}} else {configure_entry .menu1.config.f.x34 disabled {x l}}
+	global CONFIG_DEFAULTS_SNAPGEAR
+	if {($CONFIG_DEFAULTS_SNAPGEAR == 1)} then {configure_entry .menu1.config.f.x35 normal {x l}} else {configure_entry .menu1.config.f.x35 disabled {x l}}
+	global CONFIG_DEFAULTS_SOEKRIS
+	if {($CONFIG_DEFAULTS_SOEKRIS == 1)} then {configure_entry .menu1.config.f.x36 normal {x l}} else {configure_entry .menu1.config.f.x36 disabled {x l}}
+	global CONFIG_DEFAULTS_SSV
+	if {($CONFIG_DEFAULTS_SSV == 1)} then {configure_entry .menu1.config.f.x37 normal {x l}} else {configure_entry .menu1.config.f.x37 disabled {x l}}
+	global CONFIG_DEFAULTS_SWARM
+	if {($CONFIG_DEFAULTS_SWARM == 1)} then {configure_entry .menu1.config.f.x38 normal {x l}} else {configure_entry .menu1.config.f.x38 disabled {x l}}
+	global CONFIG_DEFAULTS_TELEIP
+	if {($CONFIG_DEFAULTS_TELEIP == 1)} then {configure_entry .menu1.config.f.x39 normal {x l}} else {configure_entry .menu1.config.f.x39 disabled {x l}}
+	global CONFIG_DEFAULTS_TRISCEND
+	if {($CONFIG_DEFAULTS_TRISCEND == 1)} then {configure_entry .menu1.config.f.x40 normal {x l}} else {configure_entry .menu1.config.f.x40 disabled {x l}}
+	global CONFIG_DEFAULTS_VIA
+	if {($CONFIG_DEFAULTS_VIA == 1)} then {configure_entry .menu1.config.f.x41 normal {x l}} else {configure_entry .menu1.config.f.x41 disabled {x l}}
+	global CONFIG_DEFAULTS_WEISS
+	if {($CONFIG_DEFAULTS_WEISS == 1)} then {configure_entry .menu1.config.f.x42 normal {x l}} else {configure_entry .menu1.config.f.x42 disabled {x l}}
+	global CONFIG_DEFAULTS_XILINX
+	if {($CONFIG_DEFAULTS_XILINX == 1)} then {configure_entry .menu1.config.f.x43 normal {x l}} else {configure_entry .menu1.config.f.x43 disabled {x l}}
+}
+
+
+proc update_define_menu1 {} {
+	update_define_mainmenu
+	global CONFIG_MODULES
+	global tmpvar_0
+	global CONFIG_DEFAULTS_3COM
+	if {$tmpvar_0 == "3com"} then {set CONFIG_DEFAULTS_3COM 1} else {set CONFIG_DEFAULTS_3COM 0}
+	global CONFIG_DEFAULTS_ADI
+	if {$tmpvar_0 == "ADI"} then {set CONFIG_DEFAULTS_ADI 1} else {set CONFIG_DEFAULTS_ADI 0}
+	global CONFIG_DEFAULTS_APPLE
+	if {$tmpvar_0 == "Apple"} then {set CONFIG_DEFAULTS_APPLE 1} else {set CONFIG_DEFAULTS_APPLE 0}
+	global CONFIG_DEFAULTS_ARCTURUS
+	if {$tmpvar_0 == "Arcturus"} then {set CONFIG_DEFAULTS_ARCTURUS 1} else {set CONFIG_DEFAULTS_ARCTURUS 0}
+	global CONFIG_DEFAULTS_ARNEWSH
+	if {$tmpvar_0 == "Arnewsh"} then {set CONFIG_DEFAULTS_ARNEWSH 1} else {set CONFIG_DEFAULTS_ARNEWSH 0}
+	global CONFIG_DEFAULTS_ATMEL
+	if {$tmpvar_0 == "Atmel"} then {set CONFIG_DEFAULTS_ATMEL 1} else {set CONFIG_DEFAULTS_ATMEL 0}
+	global CONFIG_DEFAULTS_BMOW
+	if {$tmpvar_0 == "BMOW"} then {set CONFIG_DEFAULTS_BMOW 1} else {set CONFIG_DEFAULTS_BMOW 0}
+	global CONFIG_DEFAULTS_CONEXANT
+	if {$tmpvar_0 == "Conexant"} then {set CONFIG_DEFAULTS_CONEXANT 1} else {set CONFIG_DEFAULTS_CONEXANT 0}
+	global CONFIG_DEFAULTS_CWLINUX
+	if {$tmpvar_0 == "Cwlinux"} then {set CONFIG_DEFAULTS_CWLINUX 1} else {set CONFIG_DEFAULTS_CWLINUX 0}
+	global CONFIG_DEFAULTS_CYTEK
+	if {$tmpvar_0 == "Cytek"} then {set CONFIG_DEFAULTS_CYTEK 1} else {set CONFIG_DEFAULTS_CYTEK 0}
+	global CONFIG_DEFAULTS_EXYS
+	if {$tmpvar_0 == "Exys"} then {set CONFIG_DEFAULTS_EXYS 1} else {set CONFIG_DEFAULTS_EXYS 0}
+	global CONFIG_DEFAULTS_FEITH
+	if {$tmpvar_0 == "Feith"} then {set CONFIG_DEFAULTS_FEITH 1} else {set CONFIG_DEFAULTS_FEITH 0}
+	global CONFIG_DEFAULTS_FUTURE
+	if {$tmpvar_0 == "Future"} then {set CONFIG_DEFAULTS_FUTURE 1} else {set CONFIG_DEFAULTS_FUTURE 0}
+	global CONFIG_DEFAULTS_GDB
+	if {$tmpvar_0 == "GDB"} then {set CONFIG_DEFAULTS_GDB 1} else {set CONFIG_DEFAULTS_GDB 0}
+	global CONFIG_DEFAULTS_HITACHI
+	if {$tmpvar_0 == "Hitachi"} then {set CONFIG_DEFAULTS_HITACHI 1} else {set CONFIG_DEFAULTS_HITACHI 0}
+	global CONFIG_DEFAULTS_IMT
+	if {$tmpvar_0 == "Imt"} then {set CONFIG_DEFAULTS_IMT 1} else {set CONFIG_DEFAULTS_IMT 0}
+	global CONFIG_DEFAULTS_INSIGHT
+	if {$tmpvar_0 == "Insight"} then {set CONFIG_DEFAULTS_INSIGHT 1} else {set CONFIG_DEFAULTS_INSIGHT 0}
+	global CONFIG_DEFAULTS_INTEL
+	if {$tmpvar_0 == "Intel"} then {set CONFIG_DEFAULTS_INTEL 1} else {set CONFIG_DEFAULTS_INTEL 0}
+	global CONFIG_DEFAULTS_KENDINMICREL
+	if {$tmpvar_0 == "KendinMicrel"} then {set CONFIG_DEFAULTS_KENDINMICREL 1} else {set CONFIG_DEFAULTS_KENDINMICREL 0}
+	global CONFIG_DEFAULTS_LEOX
+	if {$tmpvar_0 == "LEOX"} then {set CONFIG_DEFAULTS_LEOX 1} else {set CONFIG_DEFAULTS_LEOX 0}
+	global CONFIG_DEFAULTS_MECEL
+	if {$tmpvar_0 == "Mecel"} then {set CONFIG_DEFAULTS_MECEL 1} else {set CONFIG_DEFAULTS_MECEL 0}
+	global CONFIG_DEFAULTS_MIDAS
+	if {$tmpvar_0 == "Midas"} then {set CONFIG_DEFAULTS_MIDAS 1} else {set CONFIG_DEFAULTS_MIDAS 0}
+	global CONFIG_DEFAULTS_MOTOROLA
+	if {$tmpvar_0 == "Motorola"} then {set CONFIG_DEFAULTS_MOTOROLA 1} else {set CONFIG_DEFAULTS_MOTOROLA 0}
+	global CONFIG_DEFAULTS_NEC
+	if {$tmpvar_0 == "NEC"} then {set CONFIG_DEFAULTS_NEC 1} else {set CONFIG_DEFAULTS_NEC 0}
+	global CONFIG_DEFAULTS_NETBURNER
+	if {$tmpvar_0 == "Netburner"} then {set CONFIG_DEFAULTS_NETBURNER 1} else {set CONFIG_DEFAULTS_NETBURNER 0}
+	global CONFIG_DEFAULTS_NETSILICON
+	if {$tmpvar_0 == "NetSilicon"} then {set CONFIG_DEFAULTS_NETSILICON 1} else {set CONFIG_DEFAULTS_NETSILICON 0}
+	global CONFIG_DEFAULTS_NINTENDO
+	if {$tmpvar_0 == "Nintendo"} then {set CONFIG_DEFAULTS_NINTENDO 1} else {set CONFIG_DEFAULTS_NINTENDO 0}
+	global CONFIG_DEFAULTS_OPENCORES
+	if {$tmpvar_0 == "OPENcores"} then {set CONFIG_DEFAULTS_OPENCORES 1} else {set CONFIG_DEFAULTS_OPENCORES 0}
+	global CONFIG_DEFAULTS_PROMISE
+	if {$tmpvar_0 == "Promise"} then {set CONFIG_DEFAULTS_PROMISE 1} else {set CONFIG_DEFAULTS_PROMISE 0}
+	global CONFIG_DEFAULTS_SAMSUNG
+	if {$tmpvar_0 == "Samsung"} then {set CONFIG_DEFAULTS_SAMSUNG 1} else {set CONFIG_DEFAULTS_SAMSUNG 0}
+	global CONFIG_DEFAULTS_SECUREEDGE
+	if {$tmpvar_0 == "SecureEdge"} then {set CONFIG_DEFAULTS_SECUREEDGE 1} else {set CONFIG_DEFAULTS_SECUREEDGE 0}
+	global CONFIG_DEFAULTS_SENTEC
+	if {$tmpvar_0 == "senTec"} then {set CONFIG_DEFAULTS_SENTEC 1} else {set CONFIG_DEFAULTS_SENTEC 0}
+	global CONFIG_DEFAULTS_SNAPGEAR
+	if {$tmpvar_0 == "SnapGear"} then {set CONFIG_DEFAULTS_SNAPGEAR 1} else {set CONFIG_DEFAULTS_SNAPGEAR 0}
+	global CONFIG_DEFAULTS_SOEKRIS
+	if {$tmpvar_0 == "Soekris"} then {set CONFIG_DEFAULTS_SOEKRIS 1} else {set CONFIG_DEFAULTS_SOEKRIS 0}
+	global CONFIG_DEFAULTS_SSV
+	if {$tmpvar_0 == "SSV"} then {set CONFIG_DEFAULTS_SSV 1} else {set CONFIG_DEFAULTS_SSV 0}
+	global CONFIG_DEFAULTS_SWARM
+	if {$tmpvar_0 == "SWARM"} then {set CONFIG_DEFAULTS_SWARM 1} else {set CONFIG_DEFAULTS_SWARM 0}
+	global CONFIG_DEFAULTS_TELEIP
+	if {$tmpvar_0 == "TeleIP"} then {set CONFIG_DEFAULTS_TELEIP 1} else {set CONFIG_DEFAULTS_TELEIP 0}
+	global CONFIG_DEFAULTS_TRISCEND
+	if {$tmpvar_0 == "Triscend"} then {set CONFIG_DEFAULTS_TRISCEND 1} else {set CONFIG_DEFAULTS_TRISCEND 0}
+	global CONFIG_DEFAULTS_VIA
+	if {$tmpvar_0 == "Via"} then {set CONFIG_DEFAULTS_VIA 1} else {set CONFIG_DEFAULTS_VIA 0}
+	global CONFIG_DEFAULTS_WEISS
+	if {$tmpvar_0 == "Weiss"} then {set CONFIG_DEFAULTS_WEISS 1} else {set CONFIG_DEFAULTS_WEISS 0}
+	global CONFIG_DEFAULTS_XILINX
+	if {$tmpvar_0 == "Xilinx"} then {set CONFIG_DEFAULTS_XILINX 1} else {set CONFIG_DEFAULTS_XILINX 0}
+	global tmpvar_1
+	global CONFIG_DEFAULTS_3COM_PALMIIIX
+	if {$tmpvar_1 == "PalmIIIx"} then {set CONFIG_DEFAULTS_3COM_PALMIIIX 1} else {set CONFIG_DEFAULTS_3COM_PALMIIIX 0}
+	global CONFIG_DEFAULTS_3COM_XCOPILOT
+	if {$tmpvar_1 == "Xcopilot"} then {set CONFIG_DEFAULTS_3COM_XCOPILOT 1} else {set CONFIG_DEFAULTS_3COM_XCOPILOT 0}
+	global tmpvar_2
+	global CONFIG_DEFAULTS_ADI_COYOTE
+	if {$tmpvar_2 == "Coyote"} then {set CONFIG_DEFAULTS_ADI_COYOTE 1} else {set CONFIG_DEFAULTS_ADI_COYOTE 0}
+	global tmpvar_3
+	global CONFIG_DEFAULTS_APPLE_MACPLUS
+	if {$tmpvar_3 == "MacPlus"} then {set CONFIG_DEFAULTS_APPLE_MACPLUS 1} else {set CONFIG_DEFAULTS_APPLE_MACPLUS 0}
+	global tmpvar_4
+	global CONFIG_DEFAULTS_ARCTURUS_UC5272
+	if {$tmpvar_4 == "uC5272"} then {set CONFIG_DEFAULTS_ARCTURUS_UC5272 1} else {set CONFIG_DEFAULTS_ARCTURUS_UC5272 0}
+	global CONFIG_DEFAULTS_ARCTURUS_UCDIMM
+	if {$tmpvar_4 == "uCdimm"} then {set CONFIG_DEFAULTS_ARCTURUS_UCDIMM 1} else {set CONFIG_DEFAULTS_ARCTURUS_UCDIMM 0}
+	global CONFIG_DEFAULTS_ARCTURUS_UCDIMM_MTD
+	if {$tmpvar_4 == "uCdimm+mtd"} then {set CONFIG_DEFAULTS_ARCTURUS_UCDIMM_MTD 1} else {set CONFIG_DEFAULTS_ARCTURUS_UCDIMM_MTD 0}
+	global CONFIG_DEFAULTS_ARCTURUS_UCQUICC
+	if {$tmpvar_4 == "uCquicc"} then {set CONFIG_DEFAULTS_ARCTURUS_UCQUICC 1} else {set CONFIG_DEFAULTS_ARCTURUS_UCQUICC 0}
+	global CONFIG_DEFAULTS_ARCTURUS_UCSIMM
+	if {$tmpvar_4 == "uCsimm"} then {set CONFIG_DEFAULTS_ARCTURUS_UCSIMM 1} else {set CONFIG_DEFAULTS_ARCTURUS_UCSIMM 0}
+	global tmpvar_5
+	global CONFIG_DEFAULTS_ARNEWSH_M5206
+	if {$tmpvar_5 == "M5206"} then {set CONFIG_DEFAULTS_ARNEWSH_M5206 1} else {set CONFIG_DEFAULTS_ARNEWSH_M5206 0}
+	global CONFIG_DEFAULTS_ARNEWSH_M5307
+	if {$tmpvar_5 == "M5307"} then {set CONFIG_DEFAULTS_ARNEWSH_M5307 1} else {set CONFIG_DEFAULTS_ARNEWSH_M5307 0}
+	global tmpvar_6
+	global CONFIG_DEFAULTS_ATMEL_AT91
+	if {$tmpvar_6 == "AT91"} then {set CONFIG_DEFAULTS_ATMEL_AT91 1} else {set CONFIG_DEFAULTS_ATMEL_AT91 0}
+	global tmpvar_7
+	global CONFIG_DEFAULTS_BMOW_68KATY
+	if {$tmpvar_7 == "68Katy"} then {set CONFIG_DEFAULTS_BMOW_68KATY 1} else {set CONFIG_DEFAULTS_BMOW_68KATY 0}
+	global tmpvar_8
+	global CONFIG_DEFAULTS_CONEXANT_HUMBER
+	if {$tmpvar_8 == "Humber"} then {set CONFIG_DEFAULTS_CONEXANT_HUMBER 1} else {set CONFIG_DEFAULTS_CONEXANT_HUMBER 0}
+	global CONFIG_DEFAULTS_CONEXANT_P52
+	if {$tmpvar_8 == "P52"} then {set CONFIG_DEFAULTS_CONEXANT_P52 1} else {set CONFIG_DEFAULTS_CONEXANT_P52 0}
+	global tmpvar_9
+	global CONFIG_DEFAULTS_CWLINUX_CWEZ328
+	if {$tmpvar_9 == "cwez328"} then {set CONFIG_DEFAULTS_CWLINUX_CWEZ328 1} else {set CONFIG_DEFAULTS_CWLINUX_CWEZ328 0}
+	global CONFIG_DEFAULTS_CWLINUX_CWVZ328
+	if {$tmpvar_9 == "cwvz328"} then {set CONFIG_DEFAULTS_CWLINUX_CWVZ328 1} else {set CONFIG_DEFAULTS_CWLINUX_CWVZ328 0}
+	global tmpvar_10
+	global CONFIG_DEFAULTS_CYTEK_NETMP3
+	if {$tmpvar_10 == "NETmp3"} then {set CONFIG_DEFAULTS_CYTEK_NETMP3 1} else {set CONFIG_DEFAULTS_CYTEK_NETMP3 0}
+	global tmpvar_11
+	global CONFIG_DEFAULTS_EXYS_DE2
+	if {$tmpvar_11 == "de2"} then {set CONFIG_DEFAULTS_EXYS_DE2 1} else {set CONFIG_DEFAULTS_EXYS_DE2 0}
+	global tmpvar_12
+	global CONFIG_DEFAULTS_FEITH_CLEOPATRA2
+	if {$tmpvar_12 == "Cleopatra2"} then {set CONFIG_DEFAULTS_FEITH_CLEOPATRA2 1} else {set CONFIG_DEFAULTS_FEITH_CLEOPATRA2 0}
+	global CONFIG_DEFAULTS_FEITH_CLEOPATRA
+	if {$tmpvar_12 == "Cleopatra"} then {set CONFIG_DEFAULTS_FEITH_CLEOPATRA 1} else {set CONFIG_DEFAULTS_FEITH_CLEOPATRA 0}
+	global tmpvar_13
+	global CONFIG_DEFAULTS_FUTURE_FUTURENETBURNER5282BADGE
+	if {$tmpvar_13 == "FutureNetburner5282Badge"} then {set CONFIG_DEFAULTS_FUTURE_FUTURENETBURNER5282BADGE 1} else {set CONFIG_DEFAULTS_FUTURE_FUTURENETBURNER5282BADGE 0}
+	global tmpvar_14
+	global CONFIG_DEFAULTS_GDB_ARMULATOR
+	if {$tmpvar_14 == "ARMulator"} then {set CONFIG_DEFAULTS_GDB_ARMULATOR 1} else {set CONFIG_DEFAULTS_GDB_ARMULATOR 0}
+	global CONFIG_DEFAULTS_GDB_ARMULATOR_EB
+	if {$tmpvar_14 == "ARMulator-EB"} then {set CONFIG_DEFAULTS_GDB_ARMULATOR_EB 1} else {set CONFIG_DEFAULTS_GDB_ARMULATOR_EB 0}
+	global tmpvar_15
+	global CONFIG_DEFAULTS_HITACHI_BIGSURIV
+	if {$tmpvar_15 == "BigSurIV"} then {set CONFIG_DEFAULTS_HITACHI_BIGSURIV 1} else {set CONFIG_DEFAULTS_HITACHI_BIGSURIV 0}
+	global CONFIG_DEFAULTS_HITACHI_EDOSK2674
+	if {$tmpvar_15 == "EDOSK2674"} then {set CONFIG_DEFAULTS_HITACHI_EDOSK2674 1} else {set CONFIG_DEFAULTS_HITACHI_EDOSK2674 0}
+	global CONFIG_DEFAULTS_HITACHI_KEYWEST
+	if {$tmpvar_15 == "KeyWest"} then {set CONFIG_DEFAULTS_HITACHI_KEYWEST 1} else {set CONFIG_DEFAULTS_HITACHI_KEYWEST 0}
+	global tmpvar_16
+	global CONFIG_DEFAULTS_IMT_MWI
+	if {$tmpvar_16 == "mwi"} then {set CONFIG_DEFAULTS_IMT_MWI 1} else {set CONFIG_DEFAULTS_IMT_MWI 0}
+	global tmpvar_17
+	global CONFIG_DEFAULTS_INSIGHT_MBVANILLA_NET
+	if {$tmpvar_17 == "mbvanilla_net"} then {set CONFIG_DEFAULTS_INSIGHT_MBVANILLA_NET 1} else {set CONFIG_DEFAULTS_INSIGHT_MBVANILLA_NET 0}
+	global CONFIG_DEFAULTS_INSIGHT_XC2V1K_MICROBLAZE
+	if {$tmpvar_17 == "XC2V1K_Microblaze"} then {set CONFIG_DEFAULTS_INSIGHT_XC2V1K_MICROBLAZE 1} else {set CONFIG_DEFAULTS_INSIGHT_XC2V1K_MICROBLAZE 0}
+	global CONFIG_DEFAULTS_INSIGHT_XC2VP7_MICROBLAZE
+	if {$tmpvar_17 == "XC2VP7_Microblaze"} then {set CONFIG_DEFAULTS_INSIGHT_XC2VP7_MICROBLAZE 1} else {set CONFIG_DEFAULTS_INSIGHT_XC2VP7_MICROBLAZE 0}
+	global tmpvar_18
+	global CONFIG_DEFAULTS_INTEL_IXDP425
+	if {$tmpvar_18 == "IXDP425"} then {set CONFIG_DEFAULTS_INTEL_IXDP425 1} else {set CONFIG_DEFAULTS_INTEL_IXDP425 0}
+	global tmpvar_19
+	global CONFIG_DEFAULTS_KENDINMICREL_KS8695
+	if {$tmpvar_19 == "KS8695"} then {set CONFIG_DEFAULTS_KENDINMICREL_KS8695 1} else {set CONFIG_DEFAULTS_KENDINMICREL_KS8695 0}
+	global tmpvar_20
+	global CONFIG_DEFAULTS_LEOX_TSIM
+	if {$tmpvar_20 == "TSIM"} then {set CONFIG_DEFAULTS_LEOX_TSIM 1} else {set CONFIG_DEFAULTS_LEOX_TSIM 0}
+	global tmpvar_21
+	global CONFIG_DEFAULTS_MECEL_FR1000
+	if {$tmpvar_21 == "FR1000"} then {set CONFIG_DEFAULTS_MECEL_FR1000 1} else {set CONFIG_DEFAULTS_MECEL_FR1000 0}
+	global tmpvar_22
+	global CONFIG_DEFAULTS_MIDAS_RTE_NB85E_CB
+	if {$tmpvar_22 == "RTE-NB85E-CB"} then {set CONFIG_DEFAULTS_MIDAS_RTE_NB85E_CB 1} else {set CONFIG_DEFAULTS_MIDAS_RTE_NB85E_CB 0}
+	global CONFIG_DEFAULTS_MIDAS_RTE_V850E_MA1_CB
+	if {$tmpvar_22 == "RTE-V850E-MA1-CB"} then {set CONFIG_DEFAULTS_MIDAS_RTE_V850E_MA1_CB 1} else {set CONFIG_DEFAULTS_MIDAS_RTE_V850E_MA1_CB 0}
+	global CONFIG_DEFAULTS_MIDAS_RTE_V850E_ME2_CB
+	if {$tmpvar_22 == "RTE-V850E-ME2-CB"} then {set CONFIG_DEFAULTS_MIDAS_RTE_V850E_ME2_CB 1} else {set CONFIG_DEFAULTS_MIDAS_RTE_V850E_ME2_CB 0}
+	global tmpvar_23
+	global CONFIG_DEFAULTS_MOTOROLA_M5206EC3
+	if {$tmpvar_23 == "M5206eC3"} then {set CONFIG_DEFAULTS_MOTOROLA_M5206EC3 1} else {set CONFIG_DEFAULTS_MOTOROLA_M5206EC3 0}
+	global CONFIG_DEFAULTS_MOTOROLA_M5206ELITE
+	if {$tmpvar_23 == "M5206eLITE"} then {set CONFIG_DEFAULTS_MOTOROLA_M5206ELITE 1} else {set CONFIG_DEFAULTS_MOTOROLA_M5206ELITE 0}
+	global CONFIG_DEFAULTS_MOTOROLA_M5249C3
+	if {$tmpvar_23 == "M5249C3"} then {set CONFIG_DEFAULTS_MOTOROLA_M5249C3 1} else {set CONFIG_DEFAULTS_MOTOROLA_M5249C3 0}
+	global CONFIG_DEFAULTS_MOTOROLA_M5272C3
+	if {$tmpvar_23 == "M5272C3"} then {set CONFIG_DEFAULTS_MOTOROLA_M5272C3 1} else {set CONFIG_DEFAULTS_MOTOROLA_M5272C3 0}
+	global CONFIG_DEFAULTS_MOTOROLA_M5282C3
+	if {$tmpvar_23 == "M5282C3"} then {set CONFIG_DEFAULTS_MOTOROLA_M5282C3 1} else {set CONFIG_DEFAULTS_MOTOROLA_M5282C3 0}
+	global CONFIG_DEFAULTS_MOTOROLA_M5307C3
+	if {$tmpvar_23 == "M5307C3"} then {set CONFIG_DEFAULTS_MOTOROLA_M5307C3 1} else {set CONFIG_DEFAULTS_MOTOROLA_M5307C3 0}
+	global CONFIG_DEFAULTS_MOTOROLA_M5407C3
+	if {$tmpvar_23 == "M5407C3"} then {set CONFIG_DEFAULTS_MOTOROLA_M5407C3 1} else {set CONFIG_DEFAULTS_MOTOROLA_M5407C3 0}
+	global tmpvar_24
+	global CONFIG_DEFAULTS_NEC_ANNA
+	if {$tmpvar_24 == "Anna"} then {set CONFIG_DEFAULTS_NEC_ANNA 1} else {set CONFIG_DEFAULTS_NEC_ANNA 0}
+	global CONFIG_DEFAULTS_NEC_COMMON
+	if {$tmpvar_24 == "common"} then {set CONFIG_DEFAULTS_NEC_COMMON 1} else {set CONFIG_DEFAULTS_NEC_COMMON 0}
+	global CONFIG_DEFAULTS_NEC_V850E_SIM_GDB
+	if {$tmpvar_24 == "v850e-sim-gdb"} then {set CONFIG_DEFAULTS_NEC_V850E_SIM_GDB 1} else {set CONFIG_DEFAULTS_NEC_V850E_SIM_GDB 0}
+	global tmpvar_25
+	global CONFIG_DEFAULTS_NETBURNER_CFV240
+	if {$tmpvar_25 == "CFV240"} then {set CONFIG_DEFAULTS_NETBURNER_CFV240 1} else {set CONFIG_DEFAULTS_NETBURNER_CFV240 0}
+	global CONFIG_DEFAULTS_NETBURNER_MOD5282
+	if {$tmpvar_25 == "MOD5282"} then {set CONFIG_DEFAULTS_NETBURNER_MOD5282 1} else {set CONFIG_DEFAULTS_NETBURNER_MOD5282 0}
+	global tmpvar_26
+	global CONFIG_DEFAULTS_NETSILICON_NET_ARM
+	if {$tmpvar_26 == "NET+ARM"} then {set CONFIG_DEFAULTS_NETSILICON_NET_ARM 1} else {set CONFIG_DEFAULTS_NETSILICON_NET_ARM 0}
+	global tmpvar_27
+	global CONFIG_DEFAULTS_NINTENDO_GBA
+	if {$tmpvar_27 == "GBA"} then {set CONFIG_DEFAULTS_NINTENDO_GBA 1} else {set CONFIG_DEFAULTS_NINTENDO_GBA 0}
+	global tmpvar_28
+	global CONFIG_DEFAULTS_OPENCORES_OR32
+	if {$tmpvar_28 == "or32"} then {set CONFIG_DEFAULTS_OPENCORES_OR32 1} else {set CONFIG_DEFAULTS_OPENCORES_OR32 0}
+	global tmpvar_29
+	global CONFIG_DEFAULTS_PROMISE_SX6
+	if {$tmpvar_29 == "SX6"} then {set CONFIG_DEFAULTS_PROMISE_SX6 1} else {set CONFIG_DEFAULTS_PROMISE_SX6 0}
+	global tmpvar_30
+	global CONFIG_DEFAULTS_SAMSUNG_4510B
+	if {$tmpvar_30 == "4510B"} then {set CONFIG_DEFAULTS_SAMSUNG_4510B 1} else {set CONFIG_DEFAULTS_SAMSUNG_4510B 0}
+	global tmpvar_31
+	global CONFIG_DEFAULTS_SECUREEDGE_DISKTEL
+	if {$tmpvar_31 == "DISKtel"} then {set CONFIG_DEFAULTS_SECUREEDGE_DISKTEL 1} else {set CONFIG_DEFAULTS_SECUREEDGE_DISKTEL 0}
+	global CONFIG_DEFAULTS_SECUREEDGE_ELIA
+	if {$tmpvar_31 == "eLIA"} then {set CONFIG_DEFAULTS_SECUREEDGE_ELIA 1} else {set CONFIG_DEFAULTS_SECUREEDGE_ELIA 0}
+	global CONFIG_DEFAULTS_SECUREEDGE_MP3
+	if {$tmpvar_31 == "MP3"} then {set CONFIG_DEFAULTS_SECUREEDGE_MP3 1} else {set CONFIG_DEFAULTS_SECUREEDGE_MP3 0}
+	global CONFIG_DEFAULTS_SECUREEDGE_NETTEL1500
+	if {$tmpvar_31 == "NETtel1500"} then {set CONFIG_DEFAULTS_SECUREEDGE_NETTEL1500 1} else {set CONFIG_DEFAULTS_SECUREEDGE_NETTEL1500 0}
+	global CONFIG_DEFAULTS_SECUREEDGE_NETTEL3540
+	if {$tmpvar_31 == "NETtel3540"} then {set CONFIG_DEFAULTS_SECUREEDGE_NETTEL3540 1} else {set CONFIG_DEFAULTS_SECUREEDGE_NETTEL3540 0}
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE1100
+	if {$tmpvar_31 == "SecureEdge1100"} then {set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE1100 1} else {set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE1100 0}
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2540
+	if {$tmpvar_31 == "SecureEdge2540"} then {set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2540 1} else {set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2540 0}
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2570
+	if {$tmpvar_31 == "SecureEdge2570"} then {set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2570 1} else {set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2570 0}
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580
+	if {$tmpvar_31 == "SecureEdge2580"} then {set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580 1} else {set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580 0}
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580_JFFS
+	if {$tmpvar_31 == "SecureEdge2580-JFFS"} then {set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580_JFFS 1} else {set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580_JFFS 0}
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEEDNA
+	if {$tmpvar_31 == "SecureEdgeEdna"} then {set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEEDNA 1} else {set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEEDNA 0}
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGENAS
+	if {$tmpvar_31 == "SecureEdgeNAS"} then {set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGENAS 1} else {set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGENAS 0}
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEPCMCIA
+	if {$tmpvar_31 == "SecureEdgePCMCIA"} then {set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEPCMCIA 1} else {set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEPCMCIA 0}
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEVPN
+	if {$tmpvar_31 == "SecureEdgeVPN"} then {set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEVPN 1} else {set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEVPN 0}
+	global tmpvar_32
+	global CONFIG_DEFAULTS_SENTEC_COBRA5272
+	if {$tmpvar_32 == "COBRA5272"} then {set CONFIG_DEFAULTS_SENTEC_COBRA5272 1} else {set CONFIG_DEFAULTS_SENTEC_COBRA5272 0}
+	global tmpvar_33
+	global CONFIG_DEFAULTS_SNAPGEAR_LITE300
+	if {$tmpvar_33 == "LITE300"} then {set CONFIG_DEFAULTS_SNAPGEAR_LITE300 1} else {set CONFIG_DEFAULTS_SNAPGEAR_LITE300 0}
+	global CONFIG_DEFAULTS_SNAPGEAR_LITE
+	if {$tmpvar_33 == "LITE"} then {set CONFIG_DEFAULTS_SNAPGEAR_LITE 1} else {set CONFIG_DEFAULTS_SNAPGEAR_LITE 0}
+	global CONFIG_DEFAULTS_SNAPGEAR_PRO
+	if {$tmpvar_33 == "PRO"} then {set CONFIG_DEFAULTS_SNAPGEAR_PRO 1} else {set CONFIG_DEFAULTS_SNAPGEAR_PRO 0}
+	global CONFIG_DEFAULTS_SNAPGEAR_SE2910_INTEL
+	if {$tmpvar_33 == "SE2910-Intel"} then {set CONFIG_DEFAULTS_SNAPGEAR_SE2910_INTEL 1} else {set CONFIG_DEFAULTS_SNAPGEAR_SE2910_INTEL 0}
+	global CONFIG_DEFAULTS_SNAPGEAR_SE3400
+	if {$tmpvar_33 == "SE3400"} then {set CONFIG_DEFAULTS_SNAPGEAR_SE3400 1} else {set CONFIG_DEFAULTS_SNAPGEAR_SE3400 0}
+	global CONFIG_DEFAULTS_SNAPGEAR_SE4000
+	if {$tmpvar_33 == "SE4000"} then {set CONFIG_DEFAULTS_SNAPGEAR_SE4000 1} else {set CONFIG_DEFAULTS_SNAPGEAR_SE4000 0}
+	global CONFIG_DEFAULTS_SNAPGEAR_SME530
+	if {$tmpvar_33 == "SME530"} then {set CONFIG_DEFAULTS_SNAPGEAR_SME530 1} else {set CONFIG_DEFAULTS_SNAPGEAR_SME530 0}
+	global CONFIG_DEFAULTS_SNAPGEAR_SME550
+	if {$tmpvar_33 == "SME550"} then {set CONFIG_DEFAULTS_SNAPGEAR_SME550 1} else {set CONFIG_DEFAULTS_SNAPGEAR_SME550 0}
+	global CONFIG_DEFAULTS_SNAPGEAR_SME570
+	if {$tmpvar_33 == "SME570"} then {set CONFIG_DEFAULTS_SNAPGEAR_SME570 1} else {set CONFIG_DEFAULTS_SNAPGEAR_SME570 0}
+	global CONFIG_DEFAULTS_SNAPGEAR_SOHO_
+	if {$tmpvar_33 == "SOHO+"} then {set CONFIG_DEFAULTS_SNAPGEAR_SOHO_ 1} else {set CONFIG_DEFAULTS_SNAPGEAR_SOHO_ 0}
+	global tmpvar_34
+	global CONFIG_DEFAULTS_SOEKRIS_NET4801
+	if {$tmpvar_34 == "net4801"} then {set CONFIG_DEFAULTS_SOEKRIS_NET4801 1} else {set CONFIG_DEFAULTS_SOEKRIS_NET4801 0}
+	global tmpvar_35
+	global CONFIG_DEFAULTS_SSV_DNP5280
+	if {$tmpvar_35 == "DNP5280"} then {set CONFIG_DEFAULTS_SSV_DNP5280 1} else {set CONFIG_DEFAULTS_SSV_DNP5280 0}
+	global tmpvar_36
+	global CONFIG_DEFAULTS_SWARM_SWARM
+	if {$tmpvar_36 == "SWARM"} then {set CONFIG_DEFAULTS_SWARM_SWARM 1} else {set CONFIG_DEFAULTS_SWARM_SWARM 0}
+	global tmpvar_37
+	global CONFIG_DEFAULTS_TELEIP_RSC
+	if {$tmpvar_37 == "rsc"} then {set CONFIG_DEFAULTS_TELEIP_RSC 1} else {set CONFIG_DEFAULTS_TELEIP_RSC 0}
+	global tmpvar_38
+	global CONFIG_DEFAULTS_TRISCEND_A7DB
+	if {$tmpvar_38 == "A7DB"} then {set CONFIG_DEFAULTS_TRISCEND_A7DB 1} else {set CONFIG_DEFAULTS_TRISCEND_A7DB 0}
+	global CONFIG_DEFAULTS_TRISCEND_DEVA7
+	if {$tmpvar_38 == "DevA7"} then {set CONFIG_DEFAULTS_TRISCEND_DEVA7 1} else {set CONFIG_DEFAULTS_TRISCEND_DEVA7 0}
+	global tmpvar_39
+	global CONFIG_DEFAULTS_VIA_EPIA
+	if {$tmpvar_39 == "EPIA"} then {set CONFIG_DEFAULTS_VIA_EPIA 1} else {set CONFIG_DEFAULTS_VIA_EPIA 0}
+	global tmpvar_40
+	global CONFIG_DEFAULTS_WEISS_SM2010
+	if {$tmpvar_40 == "SM2010"} then {set CONFIG_DEFAULTS_WEISS_SM2010 1} else {set CONFIG_DEFAULTS_WEISS_SM2010 0}
+	global tmpvar_41
+	global CONFIG_DEFAULTS_XILINX_COMMON
+	if {$tmpvar_41 == "common"} then {set CONFIG_DEFAULTS_XILINX_COMMON 1} else {set CONFIG_DEFAULTS_XILINX_COMMON 0}
+}
+
+
+menu_option menu2 2 "Kernel/Library/Defaults Selection"
+proc menu2 {w title} {
+	set oldFocus [focus]
+	catch {destroy $w; unregister_active 2}
+	toplevel $w -class Dialog
+	wm withdraw $w
+	global active_menus
+	set active_menus [lsort -integer [linsert $active_menus end 2]]
+	message $w.m -width 400 -aspect 300 -text \
+		"Kernel/Library/Defaults Selection"  -relief raised
+	pack $w.m -pady 10 -side top -padx 10
+	wm title $w "Kernel/Library/Defaults Selection" 
+
+	bind $w <Escape> "catch {focus $oldFocus}; destroy $w; unregister_active 2; break"
+	set nextscript "catch {focus $oldFocus}; menu3 .menu3 \"$title\""
+	frame $w.f
+	button $w.f.back -text "Main Menu" \
+		-width 15 -command "catch {focus $oldFocus}; destroy $w; unregister_active 2"
+	button $w.f.next -text "Next" -underline 0\
+		-width 15 -command $nextscript
+	$w.f.next configure -state disabled
+	bind all <Alt-n> "puts \"no more menus\" "
+	button $w.f.prev -text "Prev" -underline 0\
+		-width 15 -command "catch {focus $oldFocus}; destroy $w; unregister_active 2; menu1 .menu1 \"$title\""
+	bind $w <Alt-p> "catch {focus $oldFocus}; destroy $w; unregister_active 2; menu1 .menu1 \"$title\";break"
+	pack $w.f.back $w.f.next $w.f.prev -side left -expand on
+	pack $w.f -pady 10 -side bottom -anchor w -fill x
+	frame $w.topline -relief ridge -borderwidth 2 -height 2
+	pack $w.topline -side top -fill x
+
+	frame $w.botline -relief ridge -borderwidth 2 -height 2
+	pack $w.botline -side bottom -fill x
+
+	frame $w.config
+	pack $w.config -fill y -expand on
+
+	scrollbar $w.config.vscroll -command "$w.config.canvas yview"
+	pack $w.config.vscroll -side right -fill y
+
+	canvas $w.config.canvas -height 1\
+		-relief flat -borderwidth 0 -yscrollcommand "$w.config.vscroll set" \
+		-width [expr [winfo screenwidth .] * 1 / 2] 
+	frame $w.config.f
+	bind $w <Key-Down> "$w.config.canvas yview scroll  1 unit;break;"
+	bind $w <Key-Up> "$w.config.canvas yview scroll  -1 unit;break;"
+	bind $w <Key-Next> "$w.config.canvas yview scroll  1 page;break;"
+	bind $w <Key-Prior> "$w.config.canvas yview scroll  -1 page;break;"
+	bind $w <Key-Home> "$w.config.canvas yview moveto 0;break;"
+	bind $w <Key-End> "$w.config.canvas yview moveto 1 ;break;"
+	pack $w.config.canvas -side right -fill y
+
+
+	global tmpvar_42
+	minimenu $w.config.f 2 0 "Kernel Version" tmpvar_42 CONFIG_DEFAULTS_KERNEL_2_0
+	menu $w.config.f.x0.x.menu -tearoffcommand "menutitle \"Kernel Version\""
+	$w.config.f.x0.x.menu add radiobutton -label "linux-2.0.x" -variable tmpvar_42 -value "linux-2.0.x" -command "update_active"
+	$w.config.f.x0.x.menu add radiobutton -label "linux-2.4.x" -variable tmpvar_42 -value "linux-2.4.x" -command "update_active"
+	$w.config.f.x0.x.menu add radiobutton -label "linux-2.6.x" -variable tmpvar_42 -value "linux-2.6.x" -command "update_active"
+	menusplit $w $w.config.f.x0.x.menu 3
+	global tmpvar_43
+	minimenu $w.config.f 2 1 "Libc Version" tmpvar_43 CONFIG_DEFAULTS_LIBC_GLIBC
+	menu $w.config.f.x1.x.menu -tearoffcommand "menutitle \"Libc Version\""
+	$w.config.f.x1.x.menu add radiobutton -label "glibc" -variable tmpvar_43 -value "glibc" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "uC-libc" -variable tmpvar_43 -value "uC-libc" -command "update_active"
+	$w.config.f.x1.x.menu add radiobutton -label "uClibc" -variable tmpvar_43 -value "uClibc" -command "update_active"
+	menusplit $w $w.config.f.x1.x.menu 3
+	bool $w.config.f 2 2 "Default all settings (lose changes)" CONFIG_DEFAULTS_OVERRIDE
+	bool $w.config.f 2 3 "Customize Kernel Settings" CONFIG_DEFAULTS_KERNEL
+	bool $w.config.f 2 4 "Customize Vendor/User Settings" CONFIG_DEFAULTS_VENDOR
+	bool $w.config.f 2 5 "Update Default Vendor Settings" CONFIG_DEFAULTS_VENDOR_UPDATE
+
+
+
+	focus $w
+	update_active
+	global winx; global winy
+	set winx [expr [winfo x .]+30]; set winy [expr [winfo y .]+30]
+	if {[winfo exists $w]} then {wm geometry $w +$winx+$winy}
+	update idletasks
+	if {[winfo exists $w]} then  {$w.config.canvas create window 0 0 -anchor nw -window $w.config.f
+
+	$w.config.canvas configure \
+		-width [expr [winfo reqwidth $w.config.f] + 1]\
+		-scrollregion "-1 -1 [expr [winfo reqwidth $w.config.f] + 1] \
+			 [expr [winfo reqheight $w.config.f] + 1]"
+
+	set winy [expr [winfo reqh $w] - [winfo reqh $w.config.canvas]]
+	set scry [expr [winfo screenh $w] / 2]
+	set maxy [expr [winfo screenh $w] * 3 / 4]
+	set canvtotal [expr [winfo reqh $w.config.f] + 2]
+	if [expr $winy + $canvtotal < $maxy] {
+		$w.config.canvas configure -height $canvtotal
+	} else {
+		$w.config.canvas configure -height [expr $scry - $winy]
+		}
+	}
+	update idletasks
+	if {[winfo exists $w]} then {
+	wm maxsize $w [winfo width $w] [winfo screenheight $w]
+	wm minsize $w [winfo width $w] 100
+
+	wm deiconify $w
+}
+}
+
+proc update_menu2 {} {
+}
+
+
+proc update_define_menu2 {} {
+	update_define_mainmenu
+	global CONFIG_MODULES
+	global tmpvar_42
+	global CONFIG_DEFAULTS_KERNEL_2_0
+	if {$tmpvar_42 == "linux-2.0.x"} then {set CONFIG_DEFAULTS_KERNEL_2_0 1} else {set CONFIG_DEFAULTS_KERNEL_2_0 0}
+	global CONFIG_DEFAULTS_KERNEL_2_4
+	if {$tmpvar_42 == "linux-2.4.x"} then {set CONFIG_DEFAULTS_KERNEL_2_4 1} else {set CONFIG_DEFAULTS_KERNEL_2_4 0}
+	global CONFIG_DEFAULTS_KERNEL_2_6
+	if {$tmpvar_42 == "linux-2.6.x"} then {set CONFIG_DEFAULTS_KERNEL_2_6 1} else {set CONFIG_DEFAULTS_KERNEL_2_6 0}
+	global tmpvar_43
+	global CONFIG_DEFAULTS_LIBC_GLIBC
+	if {$tmpvar_43 == "glibc"} then {set CONFIG_DEFAULTS_LIBC_GLIBC 1} else {set CONFIG_DEFAULTS_LIBC_GLIBC 0}
+	global CONFIG_DEFAULTS_LIBC_UC_LIBC
+	if {$tmpvar_43 == "uC-libc"} then {set CONFIG_DEFAULTS_LIBC_UC_LIBC 1} else {set CONFIG_DEFAULTS_LIBC_UC_LIBC 0}
+	global CONFIG_DEFAULTS_LIBC_UCLIBC
+	if {$tmpvar_43 == "uClibc"} then {set CONFIG_DEFAULTS_LIBC_UCLIBC 1} else {set CONFIG_DEFAULTS_LIBC_UCLIBC 0}
+}
+
+
+proc update_mainmenu {}  {
+}
+
+
+set tmpvar_0 "(not set)"
+set CONFIG_DEFAULTS_3COM 0
+set CONFIG_DEFAULTS_ADI 0
+set CONFIG_DEFAULTS_APPLE 0
+set CONFIG_DEFAULTS_ARCTURUS 0
+set CONFIG_DEFAULTS_ARNEWSH 0
+set CONFIG_DEFAULTS_ATMEL 0
+set CONFIG_DEFAULTS_BMOW 0
+set CONFIG_DEFAULTS_CONEXANT 0
+set CONFIG_DEFAULTS_CWLINUX 0
+set CONFIG_DEFAULTS_CYTEK 0
+set CONFIG_DEFAULTS_EXYS 0
+set CONFIG_DEFAULTS_FEITH 0
+set CONFIG_DEFAULTS_FUTURE 0
+set CONFIG_DEFAULTS_GDB 0
+set CONFIG_DEFAULTS_HITACHI 0
+set CONFIG_DEFAULTS_IMT 0
+set CONFIG_DEFAULTS_INSIGHT 0
+set CONFIG_DEFAULTS_INTEL 0
+set CONFIG_DEFAULTS_KENDINMICREL 0
+set CONFIG_DEFAULTS_LEOX 0
+set CONFIG_DEFAULTS_MECEL 0
+set CONFIG_DEFAULTS_MIDAS 0
+set CONFIG_DEFAULTS_MOTOROLA 0
+set CONFIG_DEFAULTS_NEC 0
+set CONFIG_DEFAULTS_NETBURNER 0
+set CONFIG_DEFAULTS_NETSILICON 0
+set CONFIG_DEFAULTS_NINTENDO 0
+set CONFIG_DEFAULTS_OPENCORES 0
+set CONFIG_DEFAULTS_PROMISE 0
+set CONFIG_DEFAULTS_SAMSUNG 0
+set CONFIG_DEFAULTS_SECUREEDGE 0
+set CONFIG_DEFAULTS_SENTEC 0
+set CONFIG_DEFAULTS_SNAPGEAR 0
+set CONFIG_DEFAULTS_SOEKRIS 0
+set CONFIG_DEFAULTS_SSV 0
+set CONFIG_DEFAULTS_SWARM 0
+set CONFIG_DEFAULTS_TELEIP 0
+set CONFIG_DEFAULTS_TRISCEND 0
+set CONFIG_DEFAULTS_VIA 0
+set CONFIG_DEFAULTS_WEISS 0
+set CONFIG_DEFAULTS_XILINX 0
+set tmpvar_1 "(not set)"
+set CONFIG_DEFAULTS_3COM_PALMIIIX 0
+set CONFIG_DEFAULTS_3COM_XCOPILOT 0
+set tmpvar_2 "(not set)"
+set CONFIG_DEFAULTS_ADI_COYOTE 0
+set tmpvar_3 "(not set)"
+set CONFIG_DEFAULTS_APPLE_MACPLUS 0
+set tmpvar_4 "(not set)"
+set CONFIG_DEFAULTS_ARCTURUS_UC5272 0
+set CONFIG_DEFAULTS_ARCTURUS_UCDIMM 0
+set CONFIG_DEFAULTS_ARCTURUS_UCDIMM_MTD 0
+set CONFIG_DEFAULTS_ARCTURUS_UCQUICC 0
+set CONFIG_DEFAULTS_ARCTURUS_UCSIMM 0
+set tmpvar_5 "(not set)"
+set CONFIG_DEFAULTS_ARNEWSH_M5206 0
+set CONFIG_DEFAULTS_ARNEWSH_M5307 0
+set tmpvar_6 "(not set)"
+set CONFIG_DEFAULTS_ATMEL_AT91 0
+set tmpvar_7 "(not set)"
+set CONFIG_DEFAULTS_BMOW_68KATY 0
+set tmpvar_8 "(not set)"
+set CONFIG_DEFAULTS_CONEXANT_HUMBER 0
+set CONFIG_DEFAULTS_CONEXANT_P52 0
+set tmpvar_9 "(not set)"
+set CONFIG_DEFAULTS_CWLINUX_CWEZ328 0
+set CONFIG_DEFAULTS_CWLINUX_CWVZ328 0
+set tmpvar_10 "(not set)"
+set CONFIG_DEFAULTS_CYTEK_NETMP3 0
+set tmpvar_11 "(not set)"
+set CONFIG_DEFAULTS_EXYS_DE2 0
+set tmpvar_12 "(not set)"
+set CONFIG_DEFAULTS_FEITH_CLEOPATRA2 0
+set CONFIG_DEFAULTS_FEITH_CLEOPATRA 0
+set tmpvar_13 "(not set)"
+set CONFIG_DEFAULTS_FUTURE_FUTURENETBURNER5282BADGE 0
+set tmpvar_14 "(not set)"
+set CONFIG_DEFAULTS_GDB_ARMULATOR 0
+set CONFIG_DEFAULTS_GDB_ARMULATOR_EB 0
+set tmpvar_15 "(not set)"
+set CONFIG_DEFAULTS_HITACHI_BIGSURIV 0
+set CONFIG_DEFAULTS_HITACHI_EDOSK2674 0
+set CONFIG_DEFAULTS_HITACHI_KEYWEST 0
+set tmpvar_16 "(not set)"
+set CONFIG_DEFAULTS_IMT_MWI 0
+set tmpvar_17 "(not set)"
+set CONFIG_DEFAULTS_INSIGHT_MBVANILLA_NET 0
+set CONFIG_DEFAULTS_INSIGHT_XC2V1K_MICROBLAZE 0
+set CONFIG_DEFAULTS_INSIGHT_XC2VP7_MICROBLAZE 0
+set tmpvar_18 "(not set)"
+set CONFIG_DEFAULTS_INTEL_IXDP425 0
+set tmpvar_19 "(not set)"
+set CONFIG_DEFAULTS_KENDINMICREL_KS8695 0
+set tmpvar_20 "(not set)"
+set CONFIG_DEFAULTS_LEOX_TSIM 0
+set tmpvar_21 "(not set)"
+set CONFIG_DEFAULTS_MECEL_FR1000 0
+set tmpvar_22 "(not set)"
+set CONFIG_DEFAULTS_MIDAS_RTE_NB85E_CB 0
+set CONFIG_DEFAULTS_MIDAS_RTE_V850E_MA1_CB 0
+set CONFIG_DEFAULTS_MIDAS_RTE_V850E_ME2_CB 0
+set tmpvar_23 "(not set)"
+set CONFIG_DEFAULTS_MOTOROLA_M5206EC3 0
+set CONFIG_DEFAULTS_MOTOROLA_M5206ELITE 0
+set CONFIG_DEFAULTS_MOTOROLA_M5249C3 0
+set CONFIG_DEFAULTS_MOTOROLA_M5272C3 0
+set CONFIG_DEFAULTS_MOTOROLA_M5282C3 0
+set CONFIG_DEFAULTS_MOTOROLA_M5307C3 0
+set CONFIG_DEFAULTS_MOTOROLA_M5407C3 0
+set tmpvar_24 "(not set)"
+set CONFIG_DEFAULTS_NEC_ANNA 0
+set CONFIG_DEFAULTS_NEC_COMMON 0
+set CONFIG_DEFAULTS_NEC_V850E_SIM_GDB 0
+set tmpvar_25 "(not set)"
+set CONFIG_DEFAULTS_NETBURNER_CFV240 0
+set CONFIG_DEFAULTS_NETBURNER_MOD5282 0
+set tmpvar_26 "(not set)"
+set CONFIG_DEFAULTS_NETSILICON_NET_ARM 0
+set tmpvar_27 "(not set)"
+set CONFIG_DEFAULTS_NINTENDO_GBA 0
+set tmpvar_28 "(not set)"
+set CONFIG_DEFAULTS_OPENCORES_OR32 0
+set tmpvar_29 "(not set)"
+set CONFIG_DEFAULTS_PROMISE_SX6 0
+set tmpvar_30 "(not set)"
+set CONFIG_DEFAULTS_SAMSUNG_4510B 0
+set tmpvar_31 "(not set)"
+set CONFIG_DEFAULTS_SECUREEDGE_DISKTEL 0
+set CONFIG_DEFAULTS_SECUREEDGE_ELIA 0
+set CONFIG_DEFAULTS_SECUREEDGE_MP3 0
+set CONFIG_DEFAULTS_SECUREEDGE_NETTEL1500 0
+set CONFIG_DEFAULTS_SECUREEDGE_NETTEL3540 0
+set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE1100 0
+set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2540 0
+set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2570 0
+set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580 0
+set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580_JFFS 0
+set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEEDNA 0
+set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGENAS 0
+set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEPCMCIA 0
+set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEVPN 0
+set tmpvar_32 "(not set)"
+set CONFIG_DEFAULTS_SENTEC_COBRA5272 0
+set tmpvar_33 "(not set)"
+set CONFIG_DEFAULTS_SNAPGEAR_LITE300 0
+set CONFIG_DEFAULTS_SNAPGEAR_LITE 0
+set CONFIG_DEFAULTS_SNAPGEAR_PRO 0
+set CONFIG_DEFAULTS_SNAPGEAR_SE2910_INTEL 0
+set CONFIG_DEFAULTS_SNAPGEAR_SE3400 0
+set CONFIG_DEFAULTS_SNAPGEAR_SE4000 0
+set CONFIG_DEFAULTS_SNAPGEAR_SME530 0
+set CONFIG_DEFAULTS_SNAPGEAR_SME550 0
+set CONFIG_DEFAULTS_SNAPGEAR_SME570 0
+set CONFIG_DEFAULTS_SNAPGEAR_SOHO_ 0
+set tmpvar_34 "(not set)"
+set CONFIG_DEFAULTS_SOEKRIS_NET4801 0
+set tmpvar_35 "(not set)"
+set CONFIG_DEFAULTS_SSV_DNP5280 0
+set tmpvar_36 "(not set)"
+set CONFIG_DEFAULTS_SWARM_SWARM 0
+set tmpvar_37 "(not set)"
+set CONFIG_DEFAULTS_TELEIP_RSC 0
+set tmpvar_38 "(not set)"
+set CONFIG_DEFAULTS_TRISCEND_A7DB 0
+set CONFIG_DEFAULTS_TRISCEND_DEVA7 0
+set tmpvar_39 "(not set)"
+set CONFIG_DEFAULTS_VIA_EPIA 0
+set tmpvar_40 "(not set)"
+set CONFIG_DEFAULTS_WEISS_SM2010 0
+set tmpvar_41 "(not set)"
+set CONFIG_DEFAULTS_XILINX_COMMON 0
+set tmpvar_42 "(not set)"
+set CONFIG_DEFAULTS_KERNEL_2_0 0
+set CONFIG_DEFAULTS_KERNEL_2_4 0
+set CONFIG_DEFAULTS_KERNEL_2_6 0
+set tmpvar_43 "(not set)"
+set CONFIG_DEFAULTS_LIBC_GLIBC 0
+set CONFIG_DEFAULTS_LIBC_UC_LIBC 0
+set CONFIG_DEFAULTS_LIBC_UCLIBC 0
+set CONFIG_DEFAULTS_OVERRIDE 0
+set CONFIG_DEFAULTS_KERNEL 0
+set CONFIG_DEFAULTS_VENDOR 0
+set CONFIG_DEFAULTS_VENDOR_UPDATE 0
+set CONFIG_MODULES 4
+proc writeconfig {file1 file2} {
+	set cfg [open $file1 w]
+	set autocfg [open $file2 w]
+	set notmod 1
+	set notset 0
+	puts $cfg "#"
+	puts $cfg "# Automatically generated make config: don't edit"
+	puts $cfg "#"
+	puts $autocfg "/*"
+	puts $autocfg " * Automatically generated C config: don't edit"
+	puts $autocfg " */"
+	puts $autocfg "#define AUTOCONF_INCLUDED"
+	write_comment $cfg $autocfg "Vendor/Product Selection"
+	write_comment $cfg $autocfg "Select the Vendor you wish to target"
+	global tmpvar_0
+	
+	if { $tmpvar_0 == "3com" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_3COM 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_3COM 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "ADI" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ADI 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ADI 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Apple" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_APPLE 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_APPLE 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Arcturus" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ARCTURUS 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ARCTURUS 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Arnewsh" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ARNEWSH 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ARNEWSH 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Atmel" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ATMEL 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ATMEL 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "BMOW" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_BMOW 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_BMOW 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Conexant" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_CONEXANT 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_CONEXANT 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Cwlinux" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_CWLINUX 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_CWLINUX 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Cytek" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_CYTEK 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_CYTEK 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Exys" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_EXYS 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_EXYS 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Feith" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_FEITH 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_FEITH 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Future" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_FUTURE 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_FUTURE 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "GDB" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_GDB 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_GDB 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Hitachi" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_HITACHI 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_HITACHI 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Imt" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_IMT 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_IMT 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Insight" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_INSIGHT 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_INSIGHT 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Intel" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_INTEL 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_INTEL 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "KendinMicrel" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_KENDINMICREL 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_KENDINMICREL 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "LEOX" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_LEOX 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_LEOX 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Mecel" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MECEL 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MECEL 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Midas" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MIDAS 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MIDAS 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Motorola" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MOTOROLA 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MOTOROLA 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "NEC" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NEC 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NEC 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Netburner" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NETBURNER 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NETBURNER 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "NetSilicon" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NETSILICON 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NETSILICON 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Nintendo" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NINTENDO 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NINTENDO 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "OPENcores" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_OPENCORES 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_OPENCORES 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Promise" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_PROMISE 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_PROMISE 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Samsung" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SAMSUNG 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SAMSUNG 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "SecureEdge" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "senTec" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SENTEC 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SENTEC 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "SnapGear" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Soekris" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SOEKRIS 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SOEKRIS 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "SSV" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SSV 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SSV 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "SWARM" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SWARM 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SWARM 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "TeleIP" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_TELEIP 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_TELEIP 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Triscend" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_TRISCEND 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_TRISCEND 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Via" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_VIA 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_VIA 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Weiss" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_WEISS 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_WEISS 0 [list $notmod] 2 }
+	if { $tmpvar_0 == "Xilinx" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_XILINX 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_XILINX 0 [list $notmod] 2 }
+	write_comment $cfg $autocfg "Select the Product you wish to target"
+	global tmpvar_1
+	global CONFIG_DEFAULTS_3COM
+	if {($CONFIG_DEFAULTS_3COM == 1)} then {
+	if { $tmpvar_1 == "PalmIIIx" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_3COM_PALMIIIX 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_3COM_PALMIIIX 0 [list $notmod] 2 }
+	if { $tmpvar_1 == "Xcopilot" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_3COM_XCOPILOT 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_3COM_XCOPILOT 0 [list $notmod] 2 }}
+	global tmpvar_2
+	global CONFIG_DEFAULTS_ADI
+	if {($CONFIG_DEFAULTS_ADI == 1)} then {
+	if { $tmpvar_2 == "Coyote" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ADI_COYOTE 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ADI_COYOTE 0 [list $notmod] 2 }}
+	global tmpvar_3
+	global CONFIG_DEFAULTS_APPLE
+	if {($CONFIG_DEFAULTS_APPLE == 1)} then {
+	if { $tmpvar_3 == "MacPlus" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_APPLE_MACPLUS 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_APPLE_MACPLUS 0 [list $notmod] 2 }}
+	global tmpvar_4
+	global CONFIG_DEFAULTS_ARCTURUS
+	if {($CONFIG_DEFAULTS_ARCTURUS == 1)} then {
+	if { $tmpvar_4 == "uC5272" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ARCTURUS_UC5272 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ARCTURUS_UC5272 0 [list $notmod] 2 }
+	if { $tmpvar_4 == "uCdimm" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ARCTURUS_UCDIMM 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ARCTURUS_UCDIMM 0 [list $notmod] 2 }
+	if { $tmpvar_4 == "uCdimm+mtd" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ARCTURUS_UCDIMM_MTD 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ARCTURUS_UCDIMM_MTD 0 [list $notmod] 2 }
+	if { $tmpvar_4 == "uCquicc" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ARCTURUS_UCQUICC 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ARCTURUS_UCQUICC 0 [list $notmod] 2 }
+	if { $tmpvar_4 == "uCsimm" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ARCTURUS_UCSIMM 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ARCTURUS_UCSIMM 0 [list $notmod] 2 }}
+	global tmpvar_5
+	global CONFIG_DEFAULTS_ARNEWSH
+	if {($CONFIG_DEFAULTS_ARNEWSH == 1)} then {
+	if { $tmpvar_5 == "M5206" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ARNEWSH_M5206 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ARNEWSH_M5206 0 [list $notmod] 2 }
+	if { $tmpvar_5 == "M5307" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ARNEWSH_M5307 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ARNEWSH_M5307 0 [list $notmod] 2 }}
+	global tmpvar_6
+	global CONFIG_DEFAULTS_ATMEL
+	if {($CONFIG_DEFAULTS_ATMEL == 1)} then {
+	if { $tmpvar_6 == "AT91" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ATMEL_AT91 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_ATMEL_AT91 0 [list $notmod] 2 }}
+	global tmpvar_7
+	global CONFIG_DEFAULTS_BMOW
+	if {($CONFIG_DEFAULTS_BMOW == 1)} then {
+	if { $tmpvar_7 == "68Katy" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_BMOW_68KATY 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_BMOW_68KATY 0 [list $notmod] 2 }}
+	global tmpvar_8
+	global CONFIG_DEFAULTS_CONEXANT
+	if {($CONFIG_DEFAULTS_CONEXANT == 1)} then {
+	if { $tmpvar_8 == "Humber" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_CONEXANT_HUMBER 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_CONEXANT_HUMBER 0 [list $notmod] 2 }
+	if { $tmpvar_8 == "P52" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_CONEXANT_P52 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_CONEXANT_P52 0 [list $notmod] 2 }}
+	global tmpvar_9
+	global CONFIG_DEFAULTS_CWLINUX
+	if {($CONFIG_DEFAULTS_CWLINUX == 1)} then {
+	if { $tmpvar_9 == "cwez328" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_CWLINUX_CWEZ328 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_CWLINUX_CWEZ328 0 [list $notmod] 2 }
+	if { $tmpvar_9 == "cwvz328" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_CWLINUX_CWVZ328 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_CWLINUX_CWVZ328 0 [list $notmod] 2 }}
+	global tmpvar_10
+	global CONFIG_DEFAULTS_CYTEK
+	if {($CONFIG_DEFAULTS_CYTEK == 1)} then {
+	if { $tmpvar_10 == "NETmp3" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_CYTEK_NETMP3 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_CYTEK_NETMP3 0 [list $notmod] 2 }}
+	global tmpvar_11
+	global CONFIG_DEFAULTS_EXYS
+	if {($CONFIG_DEFAULTS_EXYS == 1)} then {
+	if { $tmpvar_11 == "de2" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_EXYS_DE2 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_EXYS_DE2 0 [list $notmod] 2 }}
+	global tmpvar_12
+	global CONFIG_DEFAULTS_FEITH
+	if {($CONFIG_DEFAULTS_FEITH == 1)} then {
+	if { $tmpvar_12 == "Cleopatra2" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_FEITH_CLEOPATRA2 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_FEITH_CLEOPATRA2 0 [list $notmod] 2 }
+	if { $tmpvar_12 == "Cleopatra" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_FEITH_CLEOPATRA 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_FEITH_CLEOPATRA 0 [list $notmod] 2 }}
+	global tmpvar_13
+	global CONFIG_DEFAULTS_FUTURE
+	if {($CONFIG_DEFAULTS_FUTURE == 1)} then {
+	if { $tmpvar_13 == "FutureNetburner5282Badge" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_FUTURE_FUTURENETBURNER5282BADGE 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_FUTURE_FUTURENETBURNER5282BADGE 0 [list $notmod] 2 }}
+	global tmpvar_14
+	global CONFIG_DEFAULTS_GDB
+	if {($CONFIG_DEFAULTS_GDB == 1)} then {
+	if { $tmpvar_14 == "ARMulator" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_GDB_ARMULATOR 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_GDB_ARMULATOR 0 [list $notmod] 2 }
+	if { $tmpvar_14 == "ARMulator-EB" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_GDB_ARMULATOR_EB 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_GDB_ARMULATOR_EB 0 [list $notmod] 2 }}
+	global tmpvar_15
+	global CONFIG_DEFAULTS_HITACHI
+	if {($CONFIG_DEFAULTS_HITACHI == 1)} then {
+	if { $tmpvar_15 == "BigSurIV" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_HITACHI_BIGSURIV 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_HITACHI_BIGSURIV 0 [list $notmod] 2 }
+	if { $tmpvar_15 == "EDOSK2674" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_HITACHI_EDOSK2674 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_HITACHI_EDOSK2674 0 [list $notmod] 2 }
+	if { $tmpvar_15 == "KeyWest" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_HITACHI_KEYWEST 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_HITACHI_KEYWEST 0 [list $notmod] 2 }}
+	global tmpvar_16
+	global CONFIG_DEFAULTS_IMT
+	if {($CONFIG_DEFAULTS_IMT == 1)} then {
+	if { $tmpvar_16 == "mwi" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_IMT_MWI 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_IMT_MWI 0 [list $notmod] 2 }}
+	global tmpvar_17
+	global CONFIG_DEFAULTS_INSIGHT
+	if {($CONFIG_DEFAULTS_INSIGHT == 1)} then {
+	if { $tmpvar_17 == "mbvanilla_net" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_INSIGHT_MBVANILLA_NET 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_INSIGHT_MBVANILLA_NET 0 [list $notmod] 2 }
+	if { $tmpvar_17 == "XC2V1K_Microblaze" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_INSIGHT_XC2V1K_MICROBLAZE 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_INSIGHT_XC2V1K_MICROBLAZE 0 [list $notmod] 2 }
+	if { $tmpvar_17 == "XC2VP7_Microblaze" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_INSIGHT_XC2VP7_MICROBLAZE 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_INSIGHT_XC2VP7_MICROBLAZE 0 [list $notmod] 2 }}
+	global tmpvar_18
+	global CONFIG_DEFAULTS_INTEL
+	if {($CONFIG_DEFAULTS_INTEL == 1)} then {
+	if { $tmpvar_18 == "IXDP425" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_INTEL_IXDP425 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_INTEL_IXDP425 0 [list $notmod] 2 }}
+	global tmpvar_19
+	global CONFIG_DEFAULTS_KENDINMICREL
+	if {($CONFIG_DEFAULTS_KENDINMICREL == 1)} then {
+	if { $tmpvar_19 == "KS8695" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_KENDINMICREL_KS8695 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_KENDINMICREL_KS8695 0 [list $notmod] 2 }}
+	global tmpvar_20
+	global CONFIG_DEFAULTS_LEOX
+	if {($CONFIG_DEFAULTS_LEOX == 1)} then {
+	if { $tmpvar_20 == "TSIM" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_LEOX_TSIM 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_LEOX_TSIM 0 [list $notmod] 2 }}
+	global tmpvar_21
+	global CONFIG_DEFAULTS_MECEL
+	if {($CONFIG_DEFAULTS_MECEL == 1)} then {
+	if { $tmpvar_21 == "FR1000" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MECEL_FR1000 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MECEL_FR1000 0 [list $notmod] 2 }}
+	global tmpvar_22
+	global CONFIG_DEFAULTS_MIDAS
+	if {($CONFIG_DEFAULTS_MIDAS == 1)} then {
+	if { $tmpvar_22 == "RTE-NB85E-CB" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MIDAS_RTE_NB85E_CB 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MIDAS_RTE_NB85E_CB 0 [list $notmod] 2 }
+	if { $tmpvar_22 == "RTE-V850E-MA1-CB" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MIDAS_RTE_V850E_MA1_CB 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MIDAS_RTE_V850E_MA1_CB 0 [list $notmod] 2 }
+	if { $tmpvar_22 == "RTE-V850E-ME2-CB" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MIDAS_RTE_V850E_ME2_CB 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MIDAS_RTE_V850E_ME2_CB 0 [list $notmod] 2 }}
+	global tmpvar_23
+	global CONFIG_DEFAULTS_MOTOROLA
+	if {($CONFIG_DEFAULTS_MOTOROLA == 1)} then {
+	if { $tmpvar_23 == "M5206eC3" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MOTOROLA_M5206EC3 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MOTOROLA_M5206EC3 0 [list $notmod] 2 }
+	if { $tmpvar_23 == "M5206eLITE" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MOTOROLA_M5206ELITE 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MOTOROLA_M5206ELITE 0 [list $notmod] 2 }
+	if { $tmpvar_23 == "M5249C3" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MOTOROLA_M5249C3 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MOTOROLA_M5249C3 0 [list $notmod] 2 }
+	if { $tmpvar_23 == "M5272C3" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MOTOROLA_M5272C3 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MOTOROLA_M5272C3 0 [list $notmod] 2 }
+	if { $tmpvar_23 == "M5282C3" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MOTOROLA_M5282C3 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MOTOROLA_M5282C3 0 [list $notmod] 2 }
+	if { $tmpvar_23 == "M5307C3" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MOTOROLA_M5307C3 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MOTOROLA_M5307C3 0 [list $notmod] 2 }
+	if { $tmpvar_23 == "M5407C3" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MOTOROLA_M5407C3 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_MOTOROLA_M5407C3 0 [list $notmod] 2 }}
+	global tmpvar_24
+	global CONFIG_DEFAULTS_NEC
+	if {($CONFIG_DEFAULTS_NEC == 1)} then {
+	if { $tmpvar_24 == "Anna" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NEC_ANNA 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NEC_ANNA 0 [list $notmod] 2 }
+	if { $tmpvar_24 == "common" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NEC_COMMON 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NEC_COMMON 0 [list $notmod] 2 }
+	if { $tmpvar_24 == "v850e-sim-gdb" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NEC_V850E_SIM_GDB 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NEC_V850E_SIM_GDB 0 [list $notmod] 2 }}
+	global tmpvar_25
+	global CONFIG_DEFAULTS_NETBURNER
+	if {($CONFIG_DEFAULTS_NETBURNER == 1)} then {
+	if { $tmpvar_25 == "CFV240" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NETBURNER_CFV240 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NETBURNER_CFV240 0 [list $notmod] 2 }
+	if { $tmpvar_25 == "MOD5282" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NETBURNER_MOD5282 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NETBURNER_MOD5282 0 [list $notmod] 2 }}
+	global tmpvar_26
+	global CONFIG_DEFAULTS_NETSILICON
+	if {($CONFIG_DEFAULTS_NETSILICON == 1)} then {
+	if { $tmpvar_26 == "NET+ARM" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NETSILICON_NET_ARM 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NETSILICON_NET_ARM 0 [list $notmod] 2 }}
+	global tmpvar_27
+	global CONFIG_DEFAULTS_NINTENDO
+	if {($CONFIG_DEFAULTS_NINTENDO == 1)} then {
+	if { $tmpvar_27 == "GBA" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NINTENDO_GBA 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_NINTENDO_GBA 0 [list $notmod] 2 }}
+	global tmpvar_28
+	global CONFIG_DEFAULTS_OPENCORES
+	if {($CONFIG_DEFAULTS_OPENCORES == 1)} then {
+	if { $tmpvar_28 == "or32" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_OPENCORES_OR32 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_OPENCORES_OR32 0 [list $notmod] 2 }}
+	global tmpvar_29
+	global CONFIG_DEFAULTS_PROMISE
+	if {($CONFIG_DEFAULTS_PROMISE == 1)} then {
+	if { $tmpvar_29 == "SX6" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_PROMISE_SX6 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_PROMISE_SX6 0 [list $notmod] 2 }}
+	global tmpvar_30
+	global CONFIG_DEFAULTS_SAMSUNG
+	if {($CONFIG_DEFAULTS_SAMSUNG == 1)} then {
+	if { $tmpvar_30 == "4510B" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SAMSUNG_4510B 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SAMSUNG_4510B 0 [list $notmod] 2 }}
+	global tmpvar_31
+	global CONFIG_DEFAULTS_SECUREEDGE
+	if {($CONFIG_DEFAULTS_SECUREEDGE == 1)} then {
+	if { $tmpvar_31 == "DISKtel" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_DISKTEL 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_DISKTEL 0 [list $notmod] 2 }
+	if { $tmpvar_31 == "eLIA" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_ELIA 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_ELIA 0 [list $notmod] 2 }
+	if { $tmpvar_31 == "MP3" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_MP3 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_MP3 0 [list $notmod] 2 }
+	if { $tmpvar_31 == "NETtel1500" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_NETTEL1500 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_NETTEL1500 0 [list $notmod] 2 }
+	if { $tmpvar_31 == "NETtel3540" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_NETTEL3540 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_NETTEL3540 0 [list $notmod] 2 }
+	if { $tmpvar_31 == "SecureEdge1100" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE1100 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE1100 0 [list $notmod] 2 }
+	if { $tmpvar_31 == "SecureEdge2540" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2540 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2540 0 [list $notmod] 2 }
+	if { $tmpvar_31 == "SecureEdge2570" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2570 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2570 0 [list $notmod] 2 }
+	if { $tmpvar_31 == "SecureEdge2580" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580 0 [list $notmod] 2 }
+	if { $tmpvar_31 == "SecureEdge2580-JFFS" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580_JFFS 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580_JFFS 0 [list $notmod] 2 }
+	if { $tmpvar_31 == "SecureEdgeEdna" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEEDNA 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEEDNA 0 [list $notmod] 2 }
+	if { $tmpvar_31 == "SecureEdgeNAS" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGENAS 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGENAS 0 [list $notmod] 2 }
+	if { $tmpvar_31 == "SecureEdgePCMCIA" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEPCMCIA 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEPCMCIA 0 [list $notmod] 2 }
+	if { $tmpvar_31 == "SecureEdgeVPN" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEVPN 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEVPN 0 [list $notmod] 2 }}
+	global tmpvar_32
+	global CONFIG_DEFAULTS_SENTEC
+	if {($CONFIG_DEFAULTS_SENTEC == 1)} then {
+	if { $tmpvar_32 == "COBRA5272" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SENTEC_COBRA5272 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SENTEC_COBRA5272 0 [list $notmod] 2 }}
+	global tmpvar_33
+	global CONFIG_DEFAULTS_SNAPGEAR
+	if {($CONFIG_DEFAULTS_SNAPGEAR == 1)} then {
+	if { $tmpvar_33 == "LITE300" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_LITE300 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_LITE300 0 [list $notmod] 2 }
+	if { $tmpvar_33 == "LITE" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_LITE 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_LITE 0 [list $notmod] 2 }
+	if { $tmpvar_33 == "PRO" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_PRO 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_PRO 0 [list $notmod] 2 }
+	if { $tmpvar_33 == "SE2910-Intel" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_SE2910_INTEL 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_SE2910_INTEL 0 [list $notmod] 2 }
+	if { $tmpvar_33 == "SE3400" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_SE3400 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_SE3400 0 [list $notmod] 2 }
+	if { $tmpvar_33 == "SE4000" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_SE4000 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_SE4000 0 [list $notmod] 2 }
+	if { $tmpvar_33 == "SME530" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_SME530 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_SME530 0 [list $notmod] 2 }
+	if { $tmpvar_33 == "SME550" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_SME550 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_SME550 0 [list $notmod] 2 }
+	if { $tmpvar_33 == "SME570" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_SME570 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_SME570 0 [list $notmod] 2 }
+	if { $tmpvar_33 == "SOHO+" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_SOHO_ 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SNAPGEAR_SOHO_ 0 [list $notmod] 2 }}
+	global tmpvar_34
+	global CONFIG_DEFAULTS_SOEKRIS
+	if {($CONFIG_DEFAULTS_SOEKRIS == 1)} then {
+	if { $tmpvar_34 == "net4801" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SOEKRIS_NET4801 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SOEKRIS_NET4801 0 [list $notmod] 2 }}
+	global tmpvar_35
+	global CONFIG_DEFAULTS_SSV
+	if {($CONFIG_DEFAULTS_SSV == 1)} then {
+	if { $tmpvar_35 == "DNP5280" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SSV_DNP5280 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SSV_DNP5280 0 [list $notmod] 2 }}
+	global tmpvar_36
+	global CONFIG_DEFAULTS_SWARM
+	if {($CONFIG_DEFAULTS_SWARM == 1)} then {
+	if { $tmpvar_36 == "SWARM" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SWARM_SWARM 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_SWARM_SWARM 0 [list $notmod] 2 }}
+	global tmpvar_37
+	global CONFIG_DEFAULTS_TELEIP
+	if {($CONFIG_DEFAULTS_TELEIP == 1)} then {
+	if { $tmpvar_37 == "rsc" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_TELEIP_RSC 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_TELEIP_RSC 0 [list $notmod] 2 }}
+	global tmpvar_38
+	global CONFIG_DEFAULTS_TRISCEND
+	if {($CONFIG_DEFAULTS_TRISCEND == 1)} then {
+	if { $tmpvar_38 == "A7DB" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_TRISCEND_A7DB 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_TRISCEND_A7DB 0 [list $notmod] 2 }
+	if { $tmpvar_38 == "DevA7" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_TRISCEND_DEVA7 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_TRISCEND_DEVA7 0 [list $notmod] 2 }}
+	global tmpvar_39
+	global CONFIG_DEFAULTS_VIA
+	if {($CONFIG_DEFAULTS_VIA == 1)} then {
+	if { $tmpvar_39 == "EPIA" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_VIA_EPIA 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_VIA_EPIA 0 [list $notmod] 2 }}
+	global tmpvar_40
+	global CONFIG_DEFAULTS_WEISS
+	if {($CONFIG_DEFAULTS_WEISS == 1)} then {
+	if { $tmpvar_40 == "SM2010" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_WEISS_SM2010 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_WEISS_SM2010 0 [list $notmod] 2 }}
+	global tmpvar_41
+	global CONFIG_DEFAULTS_XILINX
+	if {($CONFIG_DEFAULTS_XILINX == 1)} then {
+	if { $tmpvar_41 == "common" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_XILINX_COMMON 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_XILINX_COMMON 0 [list $notmod] 2 }}
+	write_comment $cfg $autocfg "Kernel/Library/Defaults Selection"
+	global tmpvar_42
+	
+	if { $tmpvar_42 == "linux-2.0.x" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_KERNEL_2_0 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_KERNEL_2_0 0 [list $notmod] 2 }
+	if { $tmpvar_42 == "linux-2.4.x" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_KERNEL_2_4 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_KERNEL_2_4 0 [list $notmod] 2 }
+	if { $tmpvar_42 == "linux-2.6.x" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_KERNEL_2_6 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_KERNEL_2_6 0 [list $notmod] 2 }
+	global tmpvar_43
+	
+	if { $tmpvar_43 == "glibc" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_LIBC_GLIBC 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_LIBC_GLIBC 0 [list $notmod] 2 }
+	if { $tmpvar_43 == "uC-libc" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_LIBC_UC_LIBC 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_LIBC_UC_LIBC 0 [list $notmod] 2 }
+	if { $tmpvar_43 == "uClibc" } then { write_tristate $cfg $autocfg CONFIG_DEFAULTS_LIBC_UCLIBC 1 [list $notmod] 2 } else { write_tristate $cfg $autocfg CONFIG_DEFAULTS_LIBC_UCLIBC 0 [list $notmod] 2 }
+	global CONFIG_DEFAULTS_OVERRIDE
+	write_tristate $cfg $autocfg CONFIG_DEFAULTS_OVERRIDE $CONFIG_DEFAULTS_OVERRIDE [list $notmod] 2
+	global CONFIG_DEFAULTS_KERNEL
+	write_tristate $cfg $autocfg CONFIG_DEFAULTS_KERNEL $CONFIG_DEFAULTS_KERNEL [list $notmod] 2
+	global CONFIG_DEFAULTS_VENDOR
+	write_tristate $cfg $autocfg CONFIG_DEFAULTS_VENDOR $CONFIG_DEFAULTS_VENDOR [list $notmod] 2
+	global CONFIG_DEFAULTS_VENDOR_UPDATE
+	write_tristate $cfg $autocfg CONFIG_DEFAULTS_VENDOR_UPDATE $CONFIG_DEFAULTS_VENDOR_UPDATE [list $notmod] 2
+	close $cfg
+	close $autocfg
+}
+
+
+proc clear_choices { } {
+	global CONFIG_DEFAULTS_3COM; set CONFIG_DEFAULTS_3COM 0
+	global CONFIG_DEFAULTS_ADI; set CONFIG_DEFAULTS_ADI 0
+	global CONFIG_DEFAULTS_APPLE; set CONFIG_DEFAULTS_APPLE 0
+	global CONFIG_DEFAULTS_ARCTURUS; set CONFIG_DEFAULTS_ARCTURUS 0
+	global CONFIG_DEFAULTS_ARNEWSH; set CONFIG_DEFAULTS_ARNEWSH 0
+	global CONFIG_DEFAULTS_ATMEL; set CONFIG_DEFAULTS_ATMEL 0
+	global CONFIG_DEFAULTS_BMOW; set CONFIG_DEFAULTS_BMOW 0
+	global CONFIG_DEFAULTS_CONEXANT; set CONFIG_DEFAULTS_CONEXANT 0
+	global CONFIG_DEFAULTS_CWLINUX; set CONFIG_DEFAULTS_CWLINUX 0
+	global CONFIG_DEFAULTS_CYTEK; set CONFIG_DEFAULTS_CYTEK 0
+	global CONFIG_DEFAULTS_EXYS; set CONFIG_DEFAULTS_EXYS 0
+	global CONFIG_DEFAULTS_FEITH; set CONFIG_DEFAULTS_FEITH 0
+	global CONFIG_DEFAULTS_FUTURE; set CONFIG_DEFAULTS_FUTURE 0
+	global CONFIG_DEFAULTS_GDB; set CONFIG_DEFAULTS_GDB 0
+	global CONFIG_DEFAULTS_HITACHI; set CONFIG_DEFAULTS_HITACHI 0
+	global CONFIG_DEFAULTS_IMT; set CONFIG_DEFAULTS_IMT 0
+	global CONFIG_DEFAULTS_INSIGHT; set CONFIG_DEFAULTS_INSIGHT 0
+	global CONFIG_DEFAULTS_INTEL; set CONFIG_DEFAULTS_INTEL 0
+	global CONFIG_DEFAULTS_KENDINMICREL; set CONFIG_DEFAULTS_KENDINMICREL 0
+	global CONFIG_DEFAULTS_LEOX; set CONFIG_DEFAULTS_LEOX 0
+	global CONFIG_DEFAULTS_MECEL; set CONFIG_DEFAULTS_MECEL 0
+	global CONFIG_DEFAULTS_MIDAS; set CONFIG_DEFAULTS_MIDAS 0
+	global CONFIG_DEFAULTS_MOTOROLA; set CONFIG_DEFAULTS_MOTOROLA 0
+	global CONFIG_DEFAULTS_NEC; set CONFIG_DEFAULTS_NEC 0
+	global CONFIG_DEFAULTS_NETBURNER; set CONFIG_DEFAULTS_NETBURNER 0
+	global CONFIG_DEFAULTS_NETSILICON; set CONFIG_DEFAULTS_NETSILICON 0
+	global CONFIG_DEFAULTS_NINTENDO; set CONFIG_DEFAULTS_NINTENDO 0
+	global CONFIG_DEFAULTS_OPENCORES; set CONFIG_DEFAULTS_OPENCORES 0
+	global CONFIG_DEFAULTS_PROMISE; set CONFIG_DEFAULTS_PROMISE 0
+	global CONFIG_DEFAULTS_SAMSUNG; set CONFIG_DEFAULTS_SAMSUNG 0
+	global CONFIG_DEFAULTS_SECUREEDGE; set CONFIG_DEFAULTS_SECUREEDGE 0
+	global CONFIG_DEFAULTS_SENTEC; set CONFIG_DEFAULTS_SENTEC 0
+	global CONFIG_DEFAULTS_SNAPGEAR; set CONFIG_DEFAULTS_SNAPGEAR 0
+	global CONFIG_DEFAULTS_SOEKRIS; set CONFIG_DEFAULTS_SOEKRIS 0
+	global CONFIG_DEFAULTS_SSV; set CONFIG_DEFAULTS_SSV 0
+	global CONFIG_DEFAULTS_SWARM; set CONFIG_DEFAULTS_SWARM 0
+	global CONFIG_DEFAULTS_TELEIP; set CONFIG_DEFAULTS_TELEIP 0
+	global CONFIG_DEFAULTS_TRISCEND; set CONFIG_DEFAULTS_TRISCEND 0
+	global CONFIG_DEFAULTS_VIA; set CONFIG_DEFAULTS_VIA 0
+	global CONFIG_DEFAULTS_WEISS; set CONFIG_DEFAULTS_WEISS 0
+	global CONFIG_DEFAULTS_XILINX; set CONFIG_DEFAULTS_XILINX 0
+	global CONFIG_DEFAULTS_3COM_PALMIIIX; set CONFIG_DEFAULTS_3COM_PALMIIIX 0
+	global CONFIG_DEFAULTS_3COM_XCOPILOT; set CONFIG_DEFAULTS_3COM_XCOPILOT 0
+	global CONFIG_DEFAULTS_ADI_COYOTE; set CONFIG_DEFAULTS_ADI_COYOTE 0
+	global CONFIG_DEFAULTS_APPLE_MACPLUS; set CONFIG_DEFAULTS_APPLE_MACPLUS 0
+	global CONFIG_DEFAULTS_ARCTURUS_UC5272; set CONFIG_DEFAULTS_ARCTURUS_UC5272 0
+	global CONFIG_DEFAULTS_ARCTURUS_UCDIMM; set CONFIG_DEFAULTS_ARCTURUS_UCDIMM 0
+	global CONFIG_DEFAULTS_ARCTURUS_UCDIMM_MTD; set CONFIG_DEFAULTS_ARCTURUS_UCDIMM_MTD 0
+	global CONFIG_DEFAULTS_ARCTURUS_UCQUICC; set CONFIG_DEFAULTS_ARCTURUS_UCQUICC 0
+	global CONFIG_DEFAULTS_ARCTURUS_UCSIMM; set CONFIG_DEFAULTS_ARCTURUS_UCSIMM 0
+	global CONFIG_DEFAULTS_ARNEWSH_M5206; set CONFIG_DEFAULTS_ARNEWSH_M5206 0
+	global CONFIG_DEFAULTS_ARNEWSH_M5307; set CONFIG_DEFAULTS_ARNEWSH_M5307 0
+	global CONFIG_DEFAULTS_ATMEL_AT91; set CONFIG_DEFAULTS_ATMEL_AT91 0
+	global CONFIG_DEFAULTS_BMOW_68KATY; set CONFIG_DEFAULTS_BMOW_68KATY 0
+	global CONFIG_DEFAULTS_CONEXANT_HUMBER; set CONFIG_DEFAULTS_CONEXANT_HUMBER 0
+	global CONFIG_DEFAULTS_CONEXANT_P52; set CONFIG_DEFAULTS_CONEXANT_P52 0
+	global CONFIG_DEFAULTS_CWLINUX_CWEZ328; set CONFIG_DEFAULTS_CWLINUX_CWEZ328 0
+	global CONFIG_DEFAULTS_CWLINUX_CWVZ328; set CONFIG_DEFAULTS_CWLINUX_CWVZ328 0
+	global CONFIG_DEFAULTS_CYTEK_NETMP3; set CONFIG_DEFAULTS_CYTEK_NETMP3 0
+	global CONFIG_DEFAULTS_EXYS_DE2; set CONFIG_DEFAULTS_EXYS_DE2 0
+	global CONFIG_DEFAULTS_FEITH_CLEOPATRA2; set CONFIG_DEFAULTS_FEITH_CLEOPATRA2 0
+	global CONFIG_DEFAULTS_FEITH_CLEOPATRA; set CONFIG_DEFAULTS_FEITH_CLEOPATRA 0
+	global CONFIG_DEFAULTS_FUTURE_FUTURENETBURNER5282BADGE; set CONFIG_DEFAULTS_FUTURE_FUTURENETBURNER5282BADGE 0
+	global CONFIG_DEFAULTS_GDB_ARMULATOR; set CONFIG_DEFAULTS_GDB_ARMULATOR 0
+	global CONFIG_DEFAULTS_GDB_ARMULATOR_EB; set CONFIG_DEFAULTS_GDB_ARMULATOR_EB 0
+	global CONFIG_DEFAULTS_HITACHI_BIGSURIV; set CONFIG_DEFAULTS_HITACHI_BIGSURIV 0
+	global CONFIG_DEFAULTS_HITACHI_EDOSK2674; set CONFIG_DEFAULTS_HITACHI_EDOSK2674 0
+	global CONFIG_DEFAULTS_HITACHI_KEYWEST; set CONFIG_DEFAULTS_HITACHI_KEYWEST 0
+	global CONFIG_DEFAULTS_IMT_MWI; set CONFIG_DEFAULTS_IMT_MWI 0
+	global CONFIG_DEFAULTS_INSIGHT_MBVANILLA_NET; set CONFIG_DEFAULTS_INSIGHT_MBVANILLA_NET 0
+	global CONFIG_DEFAULTS_INSIGHT_XC2V1K_MICROBLAZE; set CONFIG_DEFAULTS_INSIGHT_XC2V1K_MICROBLAZE 0
+	global CONFIG_DEFAULTS_INSIGHT_XC2VP7_MICROBLAZE; set CONFIG_DEFAULTS_INSIGHT_XC2VP7_MICROBLAZE 0
+	global CONFIG_DEFAULTS_INTEL_IXDP425; set CONFIG_DEFAULTS_INTEL_IXDP425 0
+	global CONFIG_DEFAULTS_KENDINMICREL_KS8695; set CONFIG_DEFAULTS_KENDINMICREL_KS8695 0
+	global CONFIG_DEFAULTS_LEOX_TSIM; set CONFIG_DEFAULTS_LEOX_TSIM 0
+	global CONFIG_DEFAULTS_MECEL_FR1000; set CONFIG_DEFAULTS_MECEL_FR1000 0
+	global CONFIG_DEFAULTS_MIDAS_RTE_NB85E_CB; set CONFIG_DEFAULTS_MIDAS_RTE_NB85E_CB 0
+	global CONFIG_DEFAULTS_MIDAS_RTE_V850E_MA1_CB; set CONFIG_DEFAULTS_MIDAS_RTE_V850E_MA1_CB 0
+	global CONFIG_DEFAULTS_MIDAS_RTE_V850E_ME2_CB; set CONFIG_DEFAULTS_MIDAS_RTE_V850E_ME2_CB 0
+	global CONFIG_DEFAULTS_MOTOROLA_M5206EC3; set CONFIG_DEFAULTS_MOTOROLA_M5206EC3 0
+	global CONFIG_DEFAULTS_MOTOROLA_M5206ELITE; set CONFIG_DEFAULTS_MOTOROLA_M5206ELITE 0
+	global CONFIG_DEFAULTS_MOTOROLA_M5249C3; set CONFIG_DEFAULTS_MOTOROLA_M5249C3 0
+	global CONFIG_DEFAULTS_MOTOROLA_M5272C3; set CONFIG_DEFAULTS_MOTOROLA_M5272C3 0
+	global CONFIG_DEFAULTS_MOTOROLA_M5282C3; set CONFIG_DEFAULTS_MOTOROLA_M5282C3 0
+	global CONFIG_DEFAULTS_MOTOROLA_M5307C3; set CONFIG_DEFAULTS_MOTOROLA_M5307C3 0
+	global CONFIG_DEFAULTS_MOTOROLA_M5407C3; set CONFIG_DEFAULTS_MOTOROLA_M5407C3 0
+	global CONFIG_DEFAULTS_NEC_ANNA; set CONFIG_DEFAULTS_NEC_ANNA 0
+	global CONFIG_DEFAULTS_NEC_COMMON; set CONFIG_DEFAULTS_NEC_COMMON 0
+	global CONFIG_DEFAULTS_NEC_V850E_SIM_GDB; set CONFIG_DEFAULTS_NEC_V850E_SIM_GDB 0
+	global CONFIG_DEFAULTS_NETBURNER_CFV240; set CONFIG_DEFAULTS_NETBURNER_CFV240 0
+	global CONFIG_DEFAULTS_NETBURNER_MOD5282; set CONFIG_DEFAULTS_NETBURNER_MOD5282 0
+	global CONFIG_DEFAULTS_NETSILICON_NET_ARM; set CONFIG_DEFAULTS_NETSILICON_NET_ARM 0
+	global CONFIG_DEFAULTS_NINTENDO_GBA; set CONFIG_DEFAULTS_NINTENDO_GBA 0
+	global CONFIG_DEFAULTS_OPENCORES_OR32; set CONFIG_DEFAULTS_OPENCORES_OR32 0
+	global CONFIG_DEFAULTS_PROMISE_SX6; set CONFIG_DEFAULTS_PROMISE_SX6 0
+	global CONFIG_DEFAULTS_SAMSUNG_4510B; set CONFIG_DEFAULTS_SAMSUNG_4510B 0
+	global CONFIG_DEFAULTS_SECUREEDGE_DISKTEL; set CONFIG_DEFAULTS_SECUREEDGE_DISKTEL 0
+	global CONFIG_DEFAULTS_SECUREEDGE_ELIA; set CONFIG_DEFAULTS_SECUREEDGE_ELIA 0
+	global CONFIG_DEFAULTS_SECUREEDGE_MP3; set CONFIG_DEFAULTS_SECUREEDGE_MP3 0
+	global CONFIG_DEFAULTS_SECUREEDGE_NETTEL1500; set CONFIG_DEFAULTS_SECUREEDGE_NETTEL1500 0
+	global CONFIG_DEFAULTS_SECUREEDGE_NETTEL3540; set CONFIG_DEFAULTS_SECUREEDGE_NETTEL3540 0
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE1100; set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE1100 0
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2540; set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2540 0
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2570; set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2570 0
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580; set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580 0
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580_JFFS; set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580_JFFS 0
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEEDNA; set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEEDNA 0
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGENAS; set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGENAS 0
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEPCMCIA; set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEPCMCIA 0
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEVPN; set CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEVPN 0
+	global CONFIG_DEFAULTS_SENTEC_COBRA5272; set CONFIG_DEFAULTS_SENTEC_COBRA5272 0
+	global CONFIG_DEFAULTS_SNAPGEAR_LITE300; set CONFIG_DEFAULTS_SNAPGEAR_LITE300 0
+	global CONFIG_DEFAULTS_SNAPGEAR_LITE; set CONFIG_DEFAULTS_SNAPGEAR_LITE 0
+	global CONFIG_DEFAULTS_SNAPGEAR_PRO; set CONFIG_DEFAULTS_SNAPGEAR_PRO 0
+	global CONFIG_DEFAULTS_SNAPGEAR_SE2910_INTEL; set CONFIG_DEFAULTS_SNAPGEAR_SE2910_INTEL 0
+	global CONFIG_DEFAULTS_SNAPGEAR_SE3400; set CONFIG_DEFAULTS_SNAPGEAR_SE3400 0
+	global CONFIG_DEFAULTS_SNAPGEAR_SE4000; set CONFIG_DEFAULTS_SNAPGEAR_SE4000 0
+	global CONFIG_DEFAULTS_SNAPGEAR_SME530; set CONFIG_DEFAULTS_SNAPGEAR_SME530 0
+	global CONFIG_DEFAULTS_SNAPGEAR_SME550; set CONFIG_DEFAULTS_SNAPGEAR_SME550 0
+	global CONFIG_DEFAULTS_SNAPGEAR_SME570; set CONFIG_DEFAULTS_SNAPGEAR_SME570 0
+	global CONFIG_DEFAULTS_SNAPGEAR_SOHO_; set CONFIG_DEFAULTS_SNAPGEAR_SOHO_ 0
+	global CONFIG_DEFAULTS_SOEKRIS_NET4801; set CONFIG_DEFAULTS_SOEKRIS_NET4801 0
+	global CONFIG_DEFAULTS_SSV_DNP5280; set CONFIG_DEFAULTS_SSV_DNP5280 0
+	global CONFIG_DEFAULTS_SWARM_SWARM; set CONFIG_DEFAULTS_SWARM_SWARM 0
+	global CONFIG_DEFAULTS_TELEIP_RSC; set CONFIG_DEFAULTS_TELEIP_RSC 0
+	global CONFIG_DEFAULTS_TRISCEND_A7DB; set CONFIG_DEFAULTS_TRISCEND_A7DB 0
+	global CONFIG_DEFAULTS_TRISCEND_DEVA7; set CONFIG_DEFAULTS_TRISCEND_DEVA7 0
+	global CONFIG_DEFAULTS_VIA_EPIA; set CONFIG_DEFAULTS_VIA_EPIA 0
+	global CONFIG_DEFAULTS_WEISS_SM2010; set CONFIG_DEFAULTS_WEISS_SM2010 0
+	global CONFIG_DEFAULTS_XILINX_COMMON; set CONFIG_DEFAULTS_XILINX_COMMON 0
+	global CONFIG_DEFAULTS_KERNEL_2_0; set CONFIG_DEFAULTS_KERNEL_2_0 0
+	global CONFIG_DEFAULTS_KERNEL_2_4; set CONFIG_DEFAULTS_KERNEL_2_4 0
+	global CONFIG_DEFAULTS_KERNEL_2_6; set CONFIG_DEFAULTS_KERNEL_2_6 0
+	global CONFIG_DEFAULTS_LIBC_GLIBC; set CONFIG_DEFAULTS_LIBC_GLIBC 0
+	global CONFIG_DEFAULTS_LIBC_UC_LIBC; set CONFIG_DEFAULTS_LIBC_UC_LIBC 0
+	global CONFIG_DEFAULTS_LIBC_UCLIBC; set CONFIG_DEFAULTS_LIBC_UCLIBC 0
+}
+
+
+proc update_choices { } {
+	global tmpvar_0
+	set tmpvar_0 "SnapGear"
+	global CONFIG_DEFAULTS_3COM
+	if { $CONFIG_DEFAULTS_3COM == 1 } then { set tmpvar_0 "3com" }
+	global CONFIG_DEFAULTS_ADI
+	if { $CONFIG_DEFAULTS_ADI == 1 } then { set tmpvar_0 "ADI" }
+	global CONFIG_DEFAULTS_APPLE
+	if { $CONFIG_DEFAULTS_APPLE == 1 } then { set tmpvar_0 "Apple" }
+	global CONFIG_DEFAULTS_ARCTURUS
+	if { $CONFIG_DEFAULTS_ARCTURUS == 1 } then { set tmpvar_0 "Arcturus" }
+	global CONFIG_DEFAULTS_ARNEWSH
+	if { $CONFIG_DEFAULTS_ARNEWSH == 1 } then { set tmpvar_0 "Arnewsh" }
+	global CONFIG_DEFAULTS_ATMEL
+	if { $CONFIG_DEFAULTS_ATMEL == 1 } then { set tmpvar_0 "Atmel" }
+	global CONFIG_DEFAULTS_BMOW
+	if { $CONFIG_DEFAULTS_BMOW == 1 } then { set tmpvar_0 "BMOW" }
+	global CONFIG_DEFAULTS_CONEXANT
+	if { $CONFIG_DEFAULTS_CONEXANT == 1 } then { set tmpvar_0 "Conexant" }
+	global CONFIG_DEFAULTS_CWLINUX
+	if { $CONFIG_DEFAULTS_CWLINUX == 1 } then { set tmpvar_0 "Cwlinux" }
+	global CONFIG_DEFAULTS_CYTEK
+	if { $CONFIG_DEFAULTS_CYTEK == 1 } then { set tmpvar_0 "Cytek" }
+	global CONFIG_DEFAULTS_EXYS
+	if { $CONFIG_DEFAULTS_EXYS == 1 } then { set tmpvar_0 "Exys" }
+	global CONFIG_DEFAULTS_FEITH
+	if { $CONFIG_DEFAULTS_FEITH == 1 } then { set tmpvar_0 "Feith" }
+	global CONFIG_DEFAULTS_FUTURE
+	if { $CONFIG_DEFAULTS_FUTURE == 1 } then { set tmpvar_0 "Future" }
+	global CONFIG_DEFAULTS_GDB
+	if { $CONFIG_DEFAULTS_GDB == 1 } then { set tmpvar_0 "GDB" }
+	global CONFIG_DEFAULTS_HITACHI
+	if { $CONFIG_DEFAULTS_HITACHI == 1 } then { set tmpvar_0 "Hitachi" }
+	global CONFIG_DEFAULTS_IMT
+	if { $CONFIG_DEFAULTS_IMT == 1 } then { set tmpvar_0 "Imt" }
+	global CONFIG_DEFAULTS_INSIGHT
+	if { $CONFIG_DEFAULTS_INSIGHT == 1 } then { set tmpvar_0 "Insight" }
+	global CONFIG_DEFAULTS_INTEL
+	if { $CONFIG_DEFAULTS_INTEL == 1 } then { set tmpvar_0 "Intel" }
+	global CONFIG_DEFAULTS_KENDINMICREL
+	if { $CONFIG_DEFAULTS_KENDINMICREL == 1 } then { set tmpvar_0 "KendinMicrel" }
+	global CONFIG_DEFAULTS_LEOX
+	if { $CONFIG_DEFAULTS_LEOX == 1 } then { set tmpvar_0 "LEOX" }
+	global CONFIG_DEFAULTS_MECEL
+	if { $CONFIG_DEFAULTS_MECEL == 1 } then { set tmpvar_0 "Mecel" }
+	global CONFIG_DEFAULTS_MIDAS
+	if { $CONFIG_DEFAULTS_MIDAS == 1 } then { set tmpvar_0 "Midas" }
+	global CONFIG_DEFAULTS_MOTOROLA
+	if { $CONFIG_DEFAULTS_MOTOROLA == 1 } then { set tmpvar_0 "Motorola" }
+	global CONFIG_DEFAULTS_NEC
+	if { $CONFIG_DEFAULTS_NEC == 1 } then { set tmpvar_0 "NEC" }
+	global CONFIG_DEFAULTS_NETBURNER
+	if { $CONFIG_DEFAULTS_NETBURNER == 1 } then { set tmpvar_0 "Netburner" }
+	global CONFIG_DEFAULTS_NETSILICON
+	if { $CONFIG_DEFAULTS_NETSILICON == 1 } then { set tmpvar_0 "NetSilicon" }
+	global CONFIG_DEFAULTS_NINTENDO
+	if { $CONFIG_DEFAULTS_NINTENDO == 1 } then { set tmpvar_0 "Nintendo" }
+	global CONFIG_DEFAULTS_OPENCORES
+	if { $CONFIG_DEFAULTS_OPENCORES == 1 } then { set tmpvar_0 "OPENcores" }
+	global CONFIG_DEFAULTS_PROMISE
+	if { $CONFIG_DEFAULTS_PROMISE == 1 } then { set tmpvar_0 "Promise" }
+	global CONFIG_DEFAULTS_SAMSUNG
+	if { $CONFIG_DEFAULTS_SAMSUNG == 1 } then { set tmpvar_0 "Samsung" }
+	global CONFIG_DEFAULTS_SECUREEDGE
+	if { $CONFIG_DEFAULTS_SECUREEDGE == 1 } then { set tmpvar_0 "SecureEdge" }
+	global CONFIG_DEFAULTS_SENTEC
+	if { $CONFIG_DEFAULTS_SENTEC == 1 } then { set tmpvar_0 "senTec" }
+	global CONFIG_DEFAULTS_SNAPGEAR
+	if { $CONFIG_DEFAULTS_SNAPGEAR == 1 } then { set tmpvar_0 "SnapGear" }
+	global CONFIG_DEFAULTS_SOEKRIS
+	if { $CONFIG_DEFAULTS_SOEKRIS == 1 } then { set tmpvar_0 "Soekris" }
+	global CONFIG_DEFAULTS_SSV
+	if { $CONFIG_DEFAULTS_SSV == 1 } then { set tmpvar_0 "SSV" }
+	global CONFIG_DEFAULTS_SWARM
+	if { $CONFIG_DEFAULTS_SWARM == 1 } then { set tmpvar_0 "SWARM" }
+	global CONFIG_DEFAULTS_TELEIP
+	if { $CONFIG_DEFAULTS_TELEIP == 1 } then { set tmpvar_0 "TeleIP" }
+	global CONFIG_DEFAULTS_TRISCEND
+	if { $CONFIG_DEFAULTS_TRISCEND == 1 } then { set tmpvar_0 "Triscend" }
+	global CONFIG_DEFAULTS_VIA
+	if { $CONFIG_DEFAULTS_VIA == 1 } then { set tmpvar_0 "Via" }
+	global CONFIG_DEFAULTS_WEISS
+	if { $CONFIG_DEFAULTS_WEISS == 1 } then { set tmpvar_0 "Weiss" }
+	global CONFIG_DEFAULTS_XILINX
+	if { $CONFIG_DEFAULTS_XILINX == 1 } then { set tmpvar_0 "Xilinx" }
+	global tmpvar_1
+	set tmpvar_1 "PalmIIIx"
+	global CONFIG_DEFAULTS_3COM_PALMIIIX
+	if { $CONFIG_DEFAULTS_3COM_PALMIIIX == 1 } then { set tmpvar_1 "PalmIIIx" }
+	global CONFIG_DEFAULTS_3COM_XCOPILOT
+	if { $CONFIG_DEFAULTS_3COM_XCOPILOT == 1 } then { set tmpvar_1 "Xcopilot" }
+	global tmpvar_2
+	set tmpvar_2 "Coyote"
+	global CONFIG_DEFAULTS_ADI_COYOTE
+	if { $CONFIG_DEFAULTS_ADI_COYOTE == 1 } then { set tmpvar_2 "Coyote" }
+	global tmpvar_3
+	set tmpvar_3 "MacPlus"
+	global CONFIG_DEFAULTS_APPLE_MACPLUS
+	if { $CONFIG_DEFAULTS_APPLE_MACPLUS == 1 } then { set tmpvar_3 "MacPlus" }
+	global tmpvar_4
+	set tmpvar_4 "uC5272"
+	global CONFIG_DEFAULTS_ARCTURUS_UC5272
+	if { $CONFIG_DEFAULTS_ARCTURUS_UC5272 == 1 } then { set tmpvar_4 "uC5272" }
+	global CONFIG_DEFAULTS_ARCTURUS_UCDIMM
+	if { $CONFIG_DEFAULTS_ARCTURUS_UCDIMM == 1 } then { set tmpvar_4 "uCdimm" }
+	global CONFIG_DEFAULTS_ARCTURUS_UCDIMM_MTD
+	if { $CONFIG_DEFAULTS_ARCTURUS_UCDIMM_MTD == 1 } then { set tmpvar_4 "uCdimm+mtd" }
+	global CONFIG_DEFAULTS_ARCTURUS_UCQUICC
+	if { $CONFIG_DEFAULTS_ARCTURUS_UCQUICC == 1 } then { set tmpvar_4 "uCquicc" }
+	global CONFIG_DEFAULTS_ARCTURUS_UCSIMM
+	if { $CONFIG_DEFAULTS_ARCTURUS_UCSIMM == 1 } then { set tmpvar_4 "uCsimm" }
+	global tmpvar_5
+	set tmpvar_5 "M5206"
+	global CONFIG_DEFAULTS_ARNEWSH_M5206
+	if { $CONFIG_DEFAULTS_ARNEWSH_M5206 == 1 } then { set tmpvar_5 "M5206" }
+	global CONFIG_DEFAULTS_ARNEWSH_M5307
+	if { $CONFIG_DEFAULTS_ARNEWSH_M5307 == 1 } then { set tmpvar_5 "M5307" }
+	global tmpvar_6
+	set tmpvar_6 "AT91"
+	global CONFIG_DEFAULTS_ATMEL_AT91
+	if { $CONFIG_DEFAULTS_ATMEL_AT91 == 1 } then { set tmpvar_6 "AT91" }
+	global tmpvar_7
+	set tmpvar_7 "68Katy"
+	global CONFIG_DEFAULTS_BMOW_68KATY
+	if { $CONFIG_DEFAULTS_BMOW_68KATY == 1 } then { set tmpvar_7 "68Katy" }
+	global tmpvar_8
+	set tmpvar_8 "Humber"
+	global CONFIG_DEFAULTS_CONEXANT_HUMBER
+	if { $CONFIG_DEFAULTS_CONEXANT_HUMBER == 1 } then { set tmpvar_8 "Humber" }
+	global CONFIG_DEFAULTS_CONEXANT_P52
+	if { $CONFIG_DEFAULTS_CONEXANT_P52 == 1 } then { set tmpvar_8 "P52" }
+	global tmpvar_9
+	set tmpvar_9 "cwez328"
+	global CONFIG_DEFAULTS_CWLINUX_CWEZ328
+	if { $CONFIG_DEFAULTS_CWLINUX_CWEZ328 == 1 } then { set tmpvar_9 "cwez328" }
+	global CONFIG_DEFAULTS_CWLINUX_CWVZ328
+	if { $CONFIG_DEFAULTS_CWLINUX_CWVZ328 == 1 } then { set tmpvar_9 "cwvz328" }
+	global tmpvar_10
+	set tmpvar_10 "NETmp3"
+	global CONFIG_DEFAULTS_CYTEK_NETMP3
+	if { $CONFIG_DEFAULTS_CYTEK_NETMP3 == 1 } then { set tmpvar_10 "NETmp3" }
+	global tmpvar_11
+	set tmpvar_11 "de2"
+	global CONFIG_DEFAULTS_EXYS_DE2
+	if { $CONFIG_DEFAULTS_EXYS_DE2 == 1 } then { set tmpvar_11 "de2" }
+	global tmpvar_12
+	set tmpvar_12 "Cleopatra2"
+	global CONFIG_DEFAULTS_FEITH_CLEOPATRA2
+	if { $CONFIG_DEFAULTS_FEITH_CLEOPATRA2 == 1 } then { set tmpvar_12 "Cleopatra2" }
+	global CONFIG_DEFAULTS_FEITH_CLEOPATRA
+	if { $CONFIG_DEFAULTS_FEITH_CLEOPATRA == 1 } then { set tmpvar_12 "Cleopatra" }
+	global tmpvar_13
+	set tmpvar_13 "FutureNetburner5282Badge"
+	global CONFIG_DEFAULTS_FUTURE_FUTURENETBURNER5282BADGE
+	if { $CONFIG_DEFAULTS_FUTURE_FUTURENETBURNER5282BADGE == 1 } then { set tmpvar_13 "FutureNetburner5282Badge" }
+	global tmpvar_14
+	set tmpvar_14 "ARMulator"
+	global CONFIG_DEFAULTS_GDB_ARMULATOR
+	if { $CONFIG_DEFAULTS_GDB_ARMULATOR == 1 } then { set tmpvar_14 "ARMulator" }
+	global CONFIG_DEFAULTS_GDB_ARMULATOR_EB
+	if { $CONFIG_DEFAULTS_GDB_ARMULATOR_EB == 1 } then { set tmpvar_14 "ARMulator-EB" }
+	global tmpvar_15
+	set tmpvar_15 "BigSurIV"
+	global CONFIG_DEFAULTS_HITACHI_BIGSURIV
+	if { $CONFIG_DEFAULTS_HITACHI_BIGSURIV == 1 } then { set tmpvar_15 "BigSurIV" }
+	global CONFIG_DEFAULTS_HITACHI_EDOSK2674
+	if { $CONFIG_DEFAULTS_HITACHI_EDOSK2674 == 1 } then { set tmpvar_15 "EDOSK2674" }
+	global CONFIG_DEFAULTS_HITACHI_KEYWEST
+	if { $CONFIG_DEFAULTS_HITACHI_KEYWEST == 1 } then { set tmpvar_15 "KeyWest" }
+	global tmpvar_16
+	set tmpvar_16 "mwi"
+	global CONFIG_DEFAULTS_IMT_MWI
+	if { $CONFIG_DEFAULTS_IMT_MWI == 1 } then { set tmpvar_16 "mwi" }
+	global tmpvar_17
+	set tmpvar_17 "mbvanilla_net"
+	global CONFIG_DEFAULTS_INSIGHT_MBVANILLA_NET
+	if { $CONFIG_DEFAULTS_INSIGHT_MBVANILLA_NET == 1 } then { set tmpvar_17 "mbvanilla_net" }
+	global CONFIG_DEFAULTS_INSIGHT_XC2V1K_MICROBLAZE
+	if { $CONFIG_DEFAULTS_INSIGHT_XC2V1K_MICROBLAZE == 1 } then { set tmpvar_17 "XC2V1K_Microblaze" }
+	global CONFIG_DEFAULTS_INSIGHT_XC2VP7_MICROBLAZE
+	if { $CONFIG_DEFAULTS_INSIGHT_XC2VP7_MICROBLAZE == 1 } then { set tmpvar_17 "XC2VP7_Microblaze" }
+	global tmpvar_18
+	set tmpvar_18 "IXDP425"
+	global CONFIG_DEFAULTS_INTEL_IXDP425
+	if { $CONFIG_DEFAULTS_INTEL_IXDP425 == 1 } then { set tmpvar_18 "IXDP425" }
+	global tmpvar_19
+	set tmpvar_19 "KS8695"
+	global CONFIG_DEFAULTS_KENDINMICREL_KS8695
+	if { $CONFIG_DEFAULTS_KENDINMICREL_KS8695 == 1 } then { set tmpvar_19 "KS8695" }
+	global tmpvar_20
+	set tmpvar_20 "TSIM"
+	global CONFIG_DEFAULTS_LEOX_TSIM
+	if { $CONFIG_DEFAULTS_LEOX_TSIM == 1 } then { set tmpvar_20 "TSIM" }
+	global tmpvar_21
+	set tmpvar_21 "FR1000"
+	global CONFIG_DEFAULTS_MECEL_FR1000
+	if { $CONFIG_DEFAULTS_MECEL_FR1000 == 1 } then { set tmpvar_21 "FR1000" }
+	global tmpvar_22
+	set tmpvar_22 "RTE-NB85E-CB"
+	global CONFIG_DEFAULTS_MIDAS_RTE_NB85E_CB
+	if { $CONFIG_DEFAULTS_MIDAS_RTE_NB85E_CB == 1 } then { set tmpvar_22 "RTE-NB85E-CB" }
+	global CONFIG_DEFAULTS_MIDAS_RTE_V850E_MA1_CB
+	if { $CONFIG_DEFAULTS_MIDAS_RTE_V850E_MA1_CB == 1 } then { set tmpvar_22 "RTE-V850E-MA1-CB" }
+	global CONFIG_DEFAULTS_MIDAS_RTE_V850E_ME2_CB
+	if { $CONFIG_DEFAULTS_MIDAS_RTE_V850E_ME2_CB == 1 } then { set tmpvar_22 "RTE-V850E-ME2-CB" }
+	global tmpvar_23
+	set tmpvar_23 "M5206eC3"
+	global CONFIG_DEFAULTS_MOTOROLA_M5206EC3
+	if { $CONFIG_DEFAULTS_MOTOROLA_M5206EC3 == 1 } then { set tmpvar_23 "M5206eC3" }
+	global CONFIG_DEFAULTS_MOTOROLA_M5206ELITE
+	if { $CONFIG_DEFAULTS_MOTOROLA_M5206ELITE == 1 } then { set tmpvar_23 "M5206eLITE" }
+	global CONFIG_DEFAULTS_MOTOROLA_M5249C3
+	if { $CONFIG_DEFAULTS_MOTOROLA_M5249C3 == 1 } then { set tmpvar_23 "M5249C3" }
+	global CONFIG_DEFAULTS_MOTOROLA_M5272C3
+	if { $CONFIG_DEFAULTS_MOTOROLA_M5272C3 == 1 } then { set tmpvar_23 "M5272C3" }
+	global CONFIG_DEFAULTS_MOTOROLA_M5282C3
+	if { $CONFIG_DEFAULTS_MOTOROLA_M5282C3 == 1 } then { set tmpvar_23 "M5282C3" }
+	global CONFIG_DEFAULTS_MOTOROLA_M5307C3
+	if { $CONFIG_DEFAULTS_MOTOROLA_M5307C3 == 1 } then { set tmpvar_23 "M5307C3" }
+	global CONFIG_DEFAULTS_MOTOROLA_M5407C3
+	if { $CONFIG_DEFAULTS_MOTOROLA_M5407C3 == 1 } then { set tmpvar_23 "M5407C3" }
+	global tmpvar_24
+	set tmpvar_24 "Anna"
+	global CONFIG_DEFAULTS_NEC_ANNA
+	if { $CONFIG_DEFAULTS_NEC_ANNA == 1 } then { set tmpvar_24 "Anna" }
+	global CONFIG_DEFAULTS_NEC_COMMON
+	if { $CONFIG_DEFAULTS_NEC_COMMON == 1 } then { set tmpvar_24 "common" }
+	global CONFIG_DEFAULTS_NEC_V850E_SIM_GDB
+	if { $CONFIG_DEFAULTS_NEC_V850E_SIM_GDB == 1 } then { set tmpvar_24 "v850e-sim-gdb" }
+	global tmpvar_25
+	set tmpvar_25 "CFV240"
+	global CONFIG_DEFAULTS_NETBURNER_CFV240
+	if { $CONFIG_DEFAULTS_NETBURNER_CFV240 == 1 } then { set tmpvar_25 "CFV240" }
+	global CONFIG_DEFAULTS_NETBURNER_MOD5282
+	if { $CONFIG_DEFAULTS_NETBURNER_MOD5282 == 1 } then { set tmpvar_25 "MOD5282" }
+	global tmpvar_26
+	set tmpvar_26 "NET+ARM"
+	global CONFIG_DEFAULTS_NETSILICON_NET_ARM
+	if { $CONFIG_DEFAULTS_NETSILICON_NET_ARM == 1 } then { set tmpvar_26 "NET+ARM" }
+	global tmpvar_27
+	set tmpvar_27 "GBA"
+	global CONFIG_DEFAULTS_NINTENDO_GBA
+	if { $CONFIG_DEFAULTS_NINTENDO_GBA == 1 } then { set tmpvar_27 "GBA" }
+	global tmpvar_28
+	set tmpvar_28 "or32"
+	global CONFIG_DEFAULTS_OPENCORES_OR32
+	if { $CONFIG_DEFAULTS_OPENCORES_OR32 == 1 } then { set tmpvar_28 "or32" }
+	global tmpvar_29
+	set tmpvar_29 "SX6"
+	global CONFIG_DEFAULTS_PROMISE_SX6
+	if { $CONFIG_DEFAULTS_PROMISE_SX6 == 1 } then { set tmpvar_29 "SX6" }
+	global tmpvar_30
+	set tmpvar_30 "4510B"
+	global CONFIG_DEFAULTS_SAMSUNG_4510B
+	if { $CONFIG_DEFAULTS_SAMSUNG_4510B == 1 } then { set tmpvar_30 "4510B" }
+	global tmpvar_31
+	set tmpvar_31 "DISKtel"
+	global CONFIG_DEFAULTS_SECUREEDGE_DISKTEL
+	if { $CONFIG_DEFAULTS_SECUREEDGE_DISKTEL == 1 } then { set tmpvar_31 "DISKtel" }
+	global CONFIG_DEFAULTS_SECUREEDGE_ELIA
+	if { $CONFIG_DEFAULTS_SECUREEDGE_ELIA == 1 } then { set tmpvar_31 "eLIA" }
+	global CONFIG_DEFAULTS_SECUREEDGE_MP3
+	if { $CONFIG_DEFAULTS_SECUREEDGE_MP3 == 1 } then { set tmpvar_31 "MP3" }
+	global CONFIG_DEFAULTS_SECUREEDGE_NETTEL1500
+	if { $CONFIG_DEFAULTS_SECUREEDGE_NETTEL1500 == 1 } then { set tmpvar_31 "NETtel1500" }
+	global CONFIG_DEFAULTS_SECUREEDGE_NETTEL3540
+	if { $CONFIG_DEFAULTS_SECUREEDGE_NETTEL3540 == 1 } then { set tmpvar_31 "NETtel3540" }
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE1100
+	if { $CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE1100 == 1 } then { set tmpvar_31 "SecureEdge1100" }
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2540
+	if { $CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2540 == 1 } then { set tmpvar_31 "SecureEdge2540" }
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2570
+	if { $CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2570 == 1 } then { set tmpvar_31 "SecureEdge2570" }
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580
+	if { $CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580 == 1 } then { set tmpvar_31 "SecureEdge2580" }
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580_JFFS
+	if { $CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGE2580_JFFS == 1 } then { set tmpvar_31 "SecureEdge2580-JFFS" }
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEEDNA
+	if { $CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEEDNA == 1 } then { set tmpvar_31 "SecureEdgeEdna" }
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGENAS
+	if { $CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGENAS == 1 } then { set tmpvar_31 "SecureEdgeNAS" }
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEPCMCIA
+	if { $CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEPCMCIA == 1 } then { set tmpvar_31 "SecureEdgePCMCIA" }
+	global CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEVPN
+	if { $CONFIG_DEFAULTS_SECUREEDGE_SECUREEDGEVPN == 1 } then { set tmpvar_31 "SecureEdgeVPN" }
+	global tmpvar_32
+	set tmpvar_32 "COBRA5272"
+	global CONFIG_DEFAULTS_SENTEC_COBRA5272
+	if { $CONFIG_DEFAULTS_SENTEC_COBRA5272 == 1 } then { set tmpvar_32 "COBRA5272" }
+	global tmpvar_33
+	set tmpvar_33 "LITE300"
+	global CONFIG_DEFAULTS_SNAPGEAR_LITE300
+	if { $CONFIG_DEFAULTS_SNAPGEAR_LITE300 == 1 } then { set tmpvar_33 "LITE300" }
+	global CONFIG_DEFAULTS_SNAPGEAR_LITE
+	if { $CONFIG_DEFAULTS_SNAPGEAR_LITE == 1 } then { set tmpvar_33 "LITE" }
+	global CONFIG_DEFAULTS_SNAPGEAR_PRO
+	if { $CONFIG_DEFAULTS_SNAPGEAR_PRO == 1 } then { set tmpvar_33 "PRO" }
+	global CONFIG_DEFAULTS_SNAPGEAR_SE2910_INTEL
+	if { $CONFIG_DEFAULTS_SNAPGEAR_SE2910_INTEL == 1 } then { set tmpvar_33 "SE2910-Intel" }
+	global CONFIG_DEFAULTS_SNAPGEAR_SE3400
+	if { $CONFIG_DEFAULTS_SNAPGEAR_SE3400 == 1 } then { set tmpvar_33 "SE3400" }
+	global CONFIG_DEFAULTS_SNAPGEAR_SE4000
+	if { $CONFIG_DEFAULTS_SNAPGEAR_SE4000 == 1 } then { set tmpvar_33 "SE4000" }
+	global CONFIG_DEFAULTS_SNAPGEAR_SME530
+	if { $CONFIG_DEFAULTS_SNAPGEAR_SME530 == 1 } then { set tmpvar_33 "SME530" }
+	global CONFIG_DEFAULTS_SNAPGEAR_SME550
+	if { $CONFIG_DEFAULTS_SNAPGEAR_SME550 == 1 } then { set tmpvar_33 "SME550" }
+	global CONFIG_DEFAULTS_SNAPGEAR_SME570
+	if { $CONFIG_DEFAULTS_SNAPGEAR_SME570 == 1 } then { set tmpvar_33 "SME570" }
+	global CONFIG_DEFAULTS_SNAPGEAR_SOHO_
+	if { $CONFIG_DEFAULTS_SNAPGEAR_SOHO_ == 1 } then { set tmpvar_33 "SOHO+" }
+	global tmpvar_34
+	set tmpvar_34 "net4801"
+	global CONFIG_DEFAULTS_SOEKRIS_NET4801
+	if { $CONFIG_DEFAULTS_SOEKRIS_NET4801 == 1 } then { set tmpvar_34 "net4801" }
+	global tmpvar_35
+	set tmpvar_35 "DNP5280"
+	global CONFIG_DEFAULTS_SSV_DNP5280
+	if { $CONFIG_DEFAULTS_SSV_DNP5280 == 1 } then { set tmpvar_35 "DNP5280" }
+	global tmpvar_36
+	set tmpvar_36 "SWARM"
+	global CONFIG_DEFAULTS_SWARM_SWARM
+	if { $CONFIG_DEFAULTS_SWARM_SWARM == 1 } then { set tmpvar_36 "SWARM" }
+	global tmpvar_37
+	set tmpvar_37 "rsc"
+	global CONFIG_DEFAULTS_TELEIP_RSC
+	if { $CONFIG_DEFAULTS_TELEIP_RSC == 1 } then { set tmpvar_37 "rsc" }
+	global tmpvar_38
+	set tmpvar_38 "A7DB"
+	global CONFIG_DEFAULTS_TRISCEND_A7DB
+	if { $CONFIG_DEFAULTS_TRISCEND_A7DB == 1 } then { set tmpvar_38 "A7DB" }
+	global CONFIG_DEFAULTS_TRISCEND_DEVA7
+	if { $CONFIG_DEFAULTS_TRISCEND_DEVA7 == 1 } then { set tmpvar_38 "DevA7" }
+	global tmpvar_39
+	set tmpvar_39 "EPIA"
+	global CONFIG_DEFAULTS_VIA_EPIA
+	if { $CONFIG_DEFAULTS_VIA_EPIA == 1 } then { set tmpvar_39 "EPIA" }
+	global tmpvar_40
+	set tmpvar_40 "SM2010"
+	global CONFIG_DEFAULTS_WEISS_SM2010
+	if { $CONFIG_DEFAULTS_WEISS_SM2010 == 1 } then { set tmpvar_40 "SM2010" }
+	global tmpvar_41
+	set tmpvar_41 "common"
+	global CONFIG_DEFAULTS_XILINX_COMMON
+	if { $CONFIG_DEFAULTS_XILINX_COMMON == 1 } then { set tmpvar_41 "common" }
+	global tmpvar_42
+	set tmpvar_42 "linux-2.6.x"
+	global CONFIG_DEFAULTS_KERNEL_2_0
+	if { $CONFIG_DEFAULTS_KERNEL_2_0 == 1 } then { set tmpvar_42 "linux-2.0.x" }
+	global CONFIG_DEFAULTS_KERNEL_2_4
+	if { $CONFIG_DEFAULTS_KERNEL_2_4 == 1 } then { set tmpvar_42 "linux-2.4.x" }
+	global CONFIG_DEFAULTS_KERNEL_2_6
+	if { $CONFIG_DEFAULTS_KERNEL_2_6 == 1 } then { set tmpvar_42 "linux-2.6.x" }
+	global tmpvar_43
+	set tmpvar_43 "uClibc"
+	global CONFIG_DEFAULTS_LIBC_GLIBC
+	if { $CONFIG_DEFAULTS_LIBC_GLIBC == 1 } then { set tmpvar_43 "glibc" }
+	global CONFIG_DEFAULTS_LIBC_UC_LIBC
+	if { $CONFIG_DEFAULTS_LIBC_UC_LIBC == 1 } then { set tmpvar_43 "uC-libc" }
+	global CONFIG_DEFAULTS_LIBC_UCLIBC
+	if { $CONFIG_DEFAULTS_LIBC_UCLIBC == 1 } then { set tmpvar_43 "uClibc" }
+}
+
+
+proc update_define_mainmenu {} {
+	global CONFIG_MODULES
+}
+
+
+set defaults "/dev/null"
+set help_file "config/Configure.help"
+# FILE: tail.tk
+# This file is boilerplate TCL/TK function definitions for 'make xconfig'.
+#
+# CHANGES
+# =======
+#
+# 8 January 1998, Michael Elizabeth Chastain, <mec@shout.net>
+# Arrange buttons in three columns for better screen fitting.
+#
+
+#
+# Read the user's settings from .config.  These will override whatever is
+# in config.in.  Don't do this if the user specified a -D to force
+# the defaults.
+#
+if { [file readable .config] == 1} then {
+	if { $argc > 0 } then {
+		if { [lindex $argv 0] != "-D" } then {
+			read_config .config
+		}
+		else
+		{
+			read_config $defaults
+		}
+	} else {
+		read_config .config
+	}
+} else {
+	read_config $defaults
+}
+
+update_define 1 $total_menus 0
+update_mainmenu
+
+global autoconf_file
+if {( $autoconf_file == "")} then {
+	set autoconf_file "/dev/null"
+}
+
+button .f0.right.save -anchor w -text "Save and Exit" \
+    -command {
+		catch {exec cp -f .config .config.old}
+		writeconfig .config $autoconf_file;
+			exit
+	}
+
+button .f0.right.quit -anchor w -text "Quit Without Saving" \
+    -command { maybe_exit .maybe }
+
+button .f0.right.load -anchor w -text "Load Configuration from File" \
+    -command { load_configfile .load "Load Configuration from file" read_config_file
+}
+
+button .f0.right.store -anchor w -text "Store Configuration to File" \
+    -command { load_configfile .load "Store Configuration to file" write_config_file }
+
+#
+# Now pack everything.
+#
+
+pack .f0.right.store .f0.right.load .f0.right.quit .f0.right.save \
+    -padx 0 -pady 0 -side bottom -fill x
+pack .f0.left .f0.middle .f0.right -side left -padx 5 -pady 0 -fill y
+pack .f0 -padx 5 -pady 5
+
+update idletasks
+set winy [expr 10 + [winfo reqheight .f0]]
+set scry [lindex [wm maxsize .] 1]
+set winx [expr 10 + [winfo reqwidth .f0]]
+set scrx [lindex [wm maxsize .] 0]
+if {$winx < $scrx} then {set maxx -1} else {set maxx $winx}
+if {$winy < $scry} then {set maxy -1} else {set maxy $winy}
+.f0 configure -width $winx -height $winy 
+wm maxsize . $maxx $maxy
+
+#
+# If we cannot write our config files, disable the write button.
+#
+if { [file exists .config] == 1 } then {
+		if { [file writable .config] == 0 } then {
+			.f0.right.save configure -state disabled
+		}
+	} else {
+		if { [file writable .] == 0 } then {
+			.f0.right.save configure -state disabled
+		}
+	}
+
+if { [file exists $autoconf_file] == 1 } then {
+		if { [file writable $autoconf_file] == 0 } then {
+			.f0.right.save configure -state disabled
+		}
+	}
+

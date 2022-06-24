@@ -1,0 +1,62 @@
+aarp.o: \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/socket.h \
+   /linux/linux-2.0.x/include/linux/sockios.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/if_ether.h \
+   /linux/linux-2.0.x/include/linux/inet.h \
+   /linux/linux-2.0.x/include/linux/notifier.h \
+   /linux/linux-2.0.x/include/linux/netdevice.h \
+   /linux/linux-2.0.x/include/linux/etherdevice.h \
+   /linux/linux-2.0.x/include/linux/if_arp.h \
+   /linux/linux-2.0.x/include/linux/skbuff.h \
+   /linux/linux-2.0.x/include/net/sock.h \
+   /linux/linux-2.0.x/include/net/datalink.h \
+   /linux/linux-2.0.x/include/net/psnap.h \
+   /linux/linux-2.0.x/include/linux/atalk.h
+ddp.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/bitops.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/socket.h \
+   /linux/linux-2.0.x/include/linux/sockios.h \
+   /linux/linux-2.0.x/include/linux/in.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/interrupt.h \
+   /linux/linux-2.0.x/include/linux/if_ether.h \
+   /linux/linux-2.0.x/include/linux/route.h \
+   /linux/linux-2.0.x/include/linux/inet.h \
+   /linux/linux-2.0.x/include/linux/notifier.h \
+   /linux/linux-2.0.x/include/linux/netdevice.h \
+   /linux/linux-2.0.x/include/linux/etherdevice.h \
+   /linux/linux-2.0.x/include/linux/if_arp.h \
+   /linux/linux-2.0.x/include/linux/skbuff.h \
+   /linux/linux-2.0.x/include/linux/termios.h \
+   /linux/linux-2.0.x/include/net/datalink.h \
+   /linux/linux-2.0.x/include/net/p8022.h \
+   /linux/linux-2.0.x/include/net/psnap.h \
+   /linux/linux-2.0.x/include/net/sock.h \
+   /linux/linux-2.0.x/include/linux/atalk.h \
+   /linux/linux-2.0.x/include/linux/proc_fs.h \
+   /linux/linux-2.0.x/include/linux/stat.h \
+   /linux/linux-2.0.x/include/linux/firewall.h \
+   $(wildcard /linux/linux-2.0.x/include/config/firewall.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/proc/fs.h)
+sysctl_net_atalk.o: \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/sysctl.h

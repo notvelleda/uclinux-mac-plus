@@ -1,0 +1,286 @@
+ad1848.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/ad1848.h) \
+   ad1848_mixer.h \
+   $(wildcard /linux/linux-2.0.x/include/config/sequencer.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ym3812.h)
+adlib_card.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/ym3812.h)
+aedsp16.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/aedsp16.h)
+audio.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/audio.h) \
+   ulaw.h \
+   coproc.h
+configure.o: \
+   hex2hex.h
+cs4232.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/cs4232.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/mpu401.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/mpu/emu.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h)
+dev_table.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/audio.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/sequencer.h)
+dev_table.h:  \
+   $(wildcard /linux/linux-2.0.x/include/config/sequencer.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/pss.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/mss.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/mad16.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/cs4232.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ym3812.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/pas.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/mpu401.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/maui.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/uart6850.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/sb.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/gus16.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/gus.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/sscape.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/trix.h)
+	@touch dev_table.h
+dmabuf.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/audio.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/gus.h)
+dmasound.o: \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/timer.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/irq.h \
+   /linux/linux-2.0.x/include/asm/pgtable.h \
+   /linux/linux-2.0.x/include/asm/bootinfo.h \
+   $(wildcard /linux/linux-2.0.x/include/config/atari.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/amiga.h) \
+   dmasound.h \
+   /linux/linux-2.0.x/include/linux/soundcard.h
+gus_card.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/gus.h) \
+   gus_hw.h \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/gusmax.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/sequencer.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/gus16.h)
+gus_midi.o: \
+   sound_config.h \
+   gus_hw.h \
+   $(wildcard /linux/linux-2.0.x/include/config/gus.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h) \
+   midi_synth.h
+gus_vol.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/gus.h) \
+   gus_linearvol.h
+gus_wave.o: \
+   sound_config.h \
+   /linux/linux-2.0.x/include/linux/ultrasound.h \
+   gus_hw.h \
+   $(wildcard /linux/linux-2.0.x/include/config/gus.h) \
+   iwmem.h \
+   $(wildcard /linux/linux-2.0.x/include/config/gusmax.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/sequencer.h)
+ics2101.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/gus.h) \
+   /linux/linux-2.0.x/include/linux/ultrasound.h \
+   gus_hw.h
+local.h:  \
+   $(wildcard /linux/linux-2.0.x/include/config/pss.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/sscape.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/cs4232.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/maui.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/gus16.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/gusmax.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/mss.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/trix.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/mad16.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/sb.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/pas.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/adlib.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/gus.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/mpu401.h)
+	@touch local.h
+mad16.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/mad16.h) \
+   sb.h \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/uart401.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/mpu/emu.h)
+maui.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/maui.h)
+midi_synth.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h) \
+   midi_synth.h \
+   $(wildcard /linux/linux-2.0.x/include/config/sequencer.h)
+midibuf.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h)
+mpu401.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/mpu401.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/mpu/emu.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h) \
+   coproc.h \
+   $(wildcard /linux/linux-2.0.x/include/config/sequencer.h) \
+   midi_synth.h
+opl3.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/ym3812.h) \
+   opl3.h
+os.h: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/version.h \
+   /linux/linux-2.0.x/include/linux/param.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/errno.h \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/fcntl.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/ctype.h \
+   /linux/linux-2.0.x/include/asm/io.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/dma.h \
+   /linux/linux-2.0.x/include/linux/wait.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/ioport.h \
+   /linux/linux-2.0.x/include/linux/utsname.h \
+   /linux/linux-2.0.x/include/linux/wrapper.h \
+   /linux/linux-2.0.x/include/linux/soundcard.h
+	@touch os.h
+pas2_card.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/pas.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/audio.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/sb.h)
+pas2_midi.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/pas.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h) \
+   midi_synth.h
+pas2_mixer.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/pas.h)
+pas2_pcm.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/pas.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/audio.h)
+patmgr.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/sequencer.h)
+pss.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/pss.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/audio.h) \
+   coproc.h \
+   $(wildcard /linux/linux-2.0.x/include/config/mpu401.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/mpu/emu.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h)
+sb_audio.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/sbdsp.h) \
+   sb_mixer.h \
+   sb.h
+sb_card.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/sbdsp.h) \
+   sb_mixer.h \
+   sb.h \
+   $(wildcard /linux/linux-2.0.x/include/config/audio.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h)
+sb_common.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/sbdsp.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/audio.h) \
+   sb_mixer.h \
+   sb.h \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/uart401.h)
+sb_midi.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/sbdsp.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h) \
+   sb.h \
+   midi_synth.h
+sb_mixer.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/sbdsp.h) \
+   sb.h \
+   sb_mixer.h
+sequencer.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/sequencer.h) \
+   midi_ctrl.h \
+   tuning.h \
+   $(wildcard /linux/linux-2.0.x/include/config/audio.h)
+sound_config.h: \
+   local.h \
+   os.h \
+   soundvers.h \
+   sound_calls.h \
+   dev_table.h
+	@touch sound_config.h
+sound_switch.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/audio.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/sequencer.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h)
+sound_timer.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/sequencer.h)
+soundcard.o: \
+   sound_config.h \
+   /linux/linux-2.0.x/include/linux/major.h \
+   $(wildcard /linux/linux-2.0.x/include/config/sequencer.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/audio.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/lowlevel/sound.h)
+sscape.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/sscape.h) \
+   coproc.h \
+   $(wildcard /linux/linux-2.0.x/include/config/mpu/emu.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h)
+sys_timer.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/sequencer.h)
+trix.o: \
+   sound_config.h \
+   sb.h \
+   $(wildcard /linux/linux-2.0.x/include/config/trix.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/sbdsp.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/uart401.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h)
+uart401.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/uart401.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h) \
+   midi_synth.h
+uart6850.o: \
+   sound_config.h \
+   $(wildcard /linux/linux-2.0.x/include/config/uart6850.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/midi.h) \
+   midi_synth.h
+.PRECIOUS:	dev_table.h \
+	local.h \
+	os.h \
+	sound_config.h \
+

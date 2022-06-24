@@ -1,0 +1,4 @@
+the uClinux kernel source tree, ported to the Mac Plus.
+based on Steve Chamberlin's 68 Katy port (https://www.bigmessowires.com/2014/11/17/68-katy-68000-linux-on-a-solderless-breadboard/)
+
+run build.sh in this directory to build the kernel, or buildinitrd.sh if you want to build an initrd for some reason (i really don't recommend it, but you can)

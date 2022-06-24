@@ -1,0 +1,22 @@
+ufs_dir.o: \
+   /linux/linux-2.0.x/include/linux/fs.h
+ufs_file.o: \
+   /linux/linux-2.0.x/include/linux/fs.h
+ufs_inode.o: \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/ufs_fs.h \
+   /linux/linux-2.0.x/include/linux/sched.h
+ufs_namei.o: \
+   /linux/linux-2.0.x/include/linux/fs.h
+ufs_super.o: \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/ufs_fs.h \
+   /linux/linux-2.0.x/include/linux/module.h \
+   /linux/linux-2.0.x/include/linux/locks.h \
+   /linux/linux-2.0.x/include/asm/segment.h
+ufs_symlink.o: \
+   /linux/linux-2.0.x/include/linux/fs.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/asm/segment.h

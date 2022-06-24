@@ -1,0 +1,54 @@
+fault.o: \
+   /linux/linux-2.0.x/include/linux/mman.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/ptrace.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/pgtable.h
+init.o: \
+   /linux/linux-2.0.x/include/linux/signal.h \
+   /linux/linux-2.0.x/include/linux/sched.h \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/swap.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   $(wildcard /linux/linux-2.0.x/include/config/blk/dev/ram.h) \
+   /linux/linux-2.0.x/include/linux/blk.h \
+   /linux/linux-2.0.x/include/asm/setup.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/page.h \
+   /linux/linux-2.0.x/include/asm/pgtable.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/machdep.h \
+   /linux/linux-2.0.x/include/asm/shglcore.h \
+   $(wildcard /linux/linux-2.0.x/include/config/net.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/coldfire.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/mac/plus.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/shglcore.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/blk/dev/initrd.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/romkernel.h)
+memory.o: \
+   /linux/linux-2.0.x/include/linux/mm.h \
+   /linux/linux-2.0.x/include/linux/kernel.h \
+   /linux/linux-2.0.x/include/linux/string.h \
+   /linux/linux-2.0.x/include/linux/types.h \
+   /linux/linux-2.0.x/include/linux/malloc.h \
+   /linux/linux-2.0.x/include/asm/setup.h \
+   /linux/linux-2.0.x/include/asm/segment.h \
+   /linux/linux-2.0.x/include/asm/page.h \
+   /linux/linux-2.0.x/include/asm/pgtable.h \
+   /linux/linux-2.0.x/include/asm/system.h \
+   /linux/linux-2.0.x/include/asm/traps.h \
+   /linux/linux-2.0.x/include/asm/shglcore.h \
+   $(wildcard /linux/linux-2.0.x/include/config/m5407.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/coldfire.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/mwi.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/pilot.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ucsimm.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/pilot/incromfs.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/ramkernel.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/m68ez328ads.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/shglcore.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/sm2010.h) \
+   $(wildcard /linux/linux-2.0.x/include/config/68katy.h)
