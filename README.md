@@ -2,7 +2,7 @@
 (specifically ones with 4 mb of ram since i was too lazy to write a decent bootloader)
 
 ## requirements
-you need Think C 5.0 to build the stage 1 loader, however the disk image includes a pre-built version for convenience
+you need Think C 5.0 to build the stage 1 loader, however the disk image includes a pre-built stage 1 for convenience
 
 you'll also need [Mini vMac](https://www.gryphel.com/c/minivmac/index.html) and [ImportFl](https://www.gryphel.com/c/minivmac/extras/importfl/) to import files into Mini vMac, or some other way to put things in a disk image with another emulator
 
