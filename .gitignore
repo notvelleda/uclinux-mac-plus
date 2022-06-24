@@ -1,3 +1,4 @@
 *.o
 *.gdb
 uClinux/images
+uClinux/romfs
