@@ -251,6 +251,15 @@ BSP_sched_init(void (*timer_routine)(int, void *, struct pt_regs *))
     // clear interrupt flag
     MAC_VIA_IFR = 0xff;
 
+    // reset the SCC. ideally it would be enough to just disable interrupts, however if any interrupts are triggered before this
+    // we can't clear them, and since the SCC is a black box with horrible documentation it's easiest to just reset it, which will
+    // disable interrupts and clear any pending interrupts
+    read_addr(MAC_SCC_B_CTL_RD); // reset to register 0
+    asm volatile("nop");
+    MAC_SCC_B_CTL_WR = 9; // select register 9
+    asm volatile("nop");
+    MAC_SCC_B_CTL_WR = 0xc0; // set d7 and d6, causing the scc to reset
+
     request_irq(MAC_INT_NUM_VIA - VEC_SPUR,
                 via_interrupt, IRQ_FLG_LOCK, "via", NULL);
     request_irq(MAC_INT_NUM_SCC - VEC_SPUR,
@@ -331,13 +340,6 @@ void config_BSP(char *command, int len)
     command[len - 1] = 0;
 
     mach_keyb_init = mac_keyb_init;
-
-    // disable SCC interrupts
-    read_addr(MAC_SCC_B_CTL_RD);
-    asm volatile("nop");
-    MAC_SCC_B_CTL_WR = 9;
-    asm volatile("nop");
-    MAC_SCC_B_CTL_WR = 0;
 #endif
 #ifdef CONFIG_SM2010  
     mpsc_console_initialize();
