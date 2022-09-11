@@ -4,7 +4,7 @@
 ## requirements
 you need Think C 5.0 to build the stage 1 loader, however the disk image includes a pre-built stage 1 for convenience
 
-you'll also need [Mini vMac](https://www.gryphel.com/c/minivmac/index.html) and [ImportFl](https://www.gryphel.com/c/minivmac/extras/importfl/) (to import files into Mini vMac), or some other way to put things in a disk image with another emulator
+you'll also need [Mini vMac](https://www.gryphel.com/c/minivmac/index.html) and [ImportFl](https://www.gryphel.com/c/minivmac/extras/importfl/) (to import files into Mini vMac), or some other way to put things in a disk image with another emulator ([hfsutils](https://www.mars.org/home/rob/proj/hfs/) works very well)
 
 for everything else, you need Docker and a POSIX compatible shell
 
@@ -28,4 +28,4 @@ when running the bootloader, if your root filesystem is on a scsi device, you'll
 - scsi controller
 
 ## what doesn't
-basically everything else. namely the computer locks up if you move the mouse
+basically everything else
