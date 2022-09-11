@@ -117,7 +117,7 @@ extern int (*mach_keyb_init) (void);
 static void mac_configure_via() {
     int timer = VIA_TIME(1000 / 200);
 
-    MAC_VIA_IER = 0x7f; // disable all VIA interrups (:
+    MAC_VIA_IER = 0x7f; // disable all VIA interrupts (:
 
     // set up timer 1
     MAC_VIA_ACR &= 0x7f; // clear bit 7
@@ -140,7 +140,7 @@ static void via_interrupt(int irq, void *dev_id, struct pt_regs *regs) {
     // call interrupt handler based on interrupt flags
 
     if (flag & MAC_VIA_INT_KBRDY) {
-        // keyboard ready interrupt
+        // keyboard ready interrupt, placed before everything else since keyboard timings are fucky and we want it prioritized
         mac_keyb_int_ready();
     }
 
@@ -178,16 +178,44 @@ static void via_interrupt(int irq, void *dev_id, struct pt_regs *regs) {
     }*/
 }
 
-// SCC interrupt
+// SCC interrupt (currently disabled)
 static void scc_interrupt(int irq, void *dev_id, struct pt_regs *regs) {
-    //printk("scc interrupt\n");
+    u_char flags;
+
+    // get modified interrupt vector (rr2b)
+    read_addr(MAC_SCC_B_CTL_RD);
+    asm volatile("nop"); // artificial delay to make sure scc stabilizes? not sure if this is too much or not enough
+    MAC_SCC_B_CTL_WR = 2;
+    asm volatile("nop");
+    flags = 0xe & MAC_SCC_B_CTL_RD;
+
+    // handle the interrupt
+    switch (flags) {
+        case 0x0a:
+            printk("horizontal mouse movement\n");
+            break;
+        case 0x02:
+            printk("vertical mouse movement\n");
+            break;
+        default:
+            printk("unknown scc interrupt %02x\n", flags);
+            break;
+    }
+
+    // reset interrupts (not sure why this doesn't work)
+    read_addr(MAC_SCC_B_CTL_RD); // reset to register 0
+    asm volatile("nop");
+
+    /*MAC_SCC_B_CTL_WR = 0x38;
+    asm volatile("nop");*/
+    MAC_SCC_B_CTL_WR = 0x10; // reset ext/status interrupts
 }
 
 // VIA+SCC interrupt
 static void via_scc_interrupt(int irq, void *dev_id, struct pt_regs *regs) {
-    //printk("via + scc interrupt\n");
-    via_interrupt(irq, dev_id, regs);
-    scc_interrupt(irq, dev_id, regs);
+    printk("via + scc interrupt?\n");
+    //via_interrupt(irq, dev_id, regs);
+    //scc_interrupt(irq, dev_id, regs);
 }
 #endif
 
@@ -290,6 +318,7 @@ void config_BSP(char *command, int len)
 {
 #ifdef CONFIG_MAC_PLUS
     int i;
+    u_char flags;
 
     if (info->hasInitrd) {
         initrd_start = (unsigned long) info->initrdPtr;
@@ -302,6 +331,13 @@ void config_BSP(char *command, int len)
     command[len - 1] = 0;
 
     mach_keyb_init = mac_keyb_init;
+
+    // disable SCC interrupts
+    read_addr(MAC_SCC_B_CTL_RD);
+    asm volatile("nop");
+    MAC_SCC_B_CTL_WR = 9;
+    asm volatile("nop");
+    MAC_SCC_B_CTL_WR = 0;
 #endif
 #ifdef CONFIG_SM2010  
     mpsc_console_initialize();

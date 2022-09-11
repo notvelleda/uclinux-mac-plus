@@ -89,20 +89,17 @@
 #define MAC_KEYB_ACK        0x7d
 #define MAC_KEYB_NACK       0x77
 
-#if 0
-// SCSI
-#define MAC_SCSI_BASE       0x580000
+// SCC
+#define MAC_SCC_RD_BASE     0x9ffff8
+#define MAC_SCC_WR_BASE     0xbffff9
 
-#define MAC_SCSI_READ       (MAC_SCSI_BASE + 0x0)
-#define MAC_SCSI_WRITE      (MAC_SCSI_BASE + 0x1)
-
-#define NCR5380_local_declare()
-
-#define NCR5380_write(r, v) *((volatile u_char *) (MAC_SCSI_WRITE + (r << 4))) = (u_char) (v)
-
-#define NCR5380_read(r) *((volatile u_char *) (MAC_SCSI_READ + (r << 4)))
-
-#define NCR5380_implementation_fields
-#endif
+#define MAC_SCC_A_DATA_RD   (*((volatile u_char *) (MAC_SCC_RD_BASE + 0x6))) // SCC channel A data read
+#define MAC_SCC_A_DATA_WR   (*((volatile u_char *) (MAC_SCC_WR_BASE + 0x6))) // SCC channel A data write
+#define MAC_SCC_A_CTL_RD    (*((volatile u_char *) (MAC_SCC_RD_BASE + 0x2))) // SCC channel A control read
+#define MAC_SCC_A_CTL_WR    (*((volatile u_char *) (MAC_SCC_WR_BASE + 0x2))) // SCC channel A control write
+#define MAC_SCC_B_DATA_RD   (*((volatile u_char *) (MAC_SCC_RD_BASE + 0x4))) // SCC channel B data read
+#define MAC_SCC_B_DATA_WR   (*((volatile u_char *) (MAC_SCC_WR_BASE + 0x4))) // SCC channel B data write
+#define MAC_SCC_B_CTL_RD    (*((volatile u_char *) (MAC_SCC_RD_BASE + 0x0))) // SCC channel B control read
+#define MAC_SCC_B_CTL_WR    (*((volatile u_char *) (MAC_SCC_WR_BASE + 0x0))) // SCC channel B control write
 
 #endif /* __MAC_HW_H */
