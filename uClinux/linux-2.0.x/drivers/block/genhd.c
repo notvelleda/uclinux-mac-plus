@@ -687,6 +687,80 @@ rdb_done:
 }
 #endif /* CONFIG_AMIGA_PARTITION */
 
+// TODO: add config option for this
+#include <asm/byteorder.h>
+
+// apple partition map format as described in https://en.wikipedia.org/wiki/Apple_Partition_Map
+struct mac_partition {
+	char signature[2];
+	u16 reserved;
+	u32 num_partitions;
+	u32 starting_sector;
+	u32 partition_size;
+	char partition_name[32];
+	char partition_type[32];
+	u32 data_size;
+	u32 status;
+	u32 boot_code_start;
+	u32 boot_code_size;
+	u32 boot_code_addr;
+	u32 reserved2;
+	u32 boot_code_entry;
+	u32 reserved3;
+	u32 boot_code_checksum;
+	char processor_type[32];
+};
+
+static int mac_partition(struct gendisk *hd, unsigned int dev, unsigned long first_sector) {
+	struct buffer_head *bh;
+	struct mac_partition *partition;
+	int res = 0, i;
+	u32 num_partitions;
+
+	// switch our device to 512 byte blocks, since that's what's used by apple
+	set_blocksize(dev, 512);
+
+	// iterate over and discover all partitions
+	i = 1; // start at the 2nd sector, the 1st isn't a partition map
+	while (1) {
+		if (!(bh = bread(dev, i, 512))) {
+			printk("Dev %s: unable to read partition table\n",
+				kdevname(dev));
+			goto apm_done;
+		}
+		partition = (struct mac_partition *) bh->b_data;
+
+		// check signature of partition
+		if (partition->signature[0] != 'P' && partition->signature[1] != 'M') {
+			brelse(bh);
+			goto apm_done;
+		}
+
+		// we found a partition! tell the kernel about it
+		// TODO: check whether sector size is actually 512- it should be, but it might not always
+		// ntohl is required since APM is always big endian
+		add_partition(hd, current_minor, first_sector + ntohl(partition->starting_sector), ntohl(partition->partition_size));
+		current_minor ++;
+		res = 1;
+
+		// have we finished iterating over partitions?
+		if (i + 1 > ntohl(partition->num_partitions)) {
+			brelse(bh);
+			break;
+		} else {
+			brelse(bh);
+			i ++;
+		}
+	}
+
+	printk("\n");
+
+apm_done:
+	// switch our block size back to the default and return
+	set_blocksize(dev, BLOCK_SIZE);
+	return res;
+}
+
 static void check_partition(struct gendisk *hd, kdev_t dev)
 {
 	static int first_time = 1;
@@ -724,6 +798,9 @@ static void check_partition(struct gendisk *hd, kdev_t dev)
 	if(amiga_partition(hd, dev, first_sector))
 		return;
 #endif
+	// TODO: add config option for this
+	if (mac_partition(hd, dev, first_sector))
+		return;
 	printk(" unknown partition table\n");
 }
 
