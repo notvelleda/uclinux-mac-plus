@@ -45,7 +45,9 @@ echo "Copying files..."
 sudo rm -r $MOUNTDIR/*
 
 sudo cp -rv $FSDIR/!(dev*|tmp*) "$MOUNTDIR" || quit true
-sudo cp -rv $OVERLAYDIR/* "$MOUNTDIR" || quit true
+if [[ -e "$OVERLAYDIR" ]]; then
+	sudo cp -rv $OVERLAYDIR/* "$MOUNTDIR" || quit true
+fi
 
 sudo mkdir -p "$MOUNTDIR/tmp"
 sudo mkdir -p "$MOUNTDIR/dev"
