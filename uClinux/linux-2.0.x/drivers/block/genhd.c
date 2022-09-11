@@ -690,30 +690,30 @@ rdb_done:
 // TODO: add config option for this
 #include <asm/byteorder.h>
 
-// apple partition map format as described in https://en.wikipedia.org/wiki/Apple_Partition_Map
-struct mac_partition {
-	char signature[2];
-	u16 reserved;
-	u32 num_partitions;
-	u32 starting_sector;
-	u32 partition_size;
-	char partition_name[32];
-	char partition_type[32];
-	u32 data_size;
-	u32 status;
-	u32 boot_code_start;
-	u32 boot_code_size;
-	u32 boot_code_addr;
-	u32 reserved2;
-	u32 boot_code_entry;
-	u32 reserved3;
-	u32 boot_code_checksum;
-	char processor_type[32];
-};
-
 static int mac_partition(struct gendisk *hd, unsigned int dev, unsigned long first_sector) {
 	struct buffer_head *bh;
-	struct mac_partition *partition;
+
+	// apple partition map format as described in https://en.wikipedia.org/wiki/Apple_Partition_Map
+	struct mac_partition {
+		char signature[2];
+		u16 reserved;
+		u32 num_partitions;
+		u32 starting_sector;
+		u32 partition_size;
+		char partition_name[32];
+		char partition_type[32];
+		u32 data_size;
+		u32 status;
+		u32 boot_code_start;
+		u32 boot_code_size;
+		u32 boot_code_addr;
+		u32 reserved2;
+		u32 boot_code_entry;
+		u32 reserved3;
+		u32 boot_code_checksum;
+		char processor_type[32];
+	} *partition;
+
 	int res = 0, i;
 	u32 num_partitions;
 
