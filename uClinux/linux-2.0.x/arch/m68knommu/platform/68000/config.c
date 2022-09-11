@@ -102,12 +102,13 @@ struct BootInfo { // populated by bootloader, tells us where everything is
     unsigned long kernelSize;
     char *initrdPtr;
     unsigned long initrdSize;
-    int hasInitrd;
+    unsigned char hasInitrd;
 };
 
 struct BootInfo *info = (struct BootInfo *) 0x380000;
 
 extern unsigned long initrd_start, initrd_end;
+extern int mount_initrd;
 
 extern int (*mach_keyb_init) (void);
 
@@ -329,11 +330,15 @@ void config_BSP(char *command, int len)
     int i;
     u_char flags;
 
-    if (info->hasInitrd) {
+    // tell kernel where the initrd is, if one exists
+    if (mount_initrd = info->hasInitrd) {
         initrd_start = (unsigned long) info->initrdPtr;
         initrd_end = (unsigned long) info->initrdPtr + info->initrdSize;
+    } else {
+        initrd_start = initrd_end = 0;
     }
-    
+
+    // copy command line arguments
     for (i = 0; i < len - 1; i ++)
         if (!(command[i] = info->arguments[i]))
             break;
