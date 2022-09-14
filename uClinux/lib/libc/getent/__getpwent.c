@@ -22,7 +22,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <fcntl.h>
-#include <pwd.h>
+#include "pwd.h"
 
 #define PWD_BUFFER_SIZE 256
 
@@ -31,74 +31,83 @@
   so it's probably nicer.  Write me if you want the old version.  Maybe I
   should include it as a build-time option... ?
   -Nat <ndf@linux.mit.edu> */
-   
-struct passwd *
-__getpwent(int pwd_fd)
+
+struct passwd *__getpwent(int pwd_fd)
 {
-  static char *line_buff;
-  static struct passwd passwd;
-  char * field_begin;
-  char * endptr;
-  char * gid_ptr;
-  char * uid_ptr;
-  int line_len;
-  int i;
+	static char line_buff[PWD_BUFFER_SIZE];
+	static struct passwd passwd;
+	char *field_begin;
+	char *endptr;
+	char *gid_ptr=NULL;
+	char *uid_ptr=NULL;
+	int line_len;
+	int i;
 
-  if (line_buff == NULL) {
-	  line_buff = malloc(sizeof(char) * PWD_BUFFER_SIZE);
-	  if (line_buff == NULL)
-		  return NULL;
-  }
-  /* We use the restart label to handle malformatted lines */
-restart:
-  /* Read the passwd line into the static buffer using a minimal of
-     syscalls. */
-  if ((line_len=read(pwd_fd, line_buff, PWD_BUFFER_SIZE))<=0)
-    return NULL;
-  field_begin=strchr(line_buff, '\n');
-  if (field_begin!=NULL)
-    lseek(pwd_fd, (long) (1+field_begin-(line_buff+line_len)), SEEK_CUR);
-  else /* The line is too long - skip it. :-\ */
-    {
-      do { if ((line_len=read(pwd_fd, line_buff, PWD_BUFFER_SIZE))<=0)
-	return NULL;
-      } while (!(field_begin=strchr(line_buff, '\n')));
-      lseek(pwd_fd, (long) (field_begin-line_buff)-line_len+1, SEEK_CUR);
-      goto restart;
-    }
-  if (*line_buff=='#' || *line_buff==' ' || *line_buff=='\n' ||
-      *line_buff=='\t')
-      goto restart;
-  *field_begin='\0';
+	/* We use the restart label to handle malformatted lines */
+  restart:
+	/* Read the passwd line into the static buffer using a minimal of
+	   syscalls. */
+	if ((line_len = read(pwd_fd, line_buff, PWD_BUFFER_SIZE)) <= 0)
+		return NULL;
+	field_begin = strchr(line_buff, '\n');
+	if (field_begin != NULL)
+		lseek(pwd_fd, (long) (1 + field_begin - (line_buff + line_len)),
+			  SEEK_CUR);
+	else {						/* The line is too long - skip it. :-\ */
 
-  /* We've read the line; now parse it. */
-  field_begin=line_buff;
-  for (i=0;i<7;i++)
-    {
-      switch(i)
-	{
-	case 0: passwd.pw_name=field_begin; break;
-	case 1: passwd.pw_passwd=field_begin; break;
-	case 2: uid_ptr=field_begin; break;
-	case 3: gid_ptr=field_begin; break;
-	case 4: passwd.pw_gecos=field_begin; break;
-	case 5: passwd.pw_dir=field_begin; break;
-	case 6: passwd.pw_shell=field_begin; break;
+		do {
+			if ((line_len = read(pwd_fd, line_buff, PWD_BUFFER_SIZE)) <= 0)
+				return NULL;
+		} while (!(field_begin = strchr(line_buff, '\n')));
+		lseek(pwd_fd, (long) (field_begin - line_buff) - line_len + 1,
+			  SEEK_CUR);
+		goto restart;
 	}
-      if (i<6)
-	{
-	  field_begin=strchr(field_begin, ':');
-	  if (field_begin==NULL) goto restart;
-	  *field_begin++='\0';
-	}
-    }
-  passwd.pw_gid=(gid_t) strtoul(gid_ptr, &endptr, 10);
-  if (*endptr!='\0') goto restart;
-  
-  passwd.pw_uid=(uid_t) strtoul(uid_ptr, &endptr, 10);
-  if (*endptr!='\0') goto restart;
+	if (*line_buff == '#' || *line_buff == ' ' || *line_buff == '\n' ||
+		*line_buff == '\t')
+		goto restart;
+	*field_begin = '\0';
 
-  return &passwd;
+	/* We've read the line; now parse it. */
+	field_begin = line_buff;
+	for (i = 0; i < 7; i++) {
+		switch (i) {
+		case 0:
+			passwd.pw_name = field_begin;
+			break;
+		case 1:
+			passwd.pw_passwd = field_begin;
+			break;
+		case 2:
+			uid_ptr = field_begin;
+			break;
+		case 3:
+			gid_ptr = field_begin;
+			break;
+		case 4:
+			passwd.pw_gecos = field_begin;
+			break;
+		case 5:
+			passwd.pw_dir = field_begin;
+			break;
+		case 6:
+			passwd.pw_shell = field_begin;
+			break;
+		}
+		if (i < 6) {
+			field_begin = strchr(field_begin, ':');
+			if (field_begin == NULL)
+				goto restart;
+			*field_begin++ = '\0';
+		}
+	}
+	passwd.pw_gid = (gid_t) strtoul(gid_ptr, &endptr, 10);
+	if (*endptr != '\0')
+		goto restart;
+
+	passwd.pw_uid = (uid_t) strtoul(uid_ptr, &endptr, 10);
+	if (*endptr != '\0')
+		goto restart;
+
+	return &passwd;
 }
-
-

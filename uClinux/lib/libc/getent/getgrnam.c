@@ -25,12 +25,7 @@
 #include <grp.h>
 #include <linux/autoconf.h>
 
-
-#ifdef CONFIG_UCLINUX 
-#define GROUP_FILE "/etc/config/group"
-#else
 #define GROUP_FILE "/etc/group"
-#endif /*CONFIG_UCLINUX*/
 
 struct group *
 getgrnam(const char * name)

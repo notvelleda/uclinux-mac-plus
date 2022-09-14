@@ -43,7 +43,11 @@ extern int kill_main(int argc, char **argv)
 
 #ifdef BB_KILLALL
 	/* Figure out what we are trying to do here */
+#ifdef STANDALONE
+	whichApp = (strcmp(get_last_path_component(*argv), "killall") == 0)? KILLALL : KILL; 
+#else
 	whichApp = (strcmp(applet_name, "killall") == 0)? KILLALL : KILL; 
+#endif
 #else
 	whichApp = KILL;
 #endif

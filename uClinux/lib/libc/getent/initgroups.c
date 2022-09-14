@@ -25,11 +25,7 @@
 #include "config.h"
 #include <linux/autoconf.h>
 
-#ifdef CONFIG_UCLINUX
-#define GROUP_FILE "/etc/config/group"
-#else
 #define GROUP_FILE "/etc/group"
-#endif /*CONFIG_UCLINUX*/
 
 int
 initgroups(__const char * user, gid_t gid)

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 FILE=root.img
-MOUNTDIR=mount
+MOUNTDIR=__mountdir
 DEVICE=/dev/loop0
 FSDIR=rootdir
 OVERLAYDIR=rootdir-overlay
@@ -10,6 +10,7 @@ SIZE=64M
 unmount() {
     sudo umount "$MOUNTDIR"
     sudo losetup -d "$DEVICE"
+    rm -r "$MOUNTDIR"
 }
 
 quit() {

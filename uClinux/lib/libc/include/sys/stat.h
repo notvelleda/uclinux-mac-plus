@@ -124,6 +124,10 @@ extern int	__mknod __P ((__const char *__path, mode_t __mode,
 			dev_t __dev));
 extern int	mknod __P ((__const char *__path, mode_t __mode,
 			dev_t __dev));
+
+extern int fstatat __P ((int dirfd, __const char *pathname, struct stat *buf,
+			int flags));
+
 #endif		/* #if 0 */
 
 extern mode_t	__umask __P ((mode_t __mask));

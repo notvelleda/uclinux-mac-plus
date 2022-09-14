@@ -179,7 +179,11 @@ test_main(int argc, char** argv)
 {
 	int	res;
 
+#ifdef STANDALONE
+	if (strcmp(get_last_path_component(*argv), "[") == 0) {
+#else
 	if (strcmp(applet_name, "[") == 0) {
+#endif
 		if (strcmp(argv[--argc], "]"))
 			error_msg_and_die("missing ]");
 		argv[argc] = NULL;

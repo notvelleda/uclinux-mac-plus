@@ -24,29 +24,22 @@
 #include <pwd.h>
 #include <linux/autoconf.h>
 
-#ifdef CONFIG_UCLINUX
-#define PASSWD_FILE "/etc/config/passwd"
-#else
 #define PASSWD_FILE "/etc/passwd"
-#endif /*CONFIG_UCLINUX*/
 
-
-struct passwd *
-getpwuid(uid_t uid)
+struct passwd *getpwuid(uid_t uid)
 {
-  int passwd_fd;
-  struct passwd * passwd;
+	int passwd_fd;
+	struct passwd *passwd;
 
-  if ((passwd_fd=open(PASSWD_FILE, O_RDONLY))<0)
-    return NULL;
+	if ((passwd_fd = open(PASSWD_FILE, O_RDONLY)) < 0)
+		return NULL;
 
-  while ((passwd=__getpwent(passwd_fd))!=NULL)
-    if (passwd->pw_uid==uid)
-      {
+	while ((passwd = __getpwent(passwd_fd)) != NULL)
+		if (passwd->pw_uid == uid) {
+			close(passwd_fd);
+			return passwd;
+		}
+
 	close(passwd_fd);
-	return passwd;
-      }
-
-  close (passwd_fd);
-  return NULL;
+	return NULL;
 }

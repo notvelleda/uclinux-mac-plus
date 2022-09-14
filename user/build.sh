@@ -11,13 +11,14 @@ LDLIBS="-lc -lcrypt_old"
 
 ROOTDIR="$(pwd)/rootdir"
 
-makeIn() {
-    dir=${1}
-    target=${2}
-    before=${3:-echo uwu}
+makeFileIn() {
+    makefile=${1}
+    dir=${2}
+    target=${3}
+    before=${4:-echo uwu}
     wd=$(pwd)
 
-    echo " ==== making ${target} in ${dir}..."
+    echo " ==== making ${target} in ${dir} with ${makefile}..."
     cd "${dir}"
     docker run \
         --user $(id -u):$(id -u) \
@@ -25,8 +26,17 @@ makeIn() {
         --mount type=bind,source="${UCLINUX_DIR}",target="${CONT_UCLINUX_DIR}" \
         --workdir /build \
         -t uclinux-buildenv:0.1 \
-        sh -c "$before ; make CROSS=\"${CROSS}\" CC=\"${CROSS}gcc\" CFLAGS=\"${CFLAGS}\" LDFLAGS=\"${LDFLAGS}\" LDLIBS=\"${LDLIBS}\" ${target}"
+        sh -c "$before ; make -f \"${makefile}\" CROSS=\"${CROSS}\" CC=\"${CROSS}gcc\" LD=\"${CROSS}ld\" CFLAGS=\"${CFLAGS}\" LDFLAGS=\"${LDFLAGS}\" LDLIBS=\"${LDLIBS}\" ${target}"
     cd "${wd}"
+}
+
+makeIn() {
+    makeFileIn Makefile $@
+}
+
+copy() {
+    echo "copying ${1} -> ${2}"
+    cp --remove-destination "${1}" "${2}"
 }
 
 mkdir -p "${ROOTDIR}"
@@ -41,18 +51,74 @@ mkdir -p "${ROOTDIR}/usr"
 mkdir -p "${ROOTDIR}/var"
 mkdir -p "${ROOTDIR}/var/tmp"
 
-makeIn init all
-cp init/init "${ROOTDIR}/sbin/"
+#makeIn ../uClinux/lib/libc all
 
 makeIn busybox applet_source_list
-makeIn busybox busybox
-makeIn busybox busybox.links
-cd busybox
-./install.sh "${ROOTDIR}"
-cd ..
+makeIn busybox libbb.a
+#makeIn busybox busybox
+#makeIn busybox busybox.links
+#cd busybox
+#./install.sh "${ROOTDIR}"
+#cd ..
+
+makebb() {
+    makeFileIn Makefile.standalone busybox $1
+    copy busybox/$1 $2
+}
+
+makebb msh "${ROOTDIR}/bin/"
+ln -sf msh "${ROOTDIR}/bin/sh"
+makebb df "${ROOTDIR}/bin/"
+makebb getopt "${ROOTDIR}/bin/"
+makebb grep "${ROOTDIR}/bin/"
+makebb pidof "${ROOTDIR}/bin/"
+makebb hostname "${ROOTDIR}/bin/"
+makebb sed "${ROOTDIR}/bin/"
+makebb usleep "${ROOTDIR}/bin/"
+makebb ps "${ROOTDIR}/bin/"
+
+makebb halt "${ROOTDIR}/sbin/"
+makebb insmod "${ROOTDIR}/sbin/"
+makebb rmmod "${ROOTDIR}/sbin/"
+makebb modprobe "${ROOTDIR}/sbin/"
+makebb makedevs "${ROOTDIR}/sbin/"
+makebb reboot "${ROOTDIR}/sbin/"
+
+makebb test "${ROOTDIR}/usr/bin/test"
+ln -sf test "${ROOTDIR}/usr/bin/["
+makebb ar "${ROOTDIR}/usr/bin/"
+#makebb basename "${ROOTDIR}/usr/bin/"
+#makebb clear "${ROOTDIR}/usr/bin/"
+#makebb cmp "${ROOTDIR}/usr/bin/"
+makebb cut "${ROOTDIR}/usr/bin/"
+makebb dc "${ROOTDIR}/usr/bin/"
+#makebb dirname "${ROOTDIR}/usr/bin/"
+makebb du "${ROOTDIR}/usr/bin/"
+makebb expr "${ROOTDIR}/usr/bin/"
+makebb find "${ROOTDIR}/usr/bin/"
+makebb free "${ROOTDIR}/usr/bin/"
+makebb head "${ROOTDIR}/usr/bin/"
+makebb id "${ROOTDIR}/usr/bin/"
+makebb kill "${ROOTDIR}/usr/bin/killall"
+makebb md5sum "${ROOTDIR}/usr/bin/"
+makebb printf "${ROOTDIR}/usr/bin/"
+makebb reset "${ROOTDIR}/usr/bin/"
+makebb tail "${ROOTDIR}/usr/bin/"
+makebb tee "${ROOTDIR}/usr/bin/"
+makebb time "${ROOTDIR}/usr/bin/"
+#makebb tr "${ROOTDIR}/usr/bin/"
+makebb uptime "${ROOTDIR}/usr/bin/"
+makebb wc "${ROOTDIR}/usr/bin/"
+#makebb which "${ROOTDIR}/usr/bin/"
+#makebb whoami "${ROOTDIR}/usr/bin/"
+#makebb xargs "${ROOTDIR}/usr/bin/"
+#makebb yes "${ROOTDIR}/usr/bin/"
+
+makeIn init all
+copy init/init "${ROOTDIR}/sbin/"
 
 makeIn levee vi
-cp levee/vi "${ROOTDIR}/bin/"
+copy levee/vi "${ROOTDIR}/bin/"
 
 makeIn tinylogin/pwd_grp all
 makeIn tinylogin applet_source_list
@@ -62,5 +128,38 @@ cd tinylogin
 ./install.sh "${ROOTDIR}"
 cd ..
 
-makeIn ll all
-cp ll/ll "${ROOTDIR}/bin/"
+makeIn sh_utils all
+cd sh_utils
+make install INSTALL=install DESTDIR="${ROOTDIR}"
+cd ..
+
+makeIn file_utils all
+cd file_utils
+make install INSTALL=install DESTDIR="${ROOTDIR}"
+cd ..
+
+makeIn sys_utils all
+cd sys_utils
+make install INSTALL=install DESTDIR="${ROOTDIR}"
+cd ..
+
+makeIn mount all
+copy mount/mount "${ROOTDIR}/bin/"
+copy mount/umount "${ROOTDIR}/bin/"
+
+moveToUsr() {
+    mv "${ROOTDIR}/bin/$1" "${ROOTDIR}/usr/bin/$1"
+}
+
+moveToUsr basename
+moveToUsr clear
+moveToUsr cmp
+moveToUsr dirname
+moveToUsr tr
+moveToUsr which
+moveToUsr whoami
+moveToUsr xargs
+moveToUsr yes
+
+chmod 755 ${ROOTDIR}/bin/*
+chmod 755 ${ROOTDIR}/usr/bin/*

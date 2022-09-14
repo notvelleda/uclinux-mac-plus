@@ -9,6 +9,9 @@
 #define FNDELAY	O_NDELAY
 #endif
 
+#define AT_SYMLINK_NOFOLLOW 0x1
+#define AT_FDCWD 0x2
+
 __BEGIN_DECLS
 
 extern int creat __P ((__const char * __filename, mode_t __mode));

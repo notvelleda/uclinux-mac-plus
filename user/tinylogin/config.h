@@ -9,7 +9,7 @@
 #define TLG_DELGROUP
 #define TLG_LOGIN
 #define TLG_SU
-//#define TLG_SULOGIN
+#define TLG_SULOGIN
 #define TLG_PASSWD
 #define TLG_GETTY
 //#define TLG_VLOCK

@@ -37,7 +37,7 @@ DOSTATIC = false
 # I will get fewer emails asking about how glibc NSS works.  Enabling this adds
 # just 1.5k to the binary size (which is a _lot_ less then glibc NSS costs),
 # Most people will want to leave this set to false.
-USE_SYSTEM_PWD_GRP = false
+USE_SYSTEM_PWD_GRP = true
 USE_SYSTEM_SHADOW = true
 
 # GNU libc needs libcrypt, but libc5 wants it compiled out...
@@ -169,9 +169,9 @@ clean:
 	- rm -f applet_source_list
 	- rm -rf _install
 	- rm -f $(CONFIG_H)-
-ifneq ($(CONFIG_H),Config.h)
-	- rm -f $(CONFIG_H)
-endif
+#ifneq ($(CONFIG_H),Config.h)
+#	- rm -f $(CONFIG_H)
+#endif
 	- $(MAKE) -C pwd_grp clean
 
 distclean: clean

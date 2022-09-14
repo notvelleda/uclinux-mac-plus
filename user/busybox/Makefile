@@ -49,7 +49,7 @@ DODEBUG = false
 # just 1.4k to the binary size (which is a _lot_ less then glibc NSS costs).
 # Note that if you want hostname resolution to work with glibc, you still need
 # the libnss_* libraries.  
-USE_SYSTEM_PWD_GRP = false
+USE_SYSTEM_PWD_GRP = true
 
 # This enables compiling with dmalloc ( http://dmalloc.com/ )
 # which is an excellent public domain mem leak and malloc problem
@@ -475,9 +475,9 @@ clean:
 	- find . -name \*.o -exec rm -f {} \;
 	- rm -f *.gdb *.elf
 	- rm -f $(CONFIG_H)-
-ifneq ($(CONFIG_H),Config.h)
-	- rm -f $(CONFIG_H)
-endif
+#ifneq ($(CONFIG_H),Config.h)
+#	- rm -f $(CONFIG_H)
+#endif
 
 distclean: clean
 	- cd tests && $(MAKE) distclean

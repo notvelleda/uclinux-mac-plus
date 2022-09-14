@@ -596,8 +596,10 @@ int msh_main(int argc, char **argv)
 		PUSHIO(afile, 0, iof);
 		if (isatty(0) && isatty(1) && !cflag) {
 			interactive++;
+#ifndef STANDALONE
 			printf( "\n\n" BB_BANNER " Built-in shell (msh)\n\n");
 			//printf( "Enter 'help' for a list of built-in commands.\n\n");
+#endif
 		}
 	}
 	signal(SIGQUIT, qflag);
@@ -2743,6 +2745,7 @@ char *c, **v, **envp;
 	register char *sp, *tp;
 	int eacces = 0, asis = 0;
 
+#ifndef STANDALONE
 #ifdef BB_FEATURE_SH_STANDALONE_SHELL
 	char *name = c;
 #ifdef BB_FEATURE_SH_APPLETS_ALWAYS_WIN
@@ -2756,6 +2759,7 @@ char *c, **v, **envp;
 		execve("/proc/self/exe", v, envp);
 		execve("busybox", v, envp);
 	}
+#endif
 #endif
 
 	sp = any('/', c)? "": path->value;

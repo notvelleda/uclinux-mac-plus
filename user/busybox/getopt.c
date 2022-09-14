@@ -378,9 +378,11 @@ int getopt_main(int argc, char *argv[])
                 }
 
         if (!optstr) {
-                if (optind >= argc)
+                if (optind >= argc) {
+                        if (name)
+                                free(name);
                         error_msg_and_die("missing optstring argument");
-                else {
+                } else {
                         optstr=xmalloc(strlen(argv[optind])+1);
                         strcpy(optstr,argv[optind]);
                         optind++;

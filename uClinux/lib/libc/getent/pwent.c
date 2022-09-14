@@ -25,11 +25,7 @@
 #include <fcntl.h>
 #include <linux/autoconf.h>
 
-#ifdef CONFIG_UCLINUX
-#define PASSWD_FILE "/etc/config/passwd"
-#else
 #define PASSWD_FILE "/etc/passwd"
-#endif /*CONFIG_UCLINUX*/
 
 /*
  * setpwent(), endpwent(), and getpwent() are included in the same object

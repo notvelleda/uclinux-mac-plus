@@ -548,12 +548,12 @@
 	"\t-a, --alternative		Allow long options starting with single -\n" \
 	"\t-l, --longoptions=longopts	Long options to be recognized\n" \
 	"\t-n, --name=progname		The name under which errors are reported\n" \
-	"\t-o, --options=optstring	Short options to be recognized\n" \
+	"\t-o, --options=optstring		Short options to be recognized\n" \
 	"\t-q, --quiet			Disable error reporting by getopt(3)\n" \
 	"\t-Q, --quiet-output		No normal output\n" \
 	"\t-s, --shell=shell		Set shell quoting conventions\n" \
 	"\t-T, --test			Test for getopt(1) version\n" \
-	"\t-u, --unqote			Do not quote the output"
+	"\t-u, --unquoted			Do not quote the output"
 #define getopt_example_usage \
         "$ cat getopt.test\n" \
         "#!/bin/sh\n" \
@@ -1021,8 +1021,8 @@
 	USAGE_LS_SORTFILES("\t-X\tsort the listing by extension\n") \
 	USAGE_HUMAN_READABLE( \
 	"\t-h\tprint sizes in human readable format (e.g., 1K 243M 2G )\n" \
-	"\t-k\tprint sizes in kilobytes(default)") USAGE_NOT_HUMAN_READABLE( \
-	"\t-k\tprint sizes in kilobytes(compatibility)") 
+	"\t-k\tprint sizes in kilobytes (default)") USAGE_NOT_HUMAN_READABLE( \
+	"\t-k\tprint sizes in kilobytes (compatibility)") 
 
 #define lsmod_trivial_usage \
 	""
@@ -1172,7 +1172,7 @@
 	"\n" \
 	"\t-k\n" \
 	"\t   Set 'autoclean' on loaded	 modules.   Used  by  the\n" \
-	"\t   kernel  when it calls on modprobe to satify a miss­\n" \
+	"\t   kernel  when it calls on modprobe to satify a missï¿½\n" \
 	"\t   ing feature (supplied as a module).  The -q  option\n" \
 	"\t   is implied by -k.	 These options will automatically\n" \
 	"\t   be sent to insmod.\n" \
@@ -1212,7 +1212,7 @@
 	"\t   Use  the	file configfile instead of (the optional)\n" \
 	"\t   /etc/modules.conf	 to  specify  the  configuration.\n" \
 	"\t   The  environment	variable  MODULECONF  can also be\n" \
-	"\t   used to select (and override) a different	 configu­\n" \
+	"\t   used to select (and override) a different	 configuï¿½\n" \
 	"\t   ration  file from the default /etc/modules.conf (or\n" \
 	"\t   /etc/conf.modules (depreciated)).\n"
 #define modprobe_example_usage \
@@ -1704,8 +1704,8 @@
 #define time_trivial_usage \
 	"[OPTION]... COMMAND [ARGS...]"
 #define time_full_usage \
-	"Runs the program COMMAND with arguments ARGS.  When COMMAND finishes,\n"
-	"COMMAND's resource usage information is displayed\n\n"
+	"Runs the program COMMAND with arguments ARGS.  When COMMAND finishes,\n" \
+	"COMMAND's resource usage information is displayed\n\n" \
 	"Options:\n" \
 	"\t-v\tDisplays verbose resource usage information."
 
@@ -1973,3 +1973,6 @@
 	"FILE"
 #define zcat_full_usage \
 	"Uncompress to stdout."
+
+#define msh_trivial_usage ""
+#define msh_full_usage ""

@@ -183,3 +183,16 @@ Cambridge, MA 02139, USA.  */
 #ifdef	__USE_POSIX2
 #include <posix2_lim.h>
 #endif
+
+/* Minimum and maximum values an ssize_t can hold */
+#ifndef SSIZE_MIN
+#define SSIZE_MIN INT_MIN
+#endif
+#ifndef SSIZE_MAX
+#define SSIZE_MAX INT_MAX
+#endif
+
+/* Maximum value a size_t can hold */
+#ifndef SIZE_MAX
+#define SIZE_MAX INT_MAX
+#endif

@@ -1,2 +1,8 @@
+echo "mounting /proc..."
 mount -t proc proc /proc
+echo "clearing /var/tmp/..."
 rm -rf /var/tmp/*
+echo "setting hostname..."
+hostname -F /etc/hostname
+echo "done"
+
