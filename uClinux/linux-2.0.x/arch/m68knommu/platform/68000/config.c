@@ -58,10 +58,20 @@ void ft245_console_initialize(void);
 
 #ifdef CONFIG_MAC_PLUS
 #include "MacPlus/mac_hw.h"
+#include <asm/traps.h>
+
+#define MAC_INT_NUM_VIA     VEC_INT1
+#define MAC_INT_NUM_SCC     VEC_INT2
+#define MAC_INT_NUM_VIA_SCC VEC_INT3
+
 void (*bsp_timer_routine)(int, void *, struct pt_regs *);
+
 extern void mac_keyb_init(void);
 extern void mac_keyb_int_handler(void);
+
 extern void fbcon_vbl_handler(int irq, struct pt_regs *fp, void *dummy);
+
+extern void mac_sound_vblank(void);
 #endif
 
 void config_M68000_irq(void);
@@ -135,7 +145,7 @@ static u_char read_addr(volatile u_char *addr) {
 
 // VIA interrupt
 static void via_interrupt(int irq, void *dev_id, struct pt_regs *regs) {
-    u_char flag = MAC_VIA_IFR;
+    register u_char flag = MAC_VIA_IFR;
     MAC_VIA_IFR = 0xff; // clear interrupt flags
 
     // call interrupt handler based on interrupt flags
@@ -143,6 +153,13 @@ static void via_interrupt(int irq, void *dev_id, struct pt_regs *regs) {
     if (flag & MAC_VIA_INT_KBRDY) {
         // keyboard ready interrupt, placed before everything else since keyboard timings are fucky and we want it prioritized
         mac_keyb_int_ready();
+    }
+
+    if (flag & MAC_VIA_INT_VBLANK) {
+        // vblank interrupt
+        mac_sound_vblank();
+        fbcon_vbl_handler(irq, regs, dev_id);
+        mac_keyb_send_queue();
     }
 
     /*if (flag & MAC_VIA_INT_KBCLK) {
@@ -160,12 +177,6 @@ static void via_interrupt(int irq, void *dev_id, struct pt_regs *regs) {
     if (flag & MAC_VIA_INT_TIMER1) {
         // call timer routine
         bsp_timer_routine(irq, dev_id, regs);
-    }
-
-    if (flag & MAC_VIA_INT_VBLANK) {
-        // vblank interrupt
-        fbcon_vbl_handler(irq, regs, dev_id);
-        mac_keyb_send_queue();
     }
 
     /*if (flag & MAC_VIA_INT_TIMER2) {

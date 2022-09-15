@@ -26,12 +26,6 @@
 #ifndef __MAC_HW_H
 #define __MAC_HW_H
 
-#include <asm/traps.h>
-
-#define MAC_INT_NUM_VIA     VEC_INT1
-#define MAC_INT_NUM_SCC     VEC_INT2
-#define MAC_INT_NUM_VIA_SCC VEC_INT3
-
 // VIA base address
 #define MAC_VIA_BASE        0xefe1fe
 

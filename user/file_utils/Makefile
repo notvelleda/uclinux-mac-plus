@@ -12,9 +12,9 @@
 
 # note: grep doesn't read stdin, replaced with minix1/grep
 # removed: l
-# uclinux: removed df, grep
+# uclinux: disabled df, grep, cat
 PRGS = ln ls mkdir mkfifo mknod more mv rm rmdir sync touch \
-	cat chgrp chmod chown cmp cp dd split
+	chgrp chmod chown cmp cp dd split
 
 all: $(PRGS)
 

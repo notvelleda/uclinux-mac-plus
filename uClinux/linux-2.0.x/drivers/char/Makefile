@@ -32,7 +32,7 @@ endif
 LX_OBJS += random.o
 
 ifeq ($(CONFIG_MAC_PLUS),y)
-L_OBJS += keyb_m68k.o keyb_mac.o
+L_OBJS += keyb_m68k.o keyb_mac.o mac_sound.o
 endif
 
 ifeq ($(CONFIG_SERIAL),y)

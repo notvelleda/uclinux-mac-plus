@@ -33,6 +33,10 @@
 #include <linux/ledman.h>
 #endif
 
+#ifdef CONFIG_MAC_PLUS
+#include "mac_sound.h"
+#endif
+
 #if defined(CONFIG_LIRC_SERIAL) || defined(CONFIG_LIRC_INTR)
 extern void lirc_init(void);
 #endif
@@ -474,6 +478,9 @@ int chr_dev_init(void)
 #endif
 #ifdef CONFIG_DS1743
 	ds1743_init();
+#endif
+#ifdef CONFIG_MAC_PLUS
+	mac_sound_init();
 #endif
 	return 0;
 }

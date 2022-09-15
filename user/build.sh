@@ -66,6 +66,7 @@ makebb() {
     copy busybox/$1 $2
 }
 
+makebb cat "${ROOTDIR}/bin/"
 makebb msh "${ROOTDIR}/bin/"
 ln -sf msh "${ROOTDIR}/bin/sh"
 makebb df "${ROOTDIR}/bin/"
@@ -163,3 +164,6 @@ moveToUsr yes
 
 chmod 755 ${ROOTDIR}/bin/*
 chmod 755 ${ROOTDIR}/usr/bin/*
+
+makeIn mplay all
+copy mplay/mplay "${ROOTDIR}/bin/"

@@ -295,7 +295,7 @@ static struct mac_keyb {
 static inline void mac_keyb_send_cmd(struct mac_keyb *keyb, register u_char cmd) {
     //printk("send %02x\n", cmd);
     //for (i = 0; i < 16; i ++);
-    cli();
+    //cli();
     keyb->last_command = cmd;
     keyb->cmd_state = 0;
     MAC_VIA_SR = 0x0;
@@ -304,7 +304,7 @@ static inline void mac_keyb_send_cmd(struct mac_keyb *keyb, register u_char cmd)
     nop();
     MAC_VIA_ACR |= 0x1c;
     MAC_VIA_SR = cmd;
-    sti();
+    //sti();
 }
 
 static inline void queue_send(struct mac_keyb *keyb, register u_char cmd) {
@@ -347,6 +347,7 @@ void mac_keyb_send_queue(void) {
 
 extern void process_keycode(int);
 
+// TODO: put this in bottom half?
 static inline void data_int_partial(void) {
     //printk("got keyboard data %02x\n", the_keyb.last_response);
     if (the_keyb.last_command == MAC_KEYB_INQ || the_keyb.last_command == MAC_KEYB_INST) { // got key transition or null
@@ -411,7 +412,7 @@ static inline void data_int_partial(void) {
 void mac_keyb_int_ready(void) {
     u_char i;
 
-    cli();
+    //cli();
 
     if (the_keyb.cmd_state == 0) {
         //for (i = 0; i < 64; i ++);
@@ -430,7 +431,7 @@ void mac_keyb_int_ready(void) {
 
         the_keyb.cmd_state = 1;
 
-        sti();
+        //sti();
         //printk("cmd state now 1\n");
     } else if (the_keyb.cmd_state == 1) {
         for (i = 0; i < 8; i ++);
@@ -440,7 +441,7 @@ void mac_keyb_int_ready(void) {
         the_keyb.cmd_state = 2;
         the_keyb.retries = 0;
 
-        sti();
+        //sti();
 
         //printk("got %02x\n", the_keyb.last_response);
 

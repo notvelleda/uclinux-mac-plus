@@ -29,6 +29,7 @@ asmlinkage void do_bottom_half(void);
 enum {
 	TIMER_BH = 0,
 	CONSOLE_BH,
+	SOUND_BH,
 	TQUEUE_BH,
 	DIGI_BH,
 	SERIAL_BH,
