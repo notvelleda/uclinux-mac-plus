@@ -99,6 +99,8 @@ sudo mknod $MOUNTDIR/dev/tty0 c 4 0
 sudo mknod $MOUNTDIR/dev/tty c 5 0
 sudo mknod $MOUNTDIR/dev/console c 5 1
 
+sudo mknod $MOUNTDIR/dev/sound c 14 0
+
 sudo mknod $MOUNTDIR/dev/fb0 c 29 0
 sudo mknod $MOUNTDIR/dev/fb0autodetect c 29 1
 sudo mknod $MOUNTDIR/dev/fb0user0 c 29 24
