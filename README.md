@@ -22,10 +22,14 @@ if you don't have any scsi storage that you can put the root fs on (you can't do
 
 when running the bootloader, if your root filesystem is on a scsi device, you'll put `root=/dev/sdX` in the kernel command line textbox when running the bootloader (where `sdX` can be replaced with `sda`, `sdb`, `sdc`, etc. depending on the scsi device number of the root fs. partitions are the same as normal). it saves the command line, so if it works you won't have to remember what to type in every time
 
-## what works (from what i remember)
+## what works
 - framebuffer
 - keyboard
 - scsi controller
+- sound
 
 ## what doesn't
-basically everything else
+- mouse
+- floppy drives
+- serial
+- a bunch more things, probably
