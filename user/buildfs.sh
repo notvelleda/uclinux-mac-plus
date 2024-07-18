@@ -25,6 +25,9 @@ quit() {
     exit
 }
 
+echo "Building bootloader installer..."
+make -C $BOOTLOADER_DIR installer || quit true
+
 echo "Setting up, mounting..."
 mkdir -p "$MOUNTDIR"
 
