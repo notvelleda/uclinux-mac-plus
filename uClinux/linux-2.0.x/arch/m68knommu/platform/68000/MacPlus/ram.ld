@@ -2,15 +2,15 @@ MEMORY {
     /* interrupt vectors in RAM */
     ramvec  : ORIGIN = 0x00000000, LENGTH = 0x400
 
-    /* user RAM memory (assumes 4 mb, starts at 0x1000 to make room for mac system variables) */
-    ram     : ORIGIN = 0x00001000, LENGTH = 0x003f2000 - 0x1000
+    /* user accessible RAM (maximum of 4 MB, starts at 0x2000 to make room for Mac system variables) */
+    ram     : ORIGIN = 0x00002000, LENGTH = 0x00400000 - 0x2000
 
     /* end of RAM (used to set %sp) */
     eram    : ORIGIN = 0x003f2000, LENGTH = 1
 }
 
 SECTIONS {
-    .ramvec : {
+    .ramvec (NOLOAD) : {
         _ramvec = .;
         *(.ramvec)
     } > ramvec
@@ -43,7 +43,6 @@ SECTIONS {
     } > ram
 
     .eram : {
-        _boot_stack = . - 4;
         _ramend = .;
     } > eram
 }

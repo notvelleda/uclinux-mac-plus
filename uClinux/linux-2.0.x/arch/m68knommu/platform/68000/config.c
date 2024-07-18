@@ -105,21 +105,7 @@ static void timer1_interrupt(int irq, void *dummy, struct pt_regs * regs)
 #endif
 
 #ifdef CONFIG_MAC_PLUS
-
-struct BootInfo { // populated by bootloader, tells us where everything is
-    char *arguments;
-    char *kernelPtr;
-    unsigned long kernelSize;
-    char *initrdPtr;
-    unsigned long initrdSize;
-    unsigned char hasInitrd;
-};
-
-struct BootInfo *info = (struct BootInfo *) 0x380000;
-
-extern unsigned long initrd_start, initrd_end;
-extern int mount_initrd;
-
+extern char *command_line_from_bootloader;
 extern int (*mach_keyb_init) (void);
 
 #define VIA_TIME(ms) ((ms) * 392)
@@ -279,7 +265,7 @@ BSP_sched_init(void (*timer_routine)(int, void *, struct pt_regs *))
     request_irq(MAC_INT_NUM_VIA_SCC - VEC_SPUR,
                 via_scc_interrupt, IRQ_FLG_LOCK, "via-and-scc", NULL);
 
-    printk("Mac Plus support by velleda\n");
+    printk("Mac Plus support (C) 2022, 2024 velleda\n");
 #endif
 }
 
@@ -341,17 +327,9 @@ void config_BSP(char *command, int len)
     int i;
     u_char flags;
 
-    // tell kernel where the initrd is, if one exists
-    if (mount_initrd = info->hasInitrd) {
-        initrd_start = (unsigned long) info->initrdPtr;
-        initrd_end = (unsigned long) info->initrdPtr + info->initrdSize;
-    } else {
-        initrd_start = initrd_end = 0;
-    }
-
     // copy command line arguments
     for (i = 0; i < len - 1; i ++)
-        if (!(command[i] = info->arguments[i]))
+        if (!(command[i] = command_line_from_bootloader[i]))
             break;
     command[len - 1] = 0;
 

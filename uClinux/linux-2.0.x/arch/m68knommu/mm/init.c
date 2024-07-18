@@ -145,8 +145,8 @@ void mem_init(unsigned long start_mem, unsigned long end_mem)
 	extern unsigned int _ramend, _rambase;
 	unsigned long len = _ramend - _rambase;
 #elif defined(CONFIG_MAC_PLUS)
-	extern char _etext, _stext, _sdata, _ebss, _ramend, _rambase;
-	unsigned long len = (unsigned long) &_ramend - (unsigned long) &_rambase;
+	extern char _etext, _stext, _sdata, _ebss, _rambase;
+	unsigned long len = end_mem;
 #else
 	extern char _etext, _romvec, __data_start;
 	unsigned long len = end_mem-(unsigned long)&__data_start;

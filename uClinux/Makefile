@@ -65,7 +65,7 @@ MAKEARCH = $(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE)
 MAKEARCH_KERNEL = $(MAKEARCH)
 endif
 
-DIRS    = $(VENDOR_TOPDIRS) lib user
+DIRS    = $(VENDOR_TOPDIRS) lib
 VENDDIR = $(ROOTDIR)/vendors/$(CONFIG_VENDOR)/$(CONFIG_PRODUCT)/.
 
 export VENDOR PRODUCT ROOTDIR LINUXDIR HOSTCC CONFIG_SHELL
@@ -259,7 +259,7 @@ linux linux%_only:
 	fi
 
 .PHONY: subdirs
-subdirs: linux
+subdirs: #linux
 	for dir in $(DIRS) ; do [ ! -d $$dir ] || $(MAKEARCH_KERNEL) -C $$dir || exit 1 ; done
 
 dep:

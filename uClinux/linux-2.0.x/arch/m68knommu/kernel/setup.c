@@ -265,7 +265,15 @@ void setup_arch(char **cmdline_p,
  #else
 	memory_start = &_end;
  #endif
+
+ #ifdef CONFIG_MAC_PLUS
+	memory_end =
+		*((unsigned long *) 0x0108) /* get value from MemTop */
+		- 0xe000 /* to make room for video memory and stuff */
+		- 4096; /* stack area */
+ #else
 	memory_end = &_ramend - 4096; /* <- stack area */
+ #endif
 #endif /* CONFIG_COLDFIRE */
 
 #ifdef CONFIG_MWI
