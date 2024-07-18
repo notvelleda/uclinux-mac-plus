@@ -157,7 +157,7 @@
 //#define BB_FEATURE_SH_IS_ASH
 //#define BB_FEATURE_SH_IS_HUSH
 //#define BB_FEATURE_SH_IS_LASH
-//#define BB_FEATURE_SH_IS_MSH
+#define BB_FEATURE_SH_IS_MSH
 //
 // BusyBox will, by default, malloc space for its buffers.  This costs code
 // size for the call to xmalloc.  You can use the following feature to have
@@ -365,7 +365,7 @@
 //#define BB_FEATURE_CLEAN_UP
 //
 // Support for human readable output by ls, du, etc.(example 13k, 23M, 235G)
-#define BB_FEATURE_HUMAN_READABLE
+//#define BB_FEATURE_HUMAN_READABLE
 //
 // Support for the find -type option.
 //#define BB_FEATURE_FIND_TYPE

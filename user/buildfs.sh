@@ -3,9 +3,13 @@
 FILE=root.img
 MOUNTDIR=__mountdir
 DEVICE=/dev/loop0
+PARTITION=${DEVICE}p1
 FSDIR=rootdir
 OVERLAYDIR=rootdir-overlay
 SIZE=64M
+KERNEL_PATH=../uClinux/images/kernel
+CMDLINE_FILE=cmdline
+BOOTLOADER_DIR=../bootloader
 
 unmount() {
     sudo umount "$MOUNTDIR"
@@ -14,7 +18,7 @@ unmount() {
 }
 
 quit() {
-    if [[ "$1" == "true" ]]; then
+    if [ "$1" = "true" ]; then
         echo "Quitting on error..."
     fi
     unmount
@@ -24,20 +28,24 @@ quit() {
 echo "Setting up, mounting..."
 mkdir -p "$MOUNTDIR"
 
-if [[ "$1" == "clean" ]]; then
+if [ "$1" = "clean" ]; then
     rm "$FILE"
 fi
 
 if [ ! -f "$FILE" ]; then
     echo "File doesn't exist, creating it..."
     truncate -s "$SIZE" "$FILE" || quit true
-    sudo losetup "$DEVICE" "$FILE" || quit true
-    sudo mkfs.ext2 -O none -I 128 "$DEVICE" || quit true
+
+    echo "Installing bootloader..."
+    $BOOTLOADER_DIR/installer -b "$BOOTLOADER_DIR/boot_block.bin" -d "$BOOTLOADER_DIR/scsi_hdd_driver.bin" -s "$FILE"
+
+    sudo losetup -P "$DEVICE" "$FILE" || quit true
+    sudo mkfs.ext2 -O none -I 128 "$PARTITION" || quit true
 else
-    sudo losetup "$DEVICE" "$FILE" || quit true
+    sudo losetup -P "$DEVICE" "$FILE" || quit true
 fi
 
-sudo mount "$DEVICE" "$MOUNTDIR" || quit true
+sudo mount "$PARTITION" "$MOUNTDIR" || quit true
 
 echo "Copying files..."
 
@@ -128,6 +136,24 @@ makescsi d 48
 makescsi e 64
 makescsi f 80
 makescsi g 96
+
+echo "Copying files for bootloader..."
+
+if [ ! -f "$KERNEL_PATH" ]; then
+    echo "warning: kernel hasn't been built yet, resulting image will not be bootable"
+else
+    sudo cp "$KERNEL_PATH" "$MOUNTDIR/" || quit true
+fi
+
+if [ ! -f "$CMDLINE_FILE" ]; then
+    cp "${CMDLINE_FILE}.default" "$CMDLINE_FILE"
+fi
+
+sudo cp "$CMDLINE_FILE" "$MOUNTDIR/" || quit true
+
+echo "Installing bootloader again..."
+sudo umount "$MOUNTDIR"
+$BOOTLOADER_DIR/installer -b "$BOOTLOADER_DIR/boot_block.bin" -d "$BOOTLOADER_DIR/scsi_hdd_driver.bin" -s "$FILE"
 
 echo "Unmounting..."
 unmount

@@ -2,6 +2,7 @@
 
 set -e
 
+CWD="$(pwd)"
 UCLINUX_DIR="$(pwd)/../uClinux"
 CONT_UCLINUX_DIR="/linux"
 CROSS="m68k-elf-"
@@ -15,7 +16,7 @@ makeFileIn() {
     makefile=${1}
     dir=${2}
     target=${3}
-    before=${4:-echo uwu}
+    before=${4:-true}
     wd=$(pwd)
 
     echo " ==== making ${target} in ${dir} with ${makefile}..."
@@ -48,8 +49,19 @@ mkdir -p "${ROOTDIR}/proc"
 mkdir -p "${ROOTDIR}/root"
 mkdir -p "${ROOTDIR}/sbin"
 mkdir -p "${ROOTDIR}/usr"
+mkdir -p "${ROOTDIR}/usr/bin"
 mkdir -p "${ROOTDIR}/var"
 mkdir -p "${ROOTDIR}/var/tmp"
+
+echo " ==== building libraries..."
+cd "${UCLINUX_DIR}"
+docker run \
+    --user $(id -u):$(id -u) \
+    --mount type=bind,source="${UCLINUX_DIR}",target=/build \
+    --workdir /build \
+    -t uclinux-buildenv:0.1 \
+     sh -c "make dep && make subdirs"
+cd "${CWD}"
 
 #makeIn ../uClinux/lib/libc all
 
@@ -167,3 +179,5 @@ chmod 755 ${ROOTDIR}/usr/bin/*
 
 makeIn mplay all
 copy mplay/mplay "${ROOTDIR}/bin/"
+
+makeIn ../bootloader boot_block.bin
