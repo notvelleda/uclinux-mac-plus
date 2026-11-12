@@ -12,7 +12,7 @@ _start:
     /* interrupts should already be disabled and bss should be cleared by the bootloader */
 
     movew #0x2700, %sr
-    movel 4(%sp), command_line_from_bootloader
+    movel 12(%sp), command_line_from_bootloader
 
     /* Move the stack below the video and sound buffers as it is not yet set at the end of RAM */
     movel (MemTop), %d0
