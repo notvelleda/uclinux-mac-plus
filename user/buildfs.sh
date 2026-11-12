@@ -1,164 +1,133 @@
 #!/bin/sh
+set -e
+cd "$(dirname "$0")"
 
 FILE=root.img
-MOUNTDIR=__mountdir
-DEVICE=/dev/loop0
-PARTITION=${DEVICE}p1
+SIZE_MB=${SIZE_MB:-32}
 FSDIR=rootdir
 OVERLAYDIR=rootdir-overlay
-SIZE=64M
 KERNEL_PATH=../uClinux/images/kernel
 CMDLINE_FILE=cmdline
 BOOTLOADER_DIR=../bootloader
+STAGE=__stage
 
-unmount() {
-    sudo umount "$MOUNTDIR"
-    sudo losetup -d "$DEVICE"
-    rm -r "$MOUNTDIR"
+install_bootloader() {
+    "$BOOTLOADER_DIR/installer" -b "$BOOTLOADER_DIR/boot_block.bin" -d "$BOOTLOADER_DIR/scsi_hdd_driver.bin" -s "$FILE"
 }
 
-quit() {
-    if [ "$1" = "true" ]; then
-        echo "Quitting on error..."
-    fi
-    unmount
-    exit
+for tool in mke2fs debugfs fakeroot od; do
+    command -v "$tool" >/dev/null 2>&1 ||
+    {
+      echo "error: '$tool'";
+      exit 1;
+    }
+done
+
+# Initial verification
+[ -f "$BOOTLOADER_DIR/boot_block.bin" ] ||
+{
+  echo "error: bootloader/boot_block.bin missing, run ./build.sh first";
+  exit 1;
+}
+[ -d "$FSDIR/bin" ] ||
+{
+  echo "error: $FSDIR is empty, run ./build.sh first";
+  exit 1;
 }
 
 echo "Building bootloader installer..."
-make -C $BOOTLOADER_DIR installer || quit true
+make -C "$BOOTLOADER_DIR" installer
 
-echo "Setting up, mounting..."
-mkdir -p "$MOUNTDIR"
+echo "Creating empty ${SIZE_MB} MB image and writing partition map + bootloader..."
+rm -f "$FILE"
+truncate -s "${SIZE_MB}M" "$FILE"
+install_bootloader
 
-if [ "$1" = "clean" ]; then
-    rm "$FILE"
-fi
+# partition map entry lives in block 1 (offset 512), big endian:
+#   +8  = first block of partition, +12 = number of blocks in partition
+PART_START=$(od -An -tu4 --endian=big -j 520 -N4 "$FILE" | tr -d ' ')
+PART_BLOCKS=$(od -An -tu4 --endian=big -j 524 -N4 "$FILE" | tr -d ' ')
+OFFSET=$((PART_START * 512))
+FS_KB=$((PART_BLOCKS * 512 / 1024))
+echo "Partition starts at block $PART_START (byte offset $OFFSET), size ${FS_KB} KB"
 
-if [ ! -f "$FILE" ]; then
-    echo "File doesn't exist, creating it..."
-    truncate -s "$SIZE" "$FILE" || quit true
+echo "Preparing staging directory..."
+rm -rf "$STAGE"
+mkdir -p "$STAGE"
+cp -a "$FSDIR"/. "$STAGE"/
+cp -a "$OVERLAYDIR"/. "$STAGE"/
+mkdir -p "$STAGE/dev" "$STAGE/var/tmp"
+ln -sfn /var/tmp "$STAGE/tmp"
 
-    echo "Installing bootloader..."
-    $BOOTLOADER_DIR/installer -b "$BOOTLOADER_DIR/boot_block.bin" -d "$BOOTLOADER_DIR/scsi_hdd_driver.bin" -s "$FILE"
-
-    sudo losetup -P "$DEVICE" "$FILE" || quit true
-    sudo mkfs.ext2 -O none -I 128 "$PARTITION" || quit true
+if [ -f "$KERNEL_PATH" ]; then
+    cp "$KERNEL_PATH" "$STAGE/kernel"
 else
-    sudo losetup -P "$DEVICE" "$FILE" || quit true
+    echo "warning: kernel hasn't been built yet (uClinux/build.sh), resulting image will not be bootable"
 fi
 
-sudo mount "$PARTITION" "$MOUNTDIR" || quit true
+[ -f "$CMDLINE_FILE" ] || cp "${CMDLINE_FILE}.default" "$CMDLINE_FILE"
+cp "$CMDLINE_FILE" "$STAGE/cmdline"
 
-echo "Copying files..."
-
-sudo rm -r $MOUNTDIR/*
-
-sudo cp -rv $FSDIR/* "$MOUNTDIR" || quit true
-sudo cp -rv $OVERLAYDIR/* "$MOUNTDIR" || quit true
-
-sudo ln -s /var/tmp "$MOUNTDIR/tmp"
+echo "Building ext2 filesystem inside the image..."
+# fakeroot makes everything look like it belongs to root (uid 0) without being root
+fakeroot sh -c "chown -R 0:0 '$STAGE' && mke2fs -q -F -t ext2 -O none -I 128 -b 1024 -E offset=$OFFSET,root_owner=0:0 -d '$STAGE' '$FILE' ${FS_KB}"
 
 echo "Creating device nodes..."
-
-sudo mknod $MOUNTDIR/dev/mem c 1 1
-sudo mknod $MOUNTDIR/dev/kmem c 1 2
-sudo mknod $MOUNTDIR/dev/null c 1 3
-sudo mknod $MOUNTDIR/dev/port c 1 4
-sudo mknod $MOUNTDIR/dev/zero c 1 5
-#sudo mknod $MOUNTDIR/dev/core c 1 6
-sudo mknod $MOUNTDIR/dev/full c 1 7
-sudo mknod $MOUNTDIR/dev/random c 1 8
-sudo mknod $MOUNTDIR/dev/urandom c 1 9
-
-sudo mknod $MOUNTDIR/dev/ptyp0 c 2 0
-sudo mknod $MOUNTDIR/dev/ptyp1 c 2 1
-sudo mknod $MOUNTDIR/dev/ptyp2 c 2 2
-sudo mknod $MOUNTDIR/dev/ptyp3 c 2 3
-sudo mknod $MOUNTDIR/dev/ptyp4 c 2 4
-sudo mknod $MOUNTDIR/dev/ptyp5 c 2 5
-sudo mknod $MOUNTDIR/dev/ptyp6 c 2 6
-sudo mknod $MOUNTDIR/dev/ptyp7 c 2 7
-sudo mknod $MOUNTDIR/dev/ptyp8 c 2 8
-sudo mknod $MOUNTDIR/dev/ptyp9 c 2 9
-sudo mknod $MOUNTDIR/dev/ptypa c 2 10
-sudo mknod $MOUNTDIR/dev/ptypb c 2 11
-sudo mknod $MOUNTDIR/dev/ptypc c 2 12
-sudo mknod $MOUNTDIR/dev/ptypd c 2 13
-sudo mknod $MOUNTDIR/dev/ptype c 2 14
-sudo mknod $MOUNTDIR/dev/ptypf c 2 15
-
-sudo mknod $MOUNTDIR/dev/ttyp0 c 3 0
-sudo mknod $MOUNTDIR/dev/ttyp1 c 3 1
-sudo mknod $MOUNTDIR/dev/ttyp2 c 3 2
-sudo mknod $MOUNTDIR/dev/ttyp3 c 3 3
-sudo mknod $MOUNTDIR/dev/ttyp4 c 3 4
-sudo mknod $MOUNTDIR/dev/ttyp5 c 3 5
-sudo mknod $MOUNTDIR/dev/ttyp6 c 3 6
-sudo mknod $MOUNTDIR/dev/ttyp7 c 3 7
-sudo mknod $MOUNTDIR/dev/ttyp8 c 3 8
-sudo mknod $MOUNTDIR/dev/ttyp9 c 3 9
-sudo mknod $MOUNTDIR/dev/ttypa c 3 10
-sudo mknod $MOUNTDIR/dev/ttypb c 3 11
-sudo mknod $MOUNTDIR/dev/ttypc c 3 12
-sudo mknod $MOUNTDIR/dev/ttypd c 3 13
-sudo mknod $MOUNTDIR/dev/ttype c 3 14
-sudo mknod $MOUNTDIR/dev/ttypf c 3 15
-
-sudo mknod $MOUNTDIR/dev/tty0 c 4 0
-
-sudo mknod $MOUNTDIR/dev/tty c 5 0
-sudo mknod $MOUNTDIR/dev/console c 5 1
-
-sudo mknod $MOUNTDIR/dev/sound c 14 0
-
-sudo mknod $MOUNTDIR/dev/fb0 c 29 0
-sudo mknod $MOUNTDIR/dev/fb0autodetect c 29 1
-sudo mknod $MOUNTDIR/dev/fb0user0 c 29 24
-sudo mknod $MOUNTDIR/dev/fb0user1 c 29 25
-sudo mknod $MOUNTDIR/dev/fb0user2 c 29 26
-sudo mknod $MOUNTDIR/dev/fb0user3 c 29 27
-sudo mknod $MOUNTDIR/dev/fb0user4 c 29 28
-sudo mknod $MOUNTDIR/dev/fb0user5 c 29 29
-sudo mknod $MOUNTDIR/dev/fb0user6 c 29 30
-sudo mknod $MOUNTDIR/dev/fb0user7 c 29 31
-
-makescsi() {
-    id=$2
-    sudo mknod $MOUNTDIR/dev/sd${1} b 8 $id
-    for i in $(seq 15); do
-        id=$(expr $id + 1)
-        sudo mknod $MOUNTDIR/dev/sd$1$i b 8 $id
+CMDS=$(mktemp)
+{
+    # debugfs's mknod doesn't understand paths, so go into /dev first
+    echo "cd /dev"
+    echo "mknod mem c 1 1"
+    echo "mknod kmem c 1 2"
+    echo "mknod null c 1 3"
+    echo "mknod port c 1 4"
+    echo "mknod zero c 1 5"
+    echo "mknod full c 1 7"
+    echo "mknod random c 1 8"
+    echo "mknod urandom c 1 9"
+    for i in 0 1 2 3 4 5 6 7 8 9 a b c d e f; do
+        n=$(printf '%d' "0x$i")
+        echo "mknod ptyp$i c 2 $n"
+        echo "mknod ttyp$i c 3 $n"
     done
-}
+    echo "mknod tty0 c 4 0"
+    echo "mknod tty c 5 0"
+    echo "mknod console c 5 1"
+    echo "mknod ttyS0 c 4 64"
+    echo "mknod ttyS1 c 4 65"
+    echo "mknod cua0 c 5 64"
+    echo "mknod cua1 c 5 65"
+    echo "mknod sound c 14 0"
+    echo "mknod fd0 b 2 0"
+    echo "mknod fd1 b 2 1"
+    echo "mknod fb0 c 29 0"
+    echo "mknod fb0autodetect c 29 1"
+    for i in 0 1 2 3 4 5 6 7; do
+        echo "mknod fb0user$i c 29 $((24 + i))"
+    done
+    # SCSI disks: sda..sdg, 16 minors each
+    base=0
+    for d in a b c d e f g; do
+        echo "mknod sd$d b 8 $base"
+        for i in $(seq 15); do
+            echo "mknod sd$d$i b 8 $((base + i))"
+        done
+        base=$((base + 16))
+    done
+} > "$CMDS"
 
-makescsi a 0
-makescsi b 16
-makescsi c 32
-makescsi d 48
-makescsi e 64
-makescsi f 80
-makescsi g 96
+# debugfs creates nodes with mode 0000: give each one normal permissions (rw-rw-rw- / rw-rw----)
+awk '/^mknod/ { print; print "sif " $2 " mode " (($3 == "c") ? "020666" : "060660"); next } { print }' "$CMDS" > "$CMDS.2"
+mv "$CMDS.2" "$CMDS"
+debugfs -w -f "$CMDS" "${FILE}?offset=${OFFSET}" > /dev/null
+rm -f "$CMDS"
 
-echo "Copying files for bootloader..."
+echo "Installing bootloader again (to be sure the boot block is intact)..."
+install_bootloader
 
-if [ ! -f "$KERNEL_PATH" ]; then
-    echo "warning: kernel hasn't been built yet, resulting image will not be bootable"
-else
-    sudo cp "$KERNEL_PATH" "$MOUNTDIR/" || quit true
-fi
+rm -rf "$STAGE"
 
-if [ ! -f "$CMDLINE_FILE" ]; then
-    cp "${CMDLINE_FILE}.default" "$CMDLINE_FILE"
-fi
+echo "Checking filesystem..."
+e2fsck -fn "${FILE}?offset=${OFFSET}" || true
 
-sudo cp "$CMDLINE_FILE" "$MOUNTDIR/" || quit true
-
-echo "Installing bootloader again..."
-sudo umount "$MOUNTDIR"
-$BOOTLOADER_DIR/installer -b "$BOOTLOADER_DIR/boot_block.bin" -d "$BOOTLOADER_DIR/scsi_hdd_driver.bin" -s "$FILE"
-
-echo "Unmounting..."
-unmount
-
-echo "Done"
+echo "Done: $(pwd)/$FILE ($(du -h "$FILE" | cut -f1) on disk, ${SIZE_MB} MB apparent)"

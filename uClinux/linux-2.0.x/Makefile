@@ -3,7 +3,7 @@ PATCHLEVEL = 0
 SUBLEVEL = 39
 UCRELEASE = uc2
 
-#ARCH = m68knommu
+ARCH = m68knommu
 #ARCH = armnommu
 #ARCH = h8300
 #ARCH = sparcnommu
