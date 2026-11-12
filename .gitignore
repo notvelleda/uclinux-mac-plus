@@ -2,3 +2,8 @@
 *.gdb
 uClinux/images
 uClinux/romfs
+
+**/.depend
+/uClinux/linux-2.0.x/.version
+/uClinux/linux-2.0.x/.hdepend
+/user/cmdline

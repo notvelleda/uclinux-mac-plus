@@ -2,6 +2,8 @@
 
 set -e
 
+cd "$(dirname "$0")"
+
 CWD="$(pwd)"
 UCLINUX_DIR="$(pwd)/../uClinux"
 CONT_UCLINUX_DIR="/linux"
